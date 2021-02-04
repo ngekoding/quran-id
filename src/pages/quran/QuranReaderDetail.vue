@@ -4,7 +4,7 @@
       v-if="$store.state.quran.loading.fetchSurah"
     />
     <template v-else>
-      <q-item class="q-py-md q-px-sm">
+      <q-item class="q-py-sm q-px-sm">
         <q-item-section side>
           <q-btn icon="arrow_back" round flat @click="$router.go(-1)" />
         </q-item-section>
@@ -16,11 +16,11 @@
       <div class="content bg-white">
         <!-- Basmallah -->
         <div
-          class="text-arabic text-center q-pt-md"
+          class="text-arabic text-center q-py-md"
           style="font-size: 16pt"
           v-if="surah.bismillah_pre"
         >
-          {{ basmallah }}
+          {{ basmallahArabic }}
         </div>
         <q-list>
           <div v-for="(ayah, index) in surah.ayahs" :key="ayah.verse_number">
@@ -60,7 +60,7 @@ export default {
   },
   data() {
     return {
-      basmallah: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ"
+      basmallahArabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ"
     };
   },
   computed: {

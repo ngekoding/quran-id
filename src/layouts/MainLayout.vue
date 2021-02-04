@@ -1,13 +1,5 @@
 <template>
   <q-layout view="lHh lpr lFf" class="bg-grey-2">
-    <q-header>
-      <q-toolbar class="q-px-md">
-        <q-toolbar-title>
-          Al-Quran
-        </q-toolbar-title>
-      </q-toolbar>
-    </q-header>
-
     <q-page-container>
       <router-view />
     </q-page-container>

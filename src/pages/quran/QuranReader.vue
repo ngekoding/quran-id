@@ -1,10 +1,12 @@
 <template>
   <div class="quran-reader q-pa-md">
+    <quran-logo />
     <div class="row items-center justify-between">
       <div class="text-h6">Daftar Surah</div>
       <q-btn icon="search" round flat size="md" />
     </div>
-    <q-list class="bg-white rounded-borders">
+    <quran-reader-skeleton v-if="$store.state.quran.loading.fetchSurahList" />
+    <q-list v-else class="bg-white rounded-borders">
       <div v-for="(surah, index) in surahList" :key="surah.id">
         <q-item class="q-py-md" clickable @click="showSurah(surah.id)">
           <q-item-section side class="items-center" style="width: 40px">
@@ -35,8 +37,14 @@
 
 <script>
 import { mapGetters } from "vuex";
+import QuranLogo from "src/components/QuranLogo.vue";
+import QuranReaderSkeleton from "./skeletons/QuranReaderSkeleton.vue";
 export default {
   name: "QuranReader",
+  components: {
+    QuranLogo,
+    QuranReaderSkeleton
+  },
   computed: {
     ...mapGetters({
       surahList: "quran/getSurahList"
