@@ -1,20 +1,26 @@
 <template>
   <div class="quran-reader q-pa-md">
-    <div class="text-h6">Daftar surat</div>
+    <div class="row items-center justify-between">
+      <div class="text-h6">Daftar Surah</div>
+      <q-btn icon="search" round flat size="md" />
+    </div>
     <q-list class="bg-white rounded-borders">
       <div v-for="(surah, index) in surahList" :key="surah.id">
-        <q-item class="q-py-md">
+        <q-item class="q-py-md" clickable @click="showSurah(surah.id)">
           <q-item-section side class="items-center" style="width: 40px">
             <div class="text-center">{{ surah.id }}</div>
           </q-item-section>
           <q-item-section>
-            <q-item-label>{{ surah.surat_name }}</q-item-label>
-            <q-item-label caption>{{ surah.count_ayat }} ayat</q-item-label>
+            <q-item-label>{{ surah.name_simple }}</q-item-label>
+            <q-item-label caption
+              >{{ surah.translated_name.name }},
+              {{ surah.verses_count }} ayat</q-item-label
+            >
           </q-item-section>
 
           <q-item-section side top>
-            <q-item-label class="text-black text-quran">{{
-              surah.surat_text
+            <q-item-label class="text-black text-arabic">{{
+              surah.name_arabic
             }}</q-item-label>
           </q-item-section>
         </q-item>
@@ -35,6 +41,11 @@ export default {
     ...mapGetters({
       surahList: "quran/getSurahList"
     })
+  },
+  methods: {
+    showSurah(surahId) {
+      this.$router.push({ name: "QuranReaderDetail", params: { surahId } });
+    }
   },
   created() {
     this.$store.dispatch("quran/fetchSurahList");

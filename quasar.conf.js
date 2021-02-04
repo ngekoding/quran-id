@@ -42,6 +42,9 @@ module.exports = function(ctx) {
       vueRouterMode: "hash", // available values: 'hash', 'history'
       publicPath: ctx.dev ? "/" : "/quran-id/",
       // transpile: false,
+      env: {
+        QURAN_API_BASE_URL: "https://api.quran.com/api/v3/"
+      },
 
       // Add dependencies for transpiling with Babel (Array of string/regex)
       // (from node_modules, which are by default not transpiled).
@@ -109,7 +112,10 @@ module.exports = function(ctx) {
     // https://quasar.dev/quasar-cli/developing-pwa/configuring-pwa
     pwa: {
       workboxPluginMode: "GenerateSW", // 'GenerateSW' or 'InjectManifest'
-      workboxOptions: {}, // only for GenerateSW
+      workboxOptions: {
+        skipWaiting: true,
+        clientsClaim: true
+      }, // only for GenerateSW
       manifest: {
         name: `Al-Quran`,
         short_name: `Al-Quran`,

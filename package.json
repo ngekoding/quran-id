@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
+    "arabic-digits": "^1.0.2",
     "axios": "^0.18.1",
     "core-js": "^3.6.5",
     "quasar": "^1.0.0"

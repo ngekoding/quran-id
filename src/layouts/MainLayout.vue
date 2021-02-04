@@ -1,12 +1,10 @@
 <template>
-  <q-layout view="Hh Lpr lFf" class="bg-grey-2">
+  <q-layout view="lHh lpr lFf" class="bg-grey-2">
     <q-header>
-      <q-toolbar>
+      <q-toolbar class="q-px-md">
         <q-toolbar-title>
           Al-Quran
         </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
 

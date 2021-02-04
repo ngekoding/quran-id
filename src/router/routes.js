@@ -10,6 +10,12 @@ const routes = [
         component: () => import("pages/quran/QuranReader.vue")
       },
       {
+        path: "reader/:surahId",
+        name: "QuranReaderDetail",
+        component: () => import("pages/quran/QuranReaderDetail.vue"),
+        props: true
+      },
+      {
         path: "player",
         name: "QuranPlayer",
         component: () => import("pages/quran/QuranPlayer.vue")
