@@ -1,21 +1,18 @@
 <template>
-  <div class="fullscreen bg-blue text-white text-center q-pa-md flex flex-center">
+  <div
+    class="fullscreen bg-blue text-white text-center q-pa-md flex flex-center"
+  >
     <div>
-      <div style="font-size: 30vh">
-        404
+      <q-icon name="travel_explore" size="65px" />
+      <div class="text-h5 q-mt-md">
+        Halaman tidak ditemukan
       </div>
-
-      <div class="text-h2" style="opacity:.4">
-        Oops. Nothing here...
-      </div>
-
       <q-btn
+        flat
+        icon="arrow_back"
         class="q-mt-xl"
-        color="white"
-        text-color="blue"
-        unelevated
-        to="/"
-        label="Go Home"
+        :to="{ name: 'QuranReader' }"
+        label="Kembali"
         no-caps
       />
     </div>
@@ -24,6 +21,6 @@
 
 <script>
 export default {
-  name: 'Error404'
-}
+  name: "Error404"
+};
 </script>

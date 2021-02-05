@@ -2,8 +2,8 @@
   <div class="quran-reader q-pa-md">
     <quran-logo />
     <div class="row items-center justify-between">
-      <div class="text-h6">Daftar Surah</div>
-      <q-btn icon="search" round flat size="md" />
+      <div class="text-h6">Surah</div>
+      <q-btn icon="search" round flat dense size="md" />
     </div>
     <quran-reader-skeleton v-if="$store.state.quran.loading.fetchSurahList" />
     <q-list v-else class="bg-white rounded-borders">
@@ -14,16 +14,15 @@
           </q-item-section>
           <q-item-section>
             <q-item-label>{{ surah.name_simple }}</q-item-label>
-            <q-item-label caption
-              >{{ surah.translated_name.name }},
-              {{ surah.verses_count }} ayat</q-item-label
-            >
+            <q-item-label caption>
+              {{ surah.translated_name.name }}, {{ surah.verses_count }} ayat
+            </q-item-label>
           </q-item-section>
 
           <q-item-section side top>
-            <q-item-label class="text-black text-arabic">{{
-              surah.name_arabic
-            }}</q-item-label>
+            <q-item-label class="text-black text-arabic">
+              {{ surah.name_arabic }}
+            </q-item-label>
           </q-item-section>
         </q-item>
         <q-separator
