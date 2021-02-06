@@ -19,11 +19,7 @@
           exact
         />
         <q-route-tab icon="bookmark" :to="{ name: 'QuranBookmark' }" exact />
-        <q-route-tab
-          icon="contact_support"
-          :to="{ name: 'AboutIndex' }"
-          exact
-        />
+        <q-route-tab icon="touch_app" :to="{ name: 'AboutIndex' }" exact />
       </q-tabs>
     </q-footer>
   </q-layout>

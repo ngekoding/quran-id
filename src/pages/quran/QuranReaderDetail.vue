@@ -36,8 +36,9 @@
                 <q-item-label class="text-arabic text-right">
                   {{ ayah.text_madani }}
                 </q-item-label>
-                <q-item-label class="q-pt-sm">
-                  {{ ayah.verse_number }}. {{ ayah.translations[0].text }}
+                <q-item-label class="q-pt-sm translation-wrap">
+                  <span>{{ ayah.verse_number + "." }}</span>
+                  <span v-html="ayah.translations[0].text" />
                 </q-item-label>
               </q-item-section>
               <q-item-section
@@ -80,20 +81,24 @@
         </q-card-section>
         <q-list separator class="bg-white">
           <q-item clickable v-ripple>
-            <q-item-section @click="copy('ayah')">Salin ayat</q-item-section>
+            <q-item-section @click="copy('ayah')">
+              Salin ayat
+            </q-item-section>
           </q-item>
           <q-item clickable v-ripple>
-            <q-item-section @click="copy('translation')"
-              >Salin terjemahan</q-item-section
-            >
+            <q-item-section @click="copy('translation')">
+              Salin terjemahan
+            </q-item-section>
           </q-item>
           <q-item clickable v-ripple>
-            <q-item-section @click="copy('both')"
-              >Salin ayat dan terjemahan</q-item-section
-            >
+            <q-item-section @click="copy('both')">
+              Salin ayat dan terjemahan
+            </q-item-section>
           </q-item>
           <q-item clickable v-ripple>
-            <q-item-section>Bookmark</q-item-section>
+            <q-item-section>
+              Bookmark
+            </q-item-section>
           </q-item>
         </q-list>
       </q-card>
@@ -141,7 +146,10 @@ export default {
       } else if (type == "both") {
         text = ayah.text_madani + "\n\n" + ayah.translations[0].text;
       }
-      text += `\n\n${this.surah.name_simple}: ${ayah.verse_number}`;
+
+      text += "\n\n";
+      text += `QS. ${this.surah.name_simple}: ${ayah.verse_number}`;
+      text = this.removeFootNote(text);
 
       copyToClipboard(text)
         .then(() => {
