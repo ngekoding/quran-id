@@ -1,26 +1,15 @@
 // app global css in Sass form
 
-@font-face
-  font-family: "Quran-Majeed"
-  src: url('../assets/fonts/Quran-Majeed/Al-Qalam-Quran-Majeed.ttf')
-
-@font-face
-  font-family: "Uthmanic-Hafs"
-  src: url('../assets/fonts/Uthmanic-Hafs/UthmanicHafs1-Ver09.otf')
-
-@font-face
-  font-family: "Uthman-Taha"
-  src: url('../assets/fonts/Uthman-Taha/KFGQPC-Uthman-Taha-Naskh-Reguler.ttf')
-  font-weight: normal
-
-@font-face
-  font-family: "Uthman-Taha"
-  src: url('../assets/fonts/Uthman-Taha/KFGQPC-Uthman-Taha-Naskh-Bold.ttf')
-  font-weight: bold
+// Modules
+@import modules/fonts
+@import modules/notify
+@import modules/reader-detail
+@import modules/button
 
 .text-arabic
   font-family: "Quran-Majeed"
+  direction: rtl
 
-// Modules
-@import modules/notify
-@import modules/reader-detail
+.text-basmalah
+  font-family: "Basmalah"
+  direction: rtl

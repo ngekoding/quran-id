@@ -13,3 +13,7 @@ export function updateSurahList(state, surahList) {
 export function updateSurah(state, surah) {
   state.surah = surah;
 }
+
+export function updateSurahLastRead(state, surah) {
+  state.surahLastRead = surah;
+}

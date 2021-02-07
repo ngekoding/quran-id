@@ -43,7 +43,7 @@ module.exports = function(ctx) {
       publicPath: ctx.dev ? "/" : "/quran-id/",
       // transpile: false,
       env: {
-        QURAN_API_BASE_URL: "https://api.quran.com/api/v3/"
+        QURAN_API_BASE_URL: "https://api.quran.com/api/v4/"
       },
 
       // Add dependencies for transpiling with Babel (Array of string/regex)
@@ -97,7 +97,7 @@ module.exports = function(ctx) {
       // directives: [],
 
       // Quasar plugins
-      plugins: ["Notify"]
+      plugins: ["Notify", "LocalStorage"]
     },
 
     // animations: 'all', // --- includes all animations

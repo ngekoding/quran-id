@@ -1,7 +1,43 @@
 <template>
   <div class="quran-reader q-pa-md">
     <quran-logo />
-    <div class="row items-center justify-between">
+    <!-- Last reading -->
+    <q-card v-if="surahLastRead" class="bg-white rounded-borders q-mb-md" flat>
+      <div class="row items-center justify-between q-pt-sm">
+        <q-item-label class="q-pa-none q-pl-md" header>
+          Terakhir dibaca
+        </q-item-label>
+        <q-btn
+          icon="cancel"
+          size="sm"
+          class="text-grey-6 q-mr-sm"
+          dense
+          round
+          flat
+          @click="clearSurahLastRead()"
+        />
+      </div>
+      <q-item class="q-py-md" clickable @click="showSurahLastRead()">
+        <q-item-section side class="items-center" style="width: 40px">
+          <div class="text-center">{{ surahLastRead.id }}</div>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label>{{ surahLastRead.name_simple }}</q-item-label>
+          <q-item-label caption>
+            {{ surahLastRead.translated_name.name }},
+            {{ surahLastRead.verses_count }} ayat
+          </q-item-label>
+        </q-item-section>
+
+        <q-item-section side top>
+          <q-item-label class="text-black text-arabic">
+            {{ surahLastRead.name_arabic }}
+          </q-item-label>
+        </q-item-section>
+      </q-item>
+    </q-card>
+    <!-- Surah list -->
+    <div class="row items-center justify-between q-mb-xs">
       <div class="text-h6">Surah</div>
       <q-btn icon="search" round flat dense size="md" />
     </div>
@@ -46,12 +82,25 @@ export default {
   },
   computed: {
     ...mapGetters({
-      surahList: "quran/getSurahList"
+      surahList: "quran/getSurahList",
+      surahLastRead: "quran/getSurahLastRead"
     })
   },
   methods: {
     showSurah(surahId) {
       this.$router.push({ name: "QuranReaderDetail", params: { surahId } });
+    },
+    showSurahLastRead() {
+      this.$router.push({
+        name: "QuranReaderDetail",
+        params: {
+          surahId: this.surahLastRead.id,
+          offsetTop: this.surahLastRead.offsetTop
+        }
+      });
+    },
+    clearSurahLastRead() {
+      this.$store.dispatch("quran/removeSurahLastRead");
     }
   },
   created() {

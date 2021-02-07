@@ -1,3 +1,5 @@
+import { LocalStorage } from "quasar";
+
 export function fetchSurahList(context) {
   context.commit("showLoading", "fetchSurahList");
   return new Promise((resolve, reject) => {
@@ -32,22 +34,32 @@ export async function fetchSurah(context, surahId) {
     .then(res => res.data.chapter)
     .catch(err => console.log(err));
 
-  const pages = Math.ceil(chapter.verses_count / 50);
+  const urls = [
+    {
+      url: "quran/verses/uthmani",
+      params: {
+        chapter_number: surahId
+      }
+    },
+    {
+      url: "quran/translations/33",
+      params: {
+        chapter_number: surahId,
+        fields: "verse_number"
+      }
+    }
+  ];
+
   const requests = [];
-  for (let page = 1; page <= pages; page++) {
+  urls.forEach(url => {
     requests.push(
       new Promise((resolve, reject) => {
         this.$httpQuran({
-          url: `chapters/${surahId}/verses`,
-          params: {
-            page,
-            limit: 50,
-            translations: 33,
-            text_type: "image"
-          }
+          url: url.url,
+          params: url.params
         })
           .then(res => {
-            resolve(res.data.verses);
+            resolve(res.data);
           })
           .catch(err => {
             console.log(err);
@@ -55,20 +67,29 @@ export async function fetchSurah(context, surahId) {
           });
       })
     );
-  }
+  });
 
-  Promise.all(requests)
+  return Promise.all(requests)
     .then(values => {
-      let merged = [];
-      values.forEach(res => {
-        Array.prototype.push.apply(merged, res);
-      });
-      const lastResult = Object.assign({ ayahs: merged }, chapter);
-      context.commit("updateSurah", lastResult);
+      const arabics = values[0].verses;
+      const translations = values[1].translations;
+      const merged = Object.assign({ ayahs: arabics, translations }, chapter);
+      context.commit("updateSurah", merged);
       context.commit("hideLoading", "fetchSurah");
     })
     .catch(err => {
       console.log(err);
       context.commit("hideLoading", "fetchSurah");
     });
+}
+
+export function setSurahLastRead(context, { surah, offsetTop }) {
+  const surahLastRead = Object.assign({ offsetTop }, surah);
+  LocalStorage.set("surah-last-read", surahLastRead);
+  context.commit("updateSurahLastRead", surahLastRead);
+}
+
+export function removeSurahLastRead(context) {
+  LocalStorage.remove("surah-last-read");
+  context.commit("updateSurahLastRead", null);
 }

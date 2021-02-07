@@ -1,5 +1,8 @@
 <template>
   <div class="quran-reader-detail">
+    <!-- Scroll handler -->
+    <q-scroll-observer @scroll="onScroll" />
+    <!-- Quran reader detail skeleton -->
     <quran-reader-detail-skeleton
       v-if="$store.state.quran.loading.fetchSurah"
     />
@@ -16,6 +19,16 @@
             </q-item-section>
           </q-item>
           <q-space />
+          <q-btn
+            flat
+            rounded
+            dense
+            icon-right="arrow_drop_down"
+            @click="prepareAyahChange()"
+            class="nowrap"
+          >
+            {{ currentAyah }}
+          </q-btn>
           <q-btn flat round dense icon="bookmark_border" />
         </q-toolbar>
         <q-separator color="grey-3" />
@@ -23,22 +36,22 @@
       <div class="content bg-white">
         <!-- Basmallah -->
         <div
-          class="text-arabic text-center q-py-md"
-          style="font-size: 16pt"
+          class="text-basmalah text-center q-py-md"
+          style="font-size: 22pt"
           v-if="surah.bismillah_pre"
         >
-          {{ basmallahArabic }}
+          {{ basmalahArabic }}
         </div>
         <q-list>
-          <div v-for="(ayah, index) in surah.ayahs" :key="ayah.verse_number">
-            <q-item class="q-py-md">
+          <div v-for="(ayah, index) in surah.ayahs" :key="ayah.verse_key">
+            <q-item class="q-py-md" :ref="ayah.verse_key">
               <q-item-section>
                 <q-item-label class="text-arabic text-right">
-                  {{ ayah.text_madani }}
+                  {{ ayah.text_uthmani }}
                 </q-item-label>
                 <q-item-label class="q-pt-sm translation-wrap">
-                  <span>{{ ayah.verse_number + "." }}</span>
-                  <span v-html="ayah.translations[0].text" />
+                  <span>{{ verseNumberFromKey(ayah.verse_key) + "." }}</span>
+                  <span v-html="surah.translations[index].text" />
                 </q-item-label>
               </q-item-section>
               <q-item-section
@@ -46,7 +59,7 @@
                 class="q-mt-sm row item-center justify-between"
               >
                 <div class="self-center">
-                  {{ arabicNumber(ayah.verse_number) }}
+                  {{ arabicNumber(verseNumberFromKey(ayah.verse_key)) }}
                 </div>
                 <q-btn
                   icon="more_vert"
@@ -56,7 +69,7 @@
                   round
                   dense
                   unelevated
-                  @click="onOptionClicked(ayah)"
+                  @click="onOptionClicked(ayah, surah.translations[index])"
                 />
               </q-item-section>
             </q-item>
@@ -73,31 +86,76 @@
       <q-card class="bg-primary" style="width: 80vw">
         <q-card-section
           v-if="ayahDialogOptions"
-          class="row items-center  text-white"
+          class="row items-center text-white"
         >
-          <div class="text-h6">Ayat {{ ayahDialogOptions.verse_number }}</div>
+          <div class="text-h6">
+            Ayat {{ ayahDialogOptions.translation.verse_number }}
+          </div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <q-list separator class="bg-white">
-          <q-item clickable v-ripple>
-            <q-item-section @click="copy('ayah')">
+          <q-item clickable v-ripple @click="copy('ayah')">
+            <q-item-section>
               Salin ayat
             </q-item-section>
           </q-item>
-          <q-item clickable v-ripple>
-            <q-item-section @click="copy('translation')">
+          <q-item clickable v-ripple @click="copy('translation')">
+            <q-item-section>
               Salin terjemahan
             </q-item-section>
           </q-item>
-          <q-item clickable v-ripple>
-            <q-item-section @click="copy('both')">
+          <q-item clickable v-ripple @click="copy('both')">
+            <q-item-section>
               Salin ayat dan terjemahan
             </q-item-section>
           </q-item>
           <q-item clickable v-ripple>
             <q-item-section>
               Bookmark
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-card>
+    </q-dialog>
+    <!-- Dialog ayah changer -->
+    <q-dialog ref="dialogOptions" v-model="showDialogAyahChanger">
+      <q-card class="bg-primary" style="width: 80vw">
+        <q-card-section class="row items-center text-white">
+          <div class="text-h6">Pergi ke ayat</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+        <q-card-section class="bg-white">
+          <q-input
+            rounded
+            outlined
+            v-model="ayahChangerKeyword"
+            placeholder="Filter nomor ayat..."
+            dense
+            type="number"
+            min="1"
+          >
+            <template v-slot:prepend>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </q-card-section>
+        <q-list separator class="scroll bg-white" style="max-height: 60vh">
+          <q-item v-if="ayahsChangerFiltered.length == 0">
+            <q-item-section class="text-center text-grey-6">
+              Tidak tersedia
+            </q-item-section>
+          </q-item>
+          <q-item
+            clickable
+            v-ripple
+            v-for="ayah in ayahsChangerFiltered"
+            :key="'ayah-changer-' + ayah.verse_key"
+            @click="onAyahChange(ayah)"
+          >
+            <q-item-section>
+              Ayat {{ verseNumberFromKey(ayah.verse_key) }}
             </q-item-section>
           </q-item>
         </q-list>
@@ -113,42 +171,76 @@ import { toArabic } from "arabic-digits";
 import QuranReaderDetailSkeleton from "./skeletons/QuranReaderDetailSkeleton.vue";
 export default {
   name: "QuranReaderDetail",
+  props: {
+    offsetTop: {
+      type: Number,
+      default: 0
+    }
+  },
   components: {
     QuranReaderDetailSkeleton
   },
   data() {
     return {
-      basmallahArabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+      init: true,
       showDialogOptions: false,
-      ayahDialogOptions: null
+      showDialogAyahChanger: false,
+      ayahDialogOptions: null,
+      currentAyah: 1,
+      ayahChangerKeyword: null
     };
   },
+  watch: {},
   computed: {
     ...mapGetters({
       surah: "quran/getSurah"
-    })
+    }),
+    surahSimple() {
+      const surahSimple = Object.assign({}, this.surah);
+      delete surahSimple.ayahs;
+      delete surahSimple.translations;
+      return surahSimple;
+    },
+    ayahsChangerFiltered() {
+      if (this.ayahChangerKeyword) {
+        return this.surah.ayahs.filter(ayah =>
+          this.verseNumberFromKey(ayah.verse_key).startsWith(
+            this.ayahChangerKeyword
+          )
+        );
+      }
+      return this.surah?.ayahs;
+    }
   },
   methods: {
+    onScroll(info) {
+      if (["up", "down"].includes(info.direction) && !this.init) {
+        this.updateSurahLastRead(info.position);
+      }
+    },
     arabicNumber(number) {
       return toArabic(number);
     },
-    onOptionClicked(ayah) {
-      this.ayahDialogOptions = ayah;
+    verseNumberFromKey(key) {
+      return key.split(":")[1];
+    },
+    onOptionClicked(arabic, translation) {
+      this.ayahDialogOptions = { arabic, translation };
       this.showDialogOptions = true;
     },
     copy(type) {
       let text;
       const ayah = this.ayahDialogOptions;
       if (type == "ayah") {
-        text = ayah.text_madani;
+        text = ayah.arabic.text_uthmani;
       } else if (type == "translation") {
-        text = ayah.translations[0].text;
+        text = ayah.translation.text;
       } else if (type == "both") {
-        text = ayah.text_madani + "\n\n" + ayah.translations[0].text;
+        text = ayah.arabic.text_uthmani + "\n\n" + ayah.translation.text;
       }
 
       text += "\n\n";
-      text += `QS. ${this.surah.name_simple}: ${ayah.verse_number}`;
+      text += `QS. ${this.surah.name_simple}: ${ayah.translation.verse_number}`;
       text = this.removeFootNote(text);
 
       copyToClipboard(text)
@@ -164,10 +256,36 @@ export default {
             message: "Gagal! Terjadi kesalahan."
           });
         });
+    },
+    prepareAyahChange() {
+      this.showDialogAyahChanger = true;
+    },
+    onAyahChange(ayah) {
+      this.showDialogAyahChanger = false;
+      this.currentAyah = this.verseNumberFromKey(ayah.verse_key);
+      this.scrollToElement(this.$refs[ayah.verse_key][0].$el);
+    },
+    testScroll() {
+      const ref = this.$refs["2-1"][0].$el;
+      console.log(ref);
+      this.scrollToElement(ref);
+    },
+    updateSurahLastRead(position) {
+      this.$store.dispatch("quran/setSurahLastRead", {
+        surah: this.surahSimple,
+        offsetTop: position
+      });
     }
   },
   created() {
-    this.$store.dispatch("quran/fetchSurah", this.$route.params.surahId);
+    this.$store
+      .dispatch("quran/fetchSurah", this.$route.params.surahId)
+      .then(_ => {
+        this.$nextTick(() => {
+          window.scrollTo(0, this.offsetTop);
+          this.init = false;
+        });
+      });
   }
 };
 </script>
