@@ -39,11 +39,32 @@
     <!-- Surah list -->
     <div class="row items-center justify-between q-mb-xs">
       <div class="text-h6">Surah</div>
-      <q-btn icon="search" round flat dense size="md" />
+      <q-btn
+        :icon="showSurahFilter ? 'search_off' : 'search'"
+        flat
+        dense
+        round
+        @click="showSurahFilter = !showSurahFilter"
+      />
     </div>
     <quran-reader-skeleton v-if="$store.state.quran.loading.fetchSurahList" />
     <q-list v-else class="bg-white rounded-borders">
-      <div v-for="(surah, index) in surahList" :key="surah.id">
+      <q-item v-if="showSurahFilter" class="q-pt-md">
+        <q-item-section>
+          <q-input
+            v-model="surahFilter"
+            type="search"
+            placeholder="Cari nama surah..."
+            input-class="q-px-sm"
+            rounded
+            outlined
+            dense
+            clearable
+            :dark="false"
+          />
+        </q-item-section>
+      </q-item>
+      <div v-for="(surah, index) in surahListFiltered" :key="surah.id">
         <q-item class="q-py-md" clickable v-ripple @click="showSurah(surah.id)">
           <q-item-section side class="items-center" style="width: 40px">
             <div class="text-center">{{ surah.id }}</div>
@@ -80,11 +101,35 @@ export default {
     QuranLogo,
     QuranReaderSkeleton
   },
+  data() {
+    return {
+      surahFilter: "",
+      showSurahFilter: false
+    };
+  },
+  watch: {
+    showSurahFilter(val, old) {
+      this.surahFilter = "";
+    }
+  },
   computed: {
     ...mapGetters({
       surahList: "quran/getSurahList",
       surahLastRead: "quran/getSurahLastRead"
-    })
+    }),
+    surahListFiltered() {
+      if (this.surahFilter && this.showSurahFilter) {
+        const q = this.surahFilter.toLowerCase();
+        return this.surahList.filter(s => {
+          return (
+            s.name_simple.toLowerCase().includes(q) ||
+            s.name_arabic.includes(q) ||
+            s.translated_name.name.toLowerCase().includes(q)
+          );
+        });
+      }
+      return this.surahList ?? [];
+    }
   },
   methods: {
     showSurah(surahId) {
