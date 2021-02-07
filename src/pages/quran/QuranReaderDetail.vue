@@ -50,7 +50,7 @@
                   {{ ayah.text_uthmani }}
                 </q-item-label>
                 <q-item-label class="q-pt-sm translation-wrap">
-                  <span>{{ verseNumberFromKey(ayah.verse_key) + "." }}</span>
+                  <span>{{ verseNumberFromKey(ayah.verse_key) + ". " }}</span>
                   <span v-html="surah.translations[index].text" />
                 </q-item-label>
               </q-item-section>
@@ -209,7 +209,7 @@ export default {
           )
         );
       }
-      return this.surah?.ayahs;
+      return this.surah?.ayahs ?? [];
     }
   },
   methods: {

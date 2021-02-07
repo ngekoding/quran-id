@@ -17,7 +17,7 @@
           @click="clearSurahLastRead()"
         />
       </div>
-      <q-item class="q-py-md" clickable @click="showSurahLastRead()">
+      <q-item class="q-py-md" clickable v-ripple @click="showSurahLastRead()">
         <q-item-section side class="items-center" style="width: 40px">
           <div class="text-center">{{ surahLastRead.id }}</div>
         </q-item-section>
@@ -44,7 +44,7 @@
     <quran-reader-skeleton v-if="$store.state.quran.loading.fetchSurahList" />
     <q-list v-else class="bg-white rounded-borders">
       <div v-for="(surah, index) in surahList" :key="surah.id">
-        <q-item class="q-py-md" clickable @click="showSurah(surah.id)">
+        <q-item class="q-py-md" clickable v-ripple @click="showSurah(surah.id)">
           <q-item-section side class="items-center" style="width: 40px">
             <div class="text-center">{{ surah.id }}</div>
           </q-item-section>
