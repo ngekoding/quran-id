@@ -19,6 +19,9 @@ export default ({ Vue }) => {
         const offset = el.offsetTop + offsetCorrection;
         const duration = 1000;
         setScrollPosition(target, offset, duration);
+      },
+      normalizeSurahNameTranslation(str) {
+        return str.replace(/\\/g, "");
       }
     }
   });

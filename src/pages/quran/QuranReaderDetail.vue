@@ -14,7 +14,8 @@
             <q-item-section>
               <q-item-label>{{ surah.name_simple }}</q-item-label>
               <q-item-label caption>
-                {{ surah.translated_name.name }}, {{ surah.verses_count }} ayat
+                {{ normalizeSurahNameTranslation(surah.translated_name.name) }},
+                {{ surah.verses_count }} ayat
               </q-item-label>
             </q-item-section>
           </q-item>

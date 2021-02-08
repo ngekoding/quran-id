@@ -24,8 +24,9 @@
         <q-item-section>
           <q-item-label>{{ surahLastRead.name_simple }}</q-item-label>
           <q-item-label caption>
-            {{ surahLastRead.translated_name.name }},
-            {{ surahLastRead.verses_count }} ayat
+            {{
+              normalizeSurahNameTranslation(surahLastRead.translated_name.name)
+            }}, {{ surahLastRead.verses_count }} ayat
           </q-item-label>
         </q-item-section>
 
@@ -52,6 +53,7 @@
       <q-item v-if="showSurahFilter" class="q-pt-md">
         <q-item-section>
           <q-input
+            ref="surahFilterInput"
             v-model="surahFilter"
             type="search"
             placeholder="Cari nama surah..."
@@ -72,7 +74,8 @@
           <q-item-section>
             <q-item-label>{{ surah.name_simple }}</q-item-label>
             <q-item-label caption>
-              {{ surah.translated_name.name }}, {{ surah.verses_count }} ayat
+              {{ normalizeSurahNameTranslation(surah.translated_name.name) }},
+              {{ surah.verses_count }} ayat
             </q-item-label>
           </q-item-section>
 
@@ -110,6 +113,11 @@ export default {
   watch: {
     showSurahFilter(val, old) {
       this.surahFilter = "";
+      if (val) {
+        this.$nextTick(() => {
+          this.$refs.surahFilterInput.focus();
+        });
+      }
     }
   },
   computed: {
