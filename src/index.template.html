@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3RT9MGB5RR"></script>
+    <script>
+      // Disable analytics for localhost
+      var host = window.location.hostname;
+      if (host == 'localhost') {
+        window['ga-disable-G-XYG2TMQGNM'] = true;
+      }
+
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-3RT9MGB5RR');
+    </script>
+
     <title><%= productName %></title>
 
     <meta charset="utf-8">
