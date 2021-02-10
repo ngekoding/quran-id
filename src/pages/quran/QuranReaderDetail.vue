@@ -8,14 +8,13 @@
     />
     <template v-else>
       <q-header class="bg-transparent">
-        <q-toolbar class="bg-white text-black q-py-sm">
+        <q-toolbar ref="toolbar" class="bg-white text-black q-py-sm">
           <q-btn icon="arrow_back" flat round dense @click="$router.go(-1)" />
           <q-item class="q-py-sm q-px-sm">
             <q-item-section>
               <q-item-label>{{ surah.name_simple }}</q-item-label>
               <q-item-label caption>
-                {{ normalizeSurahNameTranslation(surah.translated_name.name) }},
-                {{ surah.verses_count }} ayat
+                {{ surahNameTranslation }}, {{ surah.verses_count }} ayat
               </q-item-label>
             </q-item-section>
           </q-item>
@@ -32,7 +31,7 @@
           </q-btn>
           <q-btn flat round dense icon="bookmark_border" />
         </q-toolbar>
-        <q-separator color="grey-3" />
+        <q-separator />
       </q-header>
       <div class="content bg-white">
         <!-- Basmallah -->
@@ -43,42 +42,41 @@
         >
           {{ basmalahArabic }}
         </div>
-        <q-list>
-          <div v-for="(ayah, index) in surah.ayahs" :key="ayah.verse_key">
-            <q-item class="q-py-md" :ref="ayah.verse_key">
-              <q-item-section>
-                <q-item-label class="text-arabic text-right">
-                  {{ ayah.text_uthmani }}
-                </q-item-label>
-                <q-item-label class="q-pt-sm translation-wrap">
-                  <span>{{ verseNumberFromKey(ayah.verse_key) + ". " }}</span>
-                  <span v-html="surah.translations[index].text" />
-                </q-item-label>
-              </q-item-section>
-              <q-item-section
-                side
-                class="q-mt-sm row item-center justify-between"
-              >
-                <div class="self-center">
-                  {{ arabicNumber(verseNumberFromKey(ayah.verse_key)) }}
-                </div>
-                <q-btn
-                  icon="more_vert"
-                  color="grey-3"
-                  text-color="black"
-                  size="xs"
-                  round
-                  dense
-                  unelevated
-                  @click="onOptionClicked(ayah, surah.translations[index])"
-                />
-              </q-item-section>
-            </q-item>
-            <q-separator
-              v-if="index != surah.ayahs.length - 1"
-              color="grey-3"
-            />
-          </div>
+        <q-list separator>
+          <q-item
+            v-for="(ayah, index) in surah.ayahs"
+            :key="ayah.verse_key"
+            class="q-py-md"
+            :ref="ayah.verse_key"
+          >
+            <q-item-section>
+              <q-item-label class="text-arabic text-right">
+                {{ ayah.text_uthmani }}
+              </q-item-label>
+              <q-item-label class="q-pt-sm translation-wrap">
+                <span>{{ verseNumberFromKey(ayah.verse_key) + ". " }}</span>
+                <span v-html="surah.translations[index].text" />
+              </q-item-label>
+            </q-item-section>
+            <q-item-section
+              side
+              class="q-mt-sm row item-center justify-between"
+            >
+              <div class="self-center">
+                {{ arabicNumber(verseNumberFromKey(ayah.verse_key)) }}
+              </div>
+              <q-btn
+                icon="more_vert"
+                color="grey-3"
+                text-color="black"
+                size="xs"
+                round
+                dense
+                unelevated
+                @click="onOptionClicked(ayah, surah.translations[index])"
+              />
+            </q-item-section>
+          </q-item>
         </q-list>
       </div>
     </template>
@@ -168,7 +166,6 @@
 <script>
 import { copyToClipboard } from "quasar";
 import { mapGetters } from "vuex";
-import { toArabic } from "arabic-digits";
 import QuranReaderDetailSkeleton from "./skeletons/QuranReaderDetailSkeleton.vue";
 export default {
   name: "QuranReaderDetail",
@@ -191,11 +188,31 @@ export default {
       ayahChangerKeyword: null
     };
   },
-  watch: {},
+  meta() {
+    return {
+      title: this.pageTitle
+    };
+  },
   computed: {
     ...mapGetters({
       surah: "quran/getSurah"
     }),
+    pageTitle() {
+      if (!this.surah) return this.productName;
+      return (
+        "QS. " +
+        this.surah.name_simple +
+        " | " +
+        this.surahNameTranslation +
+        " | " +
+        this.productName
+      );
+    },
+    surahNameTranslation() {
+      return this.normalizeSurahNameTranslation(
+        this.surah?.translated_name.name
+      );
+    },
     surahSimple() {
       const surahSimple = Object.assign({}, this.surah);
       delete surahSimple.ayahs;
@@ -218,9 +235,6 @@ export default {
       if (["up", "down"].includes(info.direction) && !this.init) {
         this.updateSurahLastRead(info.position);
       }
-    },
-    arabicNumber(number) {
-      return toArabic(number);
     },
     verseNumberFromKey(key) {
       return key.split(":")[1];
@@ -265,11 +279,6 @@ export default {
       this.showDialogAyahChanger = false;
       this.currentAyah = this.verseNumberFromKey(ayah.verse_key);
       this.scrollToElement(this.$refs[ayah.verse_key][0].$el);
-    },
-    testScroll() {
-      const ref = this.$refs["2-1"][0].$el;
-      console.log(ref);
-      this.scrollToElement(ref);
     },
     updateSurahLastRead(position) {
       this.$store.dispatch("quran/setSurahLastRead", {

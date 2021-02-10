@@ -1,11 +1,18 @@
 import { scroll } from "quasar";
 const { getScrollTarget, setScrollPosition } = scroll;
+import { toArabic } from "arabic-digits";
+import {
+  productName,
+  description as productDescription
+} from "../../package.json";
 
 export default ({ Vue }) => {
   Vue.mixin({
     data() {
       return {
-        basmalahArabic: "﷽"
+        basmalahArabic: "﷽",
+        productName: productName,
+        productDescription: productDescription
       };
     },
     methods: {
@@ -22,6 +29,9 @@ export default ({ Vue }) => {
       },
       normalizeSurahNameTranslation(str) {
         return str.replace(/\\/g, "");
+      },
+      arabicNumber(number) {
+        return toArabic(number);
       }
     }
   });

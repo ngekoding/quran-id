@@ -49,7 +49,7 @@
       />
     </div>
     <quran-reader-skeleton v-if="$store.state.quran.loading.fetchSurahList" />
-    <q-list v-else class="bg-white rounded-borders">
+    <q-list separator v-else class="bg-white rounded-borders">
       <q-item v-if="showSurahFilter" class="q-pt-md">
         <q-item-section>
           <q-input

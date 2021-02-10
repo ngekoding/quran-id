@@ -1,7 +1,7 @@
 {
   "name": "quran-id",
   "version": "0.0.1",
-  "description": "Al-Quran with Indonesian translation",
+  "description": "Al-Quran dan Terjemahan",
   "productName": "Al-Quran",
   "author": "Nur Muhammad <blog.nurmuhammad@gmail.com>",
   "private": true,
