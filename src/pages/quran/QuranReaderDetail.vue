@@ -52,9 +52,10 @@
             <q-item-section>
               <q-item-label class="text-arabic text-right">
                 {{ ayah.text_uthmani }}
-                <span class="text-arabic-number q-mr-sm">
-                  {{ arabicNumber(verseNumberFromKey(ayah.verse_key)) }}
-                </span>
+                <span
+                  class="text-arabic-number q-mr-sm"
+                  v-html="arabicNumber(verseNumberFromKey(ayah.verse_key))"
+                />
               </q-item-label>
               <q-item-label class="q-pt-sm translation-wrap">
                 <span>{{ verseNumberFromKey(ayah.verse_key) + ". " }}</span>

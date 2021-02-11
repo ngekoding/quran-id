@@ -31,12 +31,15 @@ export default ({ Vue }) => {
       },
       arabicNumber(number) {
         const arabicNums = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
-        return number
-          .toString()
-          .split("")
-          .reverse()
-          .map(num => arabicNums[num])
-          .join("");
+        const frame = "&#1757;";
+        return (
+          frame +
+          number
+            .toString()
+            .split("")
+            .map(num => arabicNums[num])
+            .join("")
+        );
       }
     }
   });
