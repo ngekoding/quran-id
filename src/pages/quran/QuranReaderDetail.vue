@@ -46,29 +46,25 @@
           <q-item
             v-for="(ayah, index) in surah.ayahs"
             :key="ayah.verse_key"
-            class="q-py-md"
+            class="q-pt-md"
             :ref="ayah.verse_key"
           >
             <q-item-section>
               <q-item-label class="text-arabic text-right">
                 {{ ayah.text_uthmani }}
+                <span class="text-arabic-number q-mr-sm">
+                  {{ arabicNumber(verseNumberFromKey(ayah.verse_key)) }}
+                </span>
               </q-item-label>
               <q-item-label class="q-pt-sm translation-wrap">
                 <span>{{ verseNumberFromKey(ayah.verse_key) + ". " }}</span>
                 <span v-html="surah.translations[index].text" />
               </q-item-label>
-            </q-item-section>
-            <q-item-section
-              side
-              class="q-mt-sm row item-center justify-between"
-            >
-              <div class="self-center">
-                {{ arabicNumber(verseNumberFromKey(ayah.verse_key)) }}
-              </div>
               <q-btn
                 icon="more_vert"
                 color="grey-3"
                 text-color="black"
+                class="self-end"
                 size="xs"
                 round
                 dense

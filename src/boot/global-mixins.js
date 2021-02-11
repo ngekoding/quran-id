@@ -1,6 +1,5 @@
 import { scroll } from "quasar";
 const { getScrollTarget, setScrollPosition } = scroll;
-import { toArabic } from "arabic-digits";
 import {
   productName,
   description as productDescription
@@ -31,7 +30,13 @@ export default ({ Vue }) => {
         return str.replace(/\\/g, "");
       },
       arabicNumber(number) {
-        return toArabic(number);
+        const arabicNums = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+        return number
+          .toString()
+          .split("")
+          .reverse()
+          .map(num => arabicNums[num])
+          .join("");
       }
     }
   });
