@@ -53,7 +53,7 @@
               <q-item-label class="text-arabic text-right">
                 {{ ayah.text_uthmani }}
                 <span
-                  class="text-arabic-number q-mr-sm"
+                  class="text-arabic-number q-mr-xs"
                   v-html="arabicNumber(verseNumberFromKey(ayah.verse_key))"
                 />
               </q-item-label>

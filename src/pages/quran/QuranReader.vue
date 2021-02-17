@@ -31,7 +31,7 @@
         </q-item-section>
 
         <q-item-section side top>
-          <q-item-label class="text-black text-arabic">
+          <q-item-label class="text-black text-arabic arabic-surah-name">
             {{ surahLastRead.name_arabic }}
           </q-item-label>
         </q-item-section>
@@ -80,7 +80,7 @@
           </q-item-section>
 
           <q-item-section side top>
-            <q-item-label class="text-black text-arabic">
+            <q-item-label class="text-black text-arabic arabic-surah-name">
               {{ surah.name_arabic }}
             </q-item-label>
           </q-item-section>
