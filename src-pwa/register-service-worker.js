@@ -1,5 +1,6 @@
 import { register } from "register-service-worker";
 import { Notify } from "quasar";
+import localforage from "localforage";
 
 // The ready(), registered(), cached(), updatefound() and updated()
 // events passes a ServiceWorkerRegistration instance in their arguments.
@@ -37,7 +38,14 @@ register(process.env.SERVICE_WORKER_FILE, {
       closeBtn: "Perbarui",
       timeout: 10000,
       onDismiss() {
-        window.location.reload();
+        localforage
+          .clear()
+          .then(function() {
+            window.location.reload();
+          })
+          .catch(function(err) {
+            console.log("Localforage", err);
+          });
       }
     });
   },
