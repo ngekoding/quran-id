@@ -1,5 +1,8 @@
 <template>
   <div class="quran-reader q-pa-md">
+    <!-- Scroll handler -->
+    <q-scroll-observer @scroll="onScroll" />
+    <!-- Quran Logo -->
     <quran-logo />
     <!-- Last reading -->
     <q-card v-if="surahLastRead" class="bg-white rounded-borders q-mb-md" flat>
@@ -106,6 +109,7 @@ export default {
   },
   data() {
     return {
+      init: true,
       surahFilter: "",
       showSurahFilter: false
     };
@@ -123,7 +127,8 @@ export default {
   computed: {
     ...mapGetters({
       surahList: "quran/getSurahList",
-      surahLastRead: "quran/getSurahLastRead"
+      surahLastRead: "quran/getSurahLastRead",
+      scrollPosition: "quran/getQuranReaderScrollPosition"
     }),
     surahListFiltered() {
       if (this.surahFilter && this.showSurahFilter) {
@@ -140,6 +145,11 @@ export default {
     }
   },
   methods: {
+    onScroll(info) {
+      if (["up", "down"].includes(info.direction) && !this.init) {
+        this.updateScrollPosition(info.position);
+      }
+    },
     showSurah(surahId) {
       this.$router.push({ name: "QuranReaderDetail", params: { surahId } });
     },
@@ -154,10 +164,20 @@ export default {
     },
     clearSurahLastRead() {
       this.$store.dispatch("quran/removeSurahLastRead");
+    },
+    updateScrollPosition(position) {
+      this.$store.dispatch("quran/setQuranReaderScrollPosition", {
+        offsetTop: position
+      });
     }
   },
   created() {
-    this.$store.dispatch("quran/fetchSurahList");
+    this.$store.dispatch("quran/fetchSurahList").then(_ => {
+      this.$nextTick(() => {
+        window.scrollTo(0, this.scrollPosition);
+        this.init = false;
+      });
+    });
   }
 };
 </script>

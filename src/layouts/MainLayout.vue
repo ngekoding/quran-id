@@ -4,7 +4,7 @@
       <router-view />
     </q-page-container>
 
-    <q-footer>
+    <q-footer v-if="showTabMenu">
       <q-tabs
         v-model="tab"
         align="justify"
@@ -30,7 +30,8 @@ export default {
   name: "MainLayout",
   data() {
     return {
-      tab: "mail"
+      tab: "mail",
+      showTabMenu: false
     };
   }
 };

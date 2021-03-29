@@ -5,6 +5,9 @@ export default function() {
     surahList: [],
     surah: null,
     surahLastRead: LocalStorage.getItem("surah-last-read"),
+    quranReaderScrollPosition: LocalStorage.getItem(
+      "surah-list-scroll-position"
+    ),
     loading: {
       fetchSurahList: false,
       fetchSurah: false

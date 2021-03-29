@@ -17,3 +17,7 @@ export function updateSurah(state, surah) {
 export function updateSurahLastRead(state, surah) {
   state.surahLastRead = surah;
 }
+
+export function updateQuranReaderScrollPosition(state, offsetTop) {
+  state.quranReaderScrollPosition = offsetTop;
+}

@@ -93,3 +93,8 @@ export function removeSurahLastRead(context) {
   LocalStorage.remove("surah-last-read");
   context.commit("updateSurahLastRead", null);
 }
+
+export function setQuranReaderScrollPosition(context, { offsetTop }) {
+  LocalStorage.set("surah-list-scroll-position", offsetTop);
+  context.commit("updateQuranReaderScrollPosition", offsetTop);
+}
