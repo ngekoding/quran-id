@@ -16,6 +16,11 @@ const routes = [
         props: true
       },
       {
+        path: "search-by-ayah",
+        name: "QuranSearchByAyah",
+        component: () => import("pages/quran/QuranSearchByAyah.vue")
+      },
+      {
         path: "player",
         name: "QuranPlayer",
         component: () => import("pages/quran/QuranPlayer.vue")

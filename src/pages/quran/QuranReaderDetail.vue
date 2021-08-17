@@ -7,7 +7,7 @@
       v-if="$store.state.quran.loading.fetchSurah"
     />
     <template v-else>
-      <q-header class="bg-transparent">
+      <q-header ref="header" class="bg-transparent">
         <q-toolbar ref="toolbar" class="bg-white text-black q-py-sm">
           <q-btn icon="arrow_back" flat round dense @click="$router.go(-1)" />
           <q-item class="q-py-sm q-px-sm">
@@ -33,7 +33,7 @@
         </q-toolbar>
         <q-separator />
       </q-header>
-      <div class="content bg-white">
+      <div class="content bg-white" :style="contentStyles">
         <!-- Basmallah -->
         <div
           class="text-basmalah text-center q-py-md"
@@ -170,6 +170,9 @@ export default {
     offsetTop: {
       type: Number,
       default: 0
+    },
+    verseKey: {
+      type: String
     }
   },
   components: {
@@ -182,7 +185,8 @@ export default {
       showDialogAyahChanger: false,
       ayahDialogOptions: null,
       currentAyah: 1,
-      ayahChangerKeyword: null
+      ayahChangerKeyword: null,
+      contentStyles: null
     };
   },
   meta() {
@@ -232,6 +236,12 @@ export default {
       if (["up", "down"].includes(info.direction) && !this.init) {
         this.updateSurahLastRead(info.position);
       }
+    },
+    fitContentHeight() {
+      const headerHeight = this.$refs.header.$el.clientHeight + "px";
+      this.contentStyles = {
+        minHeight: `calc(100vh - ${headerHeight})`
+      };
     },
     verseNumberFromKey(key) {
       return key.split(":")[1];
@@ -289,8 +299,12 @@ export default {
       .dispatch("quran/fetchSurah", this.$route.params.surahId)
       .then(_ => {
         this.$nextTick(() => {
-          window.scrollTo(0, this.offsetTop);
           this.init = false;
+          this.fitContentHeight();
+          window.scrollTo(0, this.offsetTop);
+          if (this.verseKey) {
+            this.scrollToElement(this.$refs[this.verseKey][0].$el);
+          }
         });
       });
   }

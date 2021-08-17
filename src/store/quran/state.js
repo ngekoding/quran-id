@@ -8,9 +8,21 @@ export default function() {
     quranReaderScrollPosition: LocalStorage.getItem(
       "surah-list-scroll-position"
     ),
+    searchAyahScrollPosition: LocalStorage.getItem(
+      "search-ayah-scroll-position"
+    ),
+    searchAyah: {
+      paging: {
+        total: 0,
+        perPage: 20,
+        currentPage: 1
+      },
+      results: []
+    },
     loading: {
       fetchSurahList: false,
-      fetchSurah: false
+      fetchSurah: false,
+      searchAyah: false
     }
   };
 }

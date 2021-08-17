@@ -21,3 +21,28 @@ export function updateSurahLastRead(state, surah) {
 export function updateQuranReaderScrollPosition(state, offsetTop) {
   state.quranReaderScrollPosition = offsetTop;
 }
+
+export function updateQuranSearchAyahScrollPosition(state, offsetTop) {
+  state.searchAyahScrollPosition = offsetTop;
+}
+
+export function addSearchAyahResults(state, results) {
+  state.searchAyah.results.push(...results);
+}
+
+export function resetSearchAyahResults(state) {
+  state.searchAyah.results = [];
+}
+
+export function resetSearchAyahPaging(state) {
+  state.searchAyah.paging = {
+    total: 0,
+    perPage: 20,
+    totalPage: 0,
+    currentPage: 1
+  };
+}
+
+export function updateSearchAyahPaging(state, paging) {
+  state.searchAyah.paging = paging;
+}

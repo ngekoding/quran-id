@@ -67,6 +67,15 @@
             clearable
             :dark="false"
           />
+          <div class="row justify-center q-pt-sm">
+            <q-btn
+              flat
+              rounded
+              color="primary"
+              label="Pencarian Ayat"
+              @click="$router.push({ name: 'QuranSearchByAyah' })"
+            />
+          </div>
         </q-item-section>
       </q-item>
       <div v-for="(surah, index) in surahListFiltered" :key="surah.id">

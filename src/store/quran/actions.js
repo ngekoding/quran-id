@@ -98,3 +98,99 @@ export function setQuranReaderScrollPosition(context, { offsetTop }) {
   LocalStorage.set("surah-list-scroll-position", offsetTop);
   context.commit("updateQuranReaderScrollPosition", offsetTop);
 }
+
+export function setQuranSearchAyahScrollPosition(context, { offsetTop }) {
+  LocalStorage.set("search-ayah-scroll-position", offsetTop);
+  context.commit("updateQuranSearchAyahScrollPosition", offsetTop);
+}
+
+export async function searchByAyah(context, { keyword, page = 1 }) {
+  context.commit("showLoading", "searchAyah");
+  const surahList =
+    context.state.surahList.length != 0
+      ? context.state.surahList
+      : await context.dispatch("fetchSurahList").then(res => res.data.chapters);
+
+  // Calculating ayah start & end for each surah
+  // For getting search result detail
+  const surahListInfo = [];
+  for (let i = 0; i < surahList.length; i++) {
+    const surah = surahList[i];
+    const verseCount = surah.verses_count;
+    let keyStart, keyEnd;
+    if (i == 0) {
+      keyStart = 1;
+      keyEnd = verseCount;
+    } else {
+      keyStart = surahListInfo[i - 1].keyEnd + 1;
+      keyEnd = surahListInfo[i - 1].keyEnd + verseCount;
+    }
+
+    surahListInfo.push({
+      id: surah.id,
+      name: surah.name_simple,
+      keyStart,
+      keyEnd
+    });
+  }
+
+  const perPage = context.state.searchAyah.paging.perPage;
+
+  return new Promise((resolve, reject) => {
+    this.$httpQuran({
+      url: "search",
+      params: {
+        query: keyword,
+        size: perPage,
+        page: page - 1 // 0 base page
+      }
+    })
+      .then(res => {
+        if (res.status == 204) {
+          context.commit("hideLoading", "searchAyah");
+          resolve({
+            results: []
+          });
+          return;
+        }
+        const data = res.data.search;
+        const results = data.results;
+        const paging = {
+          total: data.total_results,
+          perPage: perPage,
+          totalPage: Math.ceil(data.total_results / perPage),
+          currentPage: page
+        };
+
+        // Appending surah name & ayah
+        results.forEach((item, i, arr) => {
+          const surahInfo = surahListInfo.find(
+            s => item.verse_id >= s.keyStart && item.verse_id <= s.keyEnd
+          );
+          arr[i].surahId = surahInfo.id;
+          arr[i].surahName = surahInfo.name;
+          arr[i].ayahNumber = item.verse_id - (surahInfo.keyStart - 1);
+        });
+
+        context.commit("updateSearchAyahPaging", paging);
+        context.commit("addSearchAyahResults", results);
+        context.commit("hideLoading", "searchAyah");
+        resolve({
+          results,
+          paging
+        });
+      })
+      .catch(err => {
+        context.commit("hideLoading", "searchAyah");
+        reject(err);
+      });
+  });
+}
+
+export function resetSearchAyahResults(context) {
+  context.commit("resetSearchAyahResults");
+}
+
+export function resetSearchAyahPaging(context) {
+  context.commit("resetSearchAyahPaging");
+}

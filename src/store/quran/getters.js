@@ -13,3 +13,15 @@ export function getSurahLastRead(state) {
 export function getQuranReaderScrollPosition(state) {
   return state.quranReaderScrollPosition;
 }
+
+export function getQuranSearchAyahScrollPosition(state) {
+  return state.searchAyahScrollPosition;
+}
+
+export function getSearchAyahResults(state) {
+  return state.searchAyah.results;
+}
+
+export function getSearchAyahPaging(state) {
+  return state.searchAyah.paging;
+}
