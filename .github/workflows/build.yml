@@ -28,9 +28,6 @@ jobs:
           npm run build
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BASE_BRANCH: master
-          BRANCH: gh-pages
-          FOLDER: dist/pwa
-          CLEAN: true
+        with:
+          branch: gh-pages
+          folder: dist/pwa
