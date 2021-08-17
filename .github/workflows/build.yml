@@ -27,7 +27,7 @@ jobs:
           npm ci
           npm run build
       - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@master
+        uses: JamesIves/github-pages-deploy-action@4.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BASE_BRANCH: master
