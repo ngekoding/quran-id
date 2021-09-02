@@ -15,7 +15,8 @@ export default function() {
       paging: {
         total: 0,
         perPage: 20,
-        currentPage: 1
+        currentPage: 1,
+        totalPage: 0
       },
       results: []
     },

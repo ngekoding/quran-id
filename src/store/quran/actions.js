@@ -111,29 +111,6 @@ export async function searchByAyah(context, { keyword, page = 1 }) {
       ? context.state.surahList
       : await context.dispatch("fetchSurahList").then(res => res.data.chapters);
 
-  // Calculating ayah start & end for each surah
-  // For getting search result detail
-  const surahListInfo = [];
-  for (let i = 0; i < surahList.length; i++) {
-    const surah = surahList[i];
-    const verseCount = surah.verses_count;
-    let keyStart, keyEnd;
-    if (i == 0) {
-      keyStart = 1;
-      keyEnd = verseCount;
-    } else {
-      keyStart = surahListInfo[i - 1].keyEnd + 1;
-      keyEnd = surahListInfo[i - 1].keyEnd + verseCount;
-    }
-
-    surahListInfo.push({
-      id: surah.id,
-      name: surah.name_simple,
-      keyStart,
-      keyEnd
-    });
-  }
-
   const perPage = context.state.searchAyah.paging.perPage;
 
   return new Promise((resolve, reject) => {
@@ -142,7 +119,7 @@ export async function searchByAyah(context, { keyword, page = 1 }) {
       params: {
         query: keyword,
         size: perPage,
-        page: page - 1 // 0 base page
+        page: page
       }
     })
       .then(res => {
@@ -158,18 +135,17 @@ export async function searchByAyah(context, { keyword, page = 1 }) {
         const paging = {
           total: data.total_results,
           perPage: perPage,
-          totalPage: Math.ceil(data.total_results / perPage),
+          totalPage: data.total_pages,
           currentPage: page
         };
 
         // Appending surah name & ayah
         results.forEach((item, i, arr) => {
-          const surahInfo = surahListInfo.find(
-            s => item.verse_id >= s.keyStart && item.verse_id <= s.keyEnd
-          );
-          arr[i].surahId = surahInfo.id;
-          arr[i].surahName = surahInfo.name;
-          arr[i].ayahNumber = item.verse_id - (surahInfo.keyStart - 1);
+          const verseKeys = item.verse_key.split(":");
+          const surah = surahList.find(s => s.id == verseKeys[0]);
+          arr[i].surahId = surah.id;
+          arr[i].surahName = surah.name_simple;
+          arr[i].ayahNumber = verseKeys[1];
         });
 
         context.commit("updateSearchAyahPaging", paging);

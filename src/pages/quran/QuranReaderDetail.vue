@@ -33,7 +33,10 @@
         </q-toolbar>
         <q-separator />
       </q-header>
-      <div class="content bg-white" :style="contentStyles">
+      <div
+        class="content bg-white"
+        :style="[{ 'padding-bottom': '64px' }, contentStyles]"
+      >
         <!-- Basmallah -->
         <div
           class="text-basmalah text-center q-py-md"
@@ -157,6 +160,8 @@
         </q-list>
       </q-card>
     </q-dialog>
+    <!-- Go to top -->
+    <to-top />
   </div>
 </template>
 
@@ -164,8 +169,13 @@
 import { copyToClipboard } from "quasar";
 import { mapGetters } from "vuex";
 import QuranReaderDetailSkeleton from "./skeletons/QuranReaderDetailSkeleton.vue";
+import ToTop from "src/components/ToTop.vue";
 export default {
   name: "QuranReaderDetail",
+  components: {
+    QuranReaderDetailSkeleton,
+    ToTop
+  },
   props: {
     offsetTop: {
       type: Number,
@@ -174,9 +184,6 @@ export default {
     verseKey: {
       type: String
     }
-  },
-  components: {
-    QuranReaderDetailSkeleton
   },
   data() {
     return {

@@ -52,7 +52,7 @@
       />
     </div>
     <quran-reader-skeleton v-if="$store.state.quran.loading.fetchSurahList" />
-    <q-list separator v-else class="bg-white rounded-borders">
+    <q-list separator v-else class="bg-white rounded-borders q-mb-lg">
       <q-item v-if="showSurahFilter" class="q-pt-md">
         <q-item-section>
           <q-input
@@ -76,6 +76,17 @@
               @click="$router.push({ name: 'QuranSearchByAyah' })"
             />
           </div>
+        </q-item-section>
+      </q-item>
+      <q-item
+        v-if="surahListFiltered.length == 0 && surahFilter"
+        class="q-py-lg"
+      >
+        <q-item-section class="column items-center">
+          <q-icon name="blur_on" size="60px" class="text-grey-8" />
+          <p class="text-center text-body1 text-grey-7 q-mt-md">
+            Nama surah tidak ditemukan.
+          </p>
         </q-item-section>
       </q-item>
       <div v-for="(surah, index) in surahListFiltered" :key="surah.id">
@@ -103,6 +114,8 @@
         />
       </div>
     </q-list>
+    <!-- Go to top -->
+    <to-top />
   </div>
 </template>
 
@@ -110,11 +123,13 @@
 import { mapGetters } from "vuex";
 import QuranLogo from "src/components/QuranLogo.vue";
 import QuranReaderSkeleton from "./skeletons/QuranReaderSkeleton.vue";
+import ToTop from "src/components/ToTop.vue";
 export default {
   name: "QuranReader",
   components: {
     QuranLogo,
-    QuranReaderSkeleton
+    QuranReaderSkeleton,
+    ToTop
   },
   data() {
     return {

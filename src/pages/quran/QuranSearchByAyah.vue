@@ -22,15 +22,17 @@
           <q-input
             v-model="keyword"
             type="search"
-            placeholder="الحمد"
-            input-class="q-px-sm text-right"
-            dir="rtl"
+            :placeholder="!inputFocusReady ? 'Masukkan kata kunci...' : ''"
+            :input-class="['q-px-sm', { 'text-right': inputFocusReady }]"
+            :dir="inputFocusReady ? 'rtl' : 'ltr'"
             rounded
             outlined
             dense
             clearable
             :dark="false"
             class="col-grow q-mr-sm"
+            @focus="() => (inputFocus = true)"
+            @blur="() => (inputFocus = false)"
           >
           </q-input>
           <q-btn
@@ -41,12 +43,34 @@
             @click="onSearch"
           />
         </div>
-        <p v-if="keyword" class="text-center q-my-md">
-          Ditemukan
-          <span class="text-primary">{{ searchPaging.total }}</span> ayat dengan
-          kata kunci
-          <span class="text-primary">'{{ keyword }}'</span>
-        </p>
+        <div v-if="!keywordSearch" class="column items-center q-py-lg">
+          <q-icon name="auto_stories" size="60px" class="text-grey-8" />
+          <p class="text-center text-body1 text-grey-7 q-mt-md">
+            Masukkan kata kunci pencarian dalam tulisan arab untuk mulai
+            mencari.
+          </p>
+        </div>
+        <template
+          v-if="keywordSearch && !$store.state.quran.loading.searchAyah"
+        >
+          <div
+            v-if="searchPaging.total == 0"
+            class="column items-center q-py-lg"
+          >
+            <q-icon name="blur_on" size="60px" class="text-grey-8" />
+            <p class="text-center text-body1 text-grey-7 q-mt-md">
+              Tidak dapat menemukan ayat dengan kata kunci
+              <span class="text-primary">{{ keywordSearch }}</span
+              >. Silahkan coba dengan kata kunci yang lain.
+            </p>
+          </div>
+          <p v-else class="text-center text-body1 text-primary q-my-md">
+            Berhasil menemukan
+            <span class="text-bold">{{ searchPaging.total }}</span>
+            ayat dengan kata kunci
+            <span class="text-bold">{{ keywordSearch }}.</span>
+          </p>
+        </template>
       </div>
       <q-list v-if="searchResults.length > 0" separator>
         <q-item
@@ -89,6 +113,8 @@
         Sudah ditampilkan semua
       </p>
     </div>
+    <!-- Go to top -->
+    <to-top />
   </div>
 </template>
 
@@ -96,15 +122,19 @@
 import { mapGetters } from "vuex";
 import { LocalStorage } from "quasar";
 import QuranSearchResultSkeleton from "./skeletons/QuranSearchResultSkeleton.vue";
+import ToTop from "src/components/ToTop.vue";
 export default {
   name: "QuranSearchByAyah",
   components: {
-    QuranSearchResultSkeleton
+    QuranSearchResultSkeleton,
+    ToTop
   },
   data() {
     return {
       init: true,
       keyword: "",
+      keywordSearch: "",
+      inputFocus: false,
       contentStyles: null
     };
   },
@@ -121,6 +151,9 @@ export default {
     }),
     isLoadMoreAvailable() {
       return this.searchPaging.currentPage < this.searchPaging.totalPage;
+    },
+    inputFocusReady() {
+      return this.keyword || this.inputFocus;
     }
   },
   methods: {
@@ -141,7 +174,7 @@ export default {
       });
     },
     saveLastKeyword() {
-      LocalStorage.set("search-keyword", this.keyword);
+      LocalStorage.set("search-keyword", this.keywordSearch);
     },
     getLastKeyword() {
       return LocalStorage.getItem("search-keyword");
@@ -149,12 +182,13 @@ export default {
     onSearch() {
       this.$store.dispatch("quran/resetSearchAyahPaging");
       this.$store.dispatch("quran/resetSearchAyahResults");
-      if (this.keyword) this.search();
+      this.keywordSearch = this.keyword;
+      if (this.keywordSearch) this.search();
     },
     search(page) {
       this.saveLastKeyword();
       this.$store
-        .dispatch("quran/searchByAyah", { keyword: this.keyword, page })
+        .dispatch("quran/searchByAyah", { keyword: this.keywordSearch, page })
         .then(res => {
           console.log(res);
         })
@@ -181,9 +215,9 @@ export default {
       window.scrollTo(0, this.scrollPosition);
       this.init = false;
     });
-  },
-  created() {
+
     if (this.searchResults.length > 0) {
+      this.keywordSearch = this.getLastKeyword();
       this.keyword = this.getLastKeyword();
     }
   }
