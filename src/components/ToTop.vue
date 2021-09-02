@@ -36,10 +36,8 @@ export default {
       }
     },
     toTop() {
-      window.scroll({
-        top: 0,
-        behavior: "smooth"
-      });
+      const el = document.getElementsByTagName("body")[0];
+      this.scrollToElement(el);
     }
   }
 };
