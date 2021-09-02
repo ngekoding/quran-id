@@ -34,6 +34,9 @@
             @focus="() => (inputFocus = true)"
             @blur="() => (inputFocus = false)"
           >
+            <template v-if="inputFocusReady" v-slot:prepend>
+              <q-icon name="spellcheck" />
+            </template>
           </q-input>
           <q-btn
             round
