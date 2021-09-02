@@ -31,23 +31,23 @@ register(process.env.SERVICE_WORKER_FILE, {
 
   updated(/* registration */) {
     // console.log('New content is available; please refresh.')
-    // Notify.create({
-    //   classes: "notify-update no-box-shadow",
-    //   message: "Terdapat pembaruan.",
-    //   icon: "update",
-    //   closeBtn: "Perbarui",
-    //   timeout: 10000,
-    //   onDismiss() {
-    //     localforage
-    //       .clear()
-    //       .then(function() {
-    //         window.location.reload();
-    //       })
-    //       .catch(function(err) {
-    //         console.log("Localforage", err);
-    //       });
-    //   }
-    // });
+    Notify.create({
+      classes: "notify-update no-box-shadow",
+      message: "Terdapat pembaruan.",
+      icon: "update",
+      closeBtn: "Perbarui",
+      timeout: 10000,
+      onDismiss() {
+        localforage
+          .clear()
+          .then(function() {
+            window.location.reload();
+          })
+          .catch(function(err) {
+            console.log("Localforage", err);
+          });
+      }
+    });
   },
 
   offline() {
