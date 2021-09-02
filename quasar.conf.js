@@ -18,7 +18,7 @@ module.exports = function(ctx) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
-    boot: ["axios", "notify-customs", "global-mixins"],
+    boot: ["axios", "notify-customs", "global-mixins", "gtag"],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: ["app.sass"],
@@ -43,7 +43,8 @@ module.exports = function(ctx) {
       publicPath: ctx.dev ? "/" : "/quran-id/",
       // transpile: false,
       env: {
-        QURAN_API_BASE_URL: "https://api.quran.com/api/v4/"
+        QURAN_API_BASE_URL: "https://api.quran.com/api/v4/",
+        GTAG_ENABLED: ctx.prod
       },
 
       // Add dependencies for transpiling with Babel (Array of string/regex)
