@@ -40,6 +40,12 @@ export default ({ Vue }) => {
             .map(num => arabicNums[num])
             .join("")
         );
+      },
+      track(title, path, loc) {
+        const page_title = title;
+        const page_path = path ?? window.location.pathname;
+        const page_location = loc ?? window.location.href;
+        this.$gtag.pageview({ page_title, page_path, page_location });
       }
     }
   });

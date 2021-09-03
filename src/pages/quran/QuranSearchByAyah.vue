@@ -143,7 +143,7 @@ export default {
   },
   meta() {
     return {
-      title: "Pencarian Ayat"
+      title: this.pageTitle
     };
   },
   computed: {
@@ -157,6 +157,13 @@ export default {
     },
     inputFocusReady() {
       return this.keyword || this.inputFocus;
+    },
+    pageTitle() {
+      return (
+        "Pencarian Ayat | " +
+        (this.keywordSearch ? this.keywordSearch + " | " : "") +
+        this.productName
+      );
     }
   },
   methods: {
@@ -189,7 +196,9 @@ export default {
       if (this.keywordSearch) this.search();
     },
     search(page) {
+      this.track(this.pageTitle);
       this.saveLastKeyword();
+
       this.$store
         .dispatch("quran/searchByAyah", { keyword: this.keywordSearch, page })
         .then(res => {
@@ -213,7 +222,9 @@ export default {
     }
   },
   mounted() {
+    this.track(this.pageTitle);
     this.fitContentHeight();
+
     this.$nextTick(() => {
       window.scrollTo(0, this.scrollPosition);
       this.init = false;

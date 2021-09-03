@@ -29,7 +29,7 @@
           >
             {{ currentAyah }}
           </q-btn>
-          <q-btn flat round dense icon="bookmark_border" />
+          <q-btn flat round dense icon="bookmark_border" @click="bookmark()" />
         </q-toolbar>
         <q-separator />
       </q-header>
@@ -109,7 +109,7 @@
               Salin ayat dan terjemahan
             </q-item-section>
           </q-item>
-          <q-item clickable v-ripple>
+          <q-item clickable v-ripple @click="bookmark()">
             <q-item-section>
               Bookmark
             </q-item-section>
@@ -299,6 +299,12 @@ export default {
         surah: this.surahSimple,
         offsetTop: position
       });
+    },
+    bookmark() {
+      this.$q.notify({
+        type: "toast-warning",
+        message: "Maaf fitur ini belum tersedia."
+      });
     }
   },
   created() {
@@ -307,6 +313,7 @@ export default {
       .then(_ => {
         this.$nextTick(() => {
           this.init = false;
+          this.track(this.pageTitle);
           this.fitContentHeight();
           window.scrollTo(0, this.offsetTop);
           if (this.verseKey) {

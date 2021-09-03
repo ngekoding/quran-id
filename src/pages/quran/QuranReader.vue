@@ -195,6 +195,9 @@ export default {
       });
     }
   },
+  mounted() {
+    this.track(this.productName);
+  },
   created() {
     this.$store.dispatch("quran/fetchSurahList").then(_ => {
       this.$nextTick(() => {

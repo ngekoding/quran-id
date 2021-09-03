@@ -37,6 +37,15 @@
       href="icons/favicon-16x16.png"
     />
     <link rel="icon" type="image/ico" href="favicon.ico" />
+    <script>
+      (function() {
+        let redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
   </head>
   <body>
     <!-- DO NOT touch the following DIV -->

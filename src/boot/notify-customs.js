@@ -11,3 +11,9 @@ Notify.registerType("toast-error", {
   badgeStyle: "display: none",
   timeout: 3000
 });
+
+Notify.registerType("toast-warning", {
+  classes: "notify-toast warning no-box-shadow",
+  badgeStyle: "display: none",
+  timeout: 3000
+});
