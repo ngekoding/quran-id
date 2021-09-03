@@ -40,7 +40,7 @@ module.exports = function(ctx) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       vueRouterMode: "history", // available values: 'hash', 'history'
-      // publicPath: ctx.dev ? "/" : "/quran-id/",
+      publicPath: ctx.dev ? "/" : "/quran-id/",
       // transpile: false,
       env: {
         QURAN_API_BASE_URL: "https://api.quran.com/api/v4/",
