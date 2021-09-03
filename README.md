@@ -12,9 +12,9 @@ If you want to run this project into your own development server and maybe makin
 
 1. Fork/download this project
 2. Enter to the project direcotry via CMD/Terminal
-3. Run: npm install
-4. Run: npm run dev for development
-5. Run: npm run build for production
+3. Run: `npm install`
+4. Run: `npm run dev` for development (automatically will opening the browser)
+5. Run: `npm run build` for production
 6. Enjoy!
 
 **Note:** 
