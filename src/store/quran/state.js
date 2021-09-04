@@ -19,7 +19,8 @@ export default function() {
         currentPage: 1,
         totalPage: 0
       },
-      results: []
+      results: [],
+      resultTranslations: []
     },
     loading: {
       fetchSurahList: false,

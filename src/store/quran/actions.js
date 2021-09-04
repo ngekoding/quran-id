@@ -153,14 +153,28 @@ export async function searchByAyah(context, { keyword, page = 1 }) {
           }
         }
 
-        // Appending surah name & ayah
-        results.forEach((item, i, arr) => {
+        // Appending surah name, ayah number & translation
+        for (let i = 0; i < results.length; i++) {
+          const item = results[i];
+
           const verseKeys = item.verse_key.split(":");
           const surah = surahList.find(s => s.id == verseKeys[0]);
-          arr[i].surahId = surah.id;
-          arr[i].surahName = surah.name_simple;
-          arr[i].ayahNumber = verseKeys[1];
-        });
+          results[i].surahId = surah.id;
+          results[i].surahName = surah.name_simple;
+          results[i].ayahNumber = verseKeys[1];
+
+          this.$httpQuran({
+            url: "quran/translations/33",
+            params: {
+              verse_key: item.verse_key
+            }
+          }).then(resT => {
+            context.commit("addSearchAyahResultsTranslation", {
+              verse_key: item.verse_key,
+              text: resT.data.translations[0].text
+            });
+          });
+        }
 
         context.commit("updateSearchAyahPaging", paging);
         context.commit("addSearchAyahResults", results);

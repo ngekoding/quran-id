@@ -100,18 +100,36 @@
           :key="item.verse_id"
           class="q-pt-md"
           clickable
-          @click="showDetail(item)"
         >
           <q-item-section>
-            <q-item-label class="text-arabic text-right">
-              <span v-html="item.text" />
-              <span
-                class="text-arabic-number q-mr-xs"
-                v-html="arabicNumber(item.ayahNumber)"
+            <div @click="showDetail(item)">
+              <q-item-label class="text-arabic text-right">
+                <span v-html="item.text" />
+                <span
+                  class="text-arabic-number q-mr-xs"
+                  v-html="arabicNumber(item.ayahNumber)"
+                />
+              </q-item-label>
+              <q-item-label class="q-pt-sm translation-wrap">
+                <span>{{ item.ayahNumber + ". " }}</span>
+                <span v-html="getTranslation(item.verse_key)" />
+              </q-item-label>
+            </div>
+            <q-item-label class="row q-py-sm translation-wrap">
+              <span class="col-grow">
+                QS. {{ `${item.surahName}: ${item.ayahNumber}` }}
+              </span>
+              <q-btn
+                icon="more_vert"
+                color="grey-3"
+                text-color="black"
+                class="self-end"
+                size="xs"
+                round
+                dense
+                unelevated
+                @click="onOptionClicked(item)"
               />
-            </q-item-label>
-            <q-item-label class="q-py-sm translation-wrap">
-              <span>QS. {{ `${item.surahName}: ${item.ayahNumber}` }} </span>
             </q-item-label>
           </q-item-section>
         </q-item>
@@ -135,6 +153,14 @@
         Sudah ditampilkan semua
       </p>
     </div>
+    <!-- Dialog options -->
+    <ayah-options-dialog
+      :show="showAyahOptionsDialog"
+      :ayah-number="ayahOptionsDialogData.ayahNumber"
+      :surah-name="ayahOptionsDialogData.surahName"
+      :arabic="ayahOptionsDialogData.arabic"
+      :translation="ayahOptionsDialogData.translation"
+    />
     <!-- Dialog full match search information -->
     <q-dialog v-model="fullMatchSearchDialog">
       <q-card>
@@ -170,11 +196,13 @@
 import { mapGetters } from "vuex";
 import { LocalStorage } from "quasar";
 import QuranSearchResultSkeleton from "./skeletons/QuranSearchResultSkeleton.vue";
+import AyahOptionsDialog from "src/components/AyahOptionsDialog.vue";
 import ToTop from "src/components/ToTop.vue";
 export default {
   name: "QuranSearchByAyah",
   components: {
     QuranSearchResultSkeleton,
+    AyahOptionsDialog,
     ToTop
   },
   data() {
@@ -185,7 +213,14 @@ export default {
       inputFocus: false,
       fullMatchSearch: this.$store.state.quran.searchAyah.fullMatch,
       fullMatchSearchDialog: false,
-      contentStyles: null
+      contentStyles: null,
+      showAyahOptionsDialog: false,
+      ayahOptionsDialogData: {
+        ayahNumber: "",
+        surahName: "",
+        arabic: "",
+        translation: ""
+      }
     };
   },
   meta() {
@@ -205,6 +240,7 @@ export default {
   computed: {
     ...mapGetters({
       searchResults: "quran/getSearchAyahResults",
+      searchResultTranslations: "quran/getSearchAyahResultTranslations",
       searchPaging: "quran/getSearchAyahPaging",
       scrollPosition: "quran/getQuranSearchAyahScrollPosition"
     }),
@@ -275,6 +311,20 @@ export default {
           verseKey: item.surahId + ":" + item.ayahNumber
         }
       });
+    },
+    getTranslation(verse_key) {
+      return this.searchResultTranslations.find(
+        item => item.verse_key == verse_key
+      )?.text;
+    },
+    onOptionClicked(item) {
+      this.ayahOptionsDialogData = {
+        ayahNumber: item.ayahNumber,
+        surahName: item.surahName,
+        arabic: item.text,
+        translation: this.getTranslation(item.verse_key)
+      };
+      this.showAyahOptionsDialog = true;
     }
   },
   mounted() {

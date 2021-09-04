@@ -30,6 +30,10 @@ export function addSearchAyahResults(state, results) {
   state.searchAyah.results.push(...results);
 }
 
+export function addSearchAyahResultsTranslation(state, translation) {
+  state.searchAyah.resultTranslations.push(translation);
+}
+
 export function resetSearchAyahResults(state) {
   state.searchAyah.results = [];
 }

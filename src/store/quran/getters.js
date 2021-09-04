@@ -22,6 +22,10 @@ export function getSearchAyahResults(state) {
   return state.searchAyah.results;
 }
 
+export function getSearchAyahResultTranslations(state) {
+  return state.searchAyah.resultTranslations;
+}
+
 export function getSearchAyahPaging(state) {
   return state.searchAyah.paging;
 }

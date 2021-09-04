@@ -81,44 +81,15 @@
       </div>
     </template>
     <!-- Dialog options -->
-    <q-dialog ref="dialogOptions" v-model="showDialogOptions">
-      <q-card class="bg-primary" style="width: 80vw">
-        <q-card-section
-          v-if="ayahDialogOptions"
-          class="row items-center text-white"
-        >
-          <div class="text-h6">
-            Ayat {{ ayahDialogOptions.translation.verse_number }}
-          </div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
-        </q-card-section>
-        <q-list separator class="bg-white">
-          <q-item clickable v-ripple @click="copy('ayah')">
-            <q-item-section>
-              Salin ayat
-            </q-item-section>
-          </q-item>
-          <q-item clickable v-ripple @click="copy('translation')">
-            <q-item-section>
-              Salin terjemahan
-            </q-item-section>
-          </q-item>
-          <q-item clickable v-ripple @click="copy('both')">
-            <q-item-section>
-              Salin ayat dan terjemahan
-            </q-item-section>
-          </q-item>
-          <q-item clickable v-ripple @click="bookmark()">
-            <q-item-section>
-              Bookmark
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-card>
-    </q-dialog>
+    <ayah-options-dialog
+      :show="showAyahOptionsDialog"
+      :ayah-number="ayahOptionsDialogData.ayahNumber"
+      :surah-name="ayahOptionsDialogData.surahName"
+      :arabic="ayahOptionsDialogData.arabic"
+      :translation="ayahOptionsDialogData.translation"
+    />
     <!-- Dialog ayah changer -->
-    <q-dialog ref="dialogOptions" v-model="showDialogAyahChanger">
+    <q-dialog v-model="showAyahChangerDialog">
       <q-card class="bg-primary" style="width: 80vw">
         <q-card-section class="row items-center text-white">
           <div class="text-h6">Pergi ke ayat</div>
@@ -166,14 +137,15 @@
 </template>
 
 <script>
-import { copyToClipboard } from "quasar";
 import { mapGetters } from "vuex";
 import QuranReaderDetailSkeleton from "./skeletons/QuranReaderDetailSkeleton.vue";
+import AyahOptionsDialog from "src/components/AyahOptionsDialog.vue";
 import ToTop from "src/components/ToTop.vue";
 export default {
   name: "QuranReaderDetail",
   components: {
     QuranReaderDetailSkeleton,
+    AyahOptionsDialog,
     ToTop
   },
   props: {
@@ -188,9 +160,14 @@ export default {
   data() {
     return {
       init: true,
-      showDialogOptions: false,
-      showDialogAyahChanger: false,
-      ayahDialogOptions: null,
+      showAyahOptionsDialog: false,
+      showAyahChangerDialog: false,
+      ayahOptionsDialogData: {
+        ayahNumber: "",
+        surahName: "",
+        arabic: "",
+        translation: ""
+      },
       currentAyah: 1,
       ayahChangerKeyword: null,
       contentStyles: null
@@ -254,43 +231,19 @@ export default {
       return key.split(":")[1];
     },
     onOptionClicked(arabic, translation) {
-      this.ayahDialogOptions = { arabic, translation };
-      this.showDialogOptions = true;
-    },
-    copy(type) {
-      let text;
-      const ayah = this.ayahDialogOptions;
-      if (type == "ayah") {
-        text = ayah.arabic.text_uthmani;
-      } else if (type == "translation") {
-        text = ayah.translation.text;
-      } else if (type == "both") {
-        text = ayah.arabic.text_uthmani + "\n\n" + ayah.translation.text;
-      }
-
-      text += "\n\n";
-      text += `QS. ${this.surah.name_simple}: ${ayah.translation.verse_number}`;
-      text = this.removeFootNote(text);
-
-      copyToClipboard(text)
-        .then(() => {
-          this.$q.notify({
-            type: "toast",
-            message: "Berhasil disalin."
-          });
-        })
-        .catch(() => {
-          this.$q.notify({
-            type: "toast-error",
-            message: "Gagal! Terjadi kesalahan."
-          });
-        });
+      this.ayahOptionsDialogData = {
+        ayahNumber: translation.verse_number,
+        surahName: this.surah.name_simple,
+        arabic: arabic.text_uthmani,
+        translation: translation.text
+      };
+      this.showAyahOptionsDialog = true;
     },
     prepareAyahChange() {
-      this.showDialogAyahChanger = true;
+      this.showAyahChangerDialog = true;
     },
     onAyahChange(ayah) {
-      this.showDialogAyahChanger = false;
+      this.showAyahChangerDialog = false;
       this.currentAyah = this.verseNumberFromKey(ayah.verse_key);
       this.scrollToElement(this.$refs[ayah.verse_key][0].$el);
     },
