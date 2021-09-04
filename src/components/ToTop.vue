@@ -2,20 +2,25 @@
   <div class="to-top">
     <q-scroll-observer @scroll="onScroll" />
     <!-- Go to top button -->
-    <transition
-      appear
-      enter-active-class="animated fadeIn"
-      leave-active-class="animated fadeOut"
+    <q-page-sticky
+      position="bottom-right"
+      :offset="[18, 18]"
+      style="z-index: 10"
     >
-      <q-btn
-        v-if="show"
-        class="fixed-bottom-right q-mr-md q-mb-md"
-        color="primary"
-        icon="expand_less"
-        fab-mini
-        @click="toTop()"
-      />
-    </transition>
+      <transition
+        appear
+        enter-active-class="animated fadeIn"
+        leave-active-class="animated fadeOut"
+      >
+        <q-btn
+          v-if="show"
+          color="primary"
+          icon="expand_less"
+          fab-mini
+          @click="toTop()"
+        />
+      </transition>
+    </q-page-sticky>
   </div>
 </template>
 
