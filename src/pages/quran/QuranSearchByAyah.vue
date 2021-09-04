@@ -17,8 +17,8 @@
       <q-separator />
     </q-header>
     <div class="content bg-white" :style="contentStyles">
-      <div class="q-px-md q-pt-md">
-        <div class="row justify-between">
+      <div class="q-px-md q-pt-md q-pb-sm bg-grey-1">
+        <div class="row">
           <q-input
             v-model="keyword"
             type="search"
@@ -30,6 +30,7 @@
             dense
             clearable
             :dark="false"
+            bg-color="white"
             class="col-grow q-mr-sm"
             @focus="() => (inputFocus = true)"
             @blur="() => (inputFocus = false)"
@@ -39,42 +40,60 @@
             </template>
           </q-input>
           <q-btn
-            round
+            rounded
             unelevated
             color="primary"
             icon="search"
             @click="onSearch"
           />
         </div>
-        <div v-if="!keywordSearch" class="column items-center q-py-lg">
-          <q-icon name="auto_stories" size="60px" class="text-grey-8" />
+        <!-- Search options -->
+        <div class="row items-start">
+          <q-toggle v-model="fullMatchSearch" />
+          <div class="row q-pt-sm">
+            <div class="text-body1">Pencarian penuh kata</div>
+            <div
+              class="row items-center text-primary q-ml-sm"
+              @click="fullMatchSearchDialog = true"
+            >
+              <q-icon name="contact_support" />
+              <span class="text-caption q-ml-xs">Info</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Search results information -->
+      <div v-if="!keywordSearch" class="column items-center q-pa-lg">
+        <q-icon name="auto_stories" size="60px" class="text-grey-8" />
+        <p class="text-center text-body1 text-grey-7 q-mt-md">
+          Masukkan kata kunci pencarian dalam tulisan arab untuk mulai mencari.
+        </p>
+      </div>
+      <template v-if="keywordSearch && !$store.state.quran.loading.searchAyah">
+        <div
+          v-if="searchResults.length == 0"
+          class="column items-center q-pa-lg"
+        >
+          <q-icon name="blur_on" size="60px" class="text-grey-8" />
           <p class="text-center text-body1 text-grey-7 q-mt-md">
-            Masukkan kata kunci pencarian dalam tulisan arab untuk mulai
-            mencari.
+            Tidak dapat menemukan ayat dengan kata kunci
+            <span class="text-primary">{{ keywordSearch }}</span
+            >. Silahkan coba dengan kata kunci yang lain.
           </p>
         </div>
-        <template
-          v-if="keywordSearch && !$store.state.quran.loading.searchAyah"
+        <!-- Only show search results count if full match search if disabled -->
+        <p
+          v-else-if="searchPaging.total != 0 && !fullMatchSearch"
+          class="text-center text-body1 text-primary q-pa-lg"
+          style="line-height: 18px"
         >
-          <div
-            v-if="searchPaging.total == 0"
-            class="column items-center q-py-lg"
-          >
-            <q-icon name="blur_on" size="60px" class="text-grey-8" />
-            <p class="text-center text-body1 text-grey-7 q-mt-md">
-              Tidak dapat menemukan ayat dengan kata kunci
-              <span class="text-primary">{{ keywordSearch }}</span
-              >. Silahkan coba dengan kata kunci yang lain.
-            </p>
-          </div>
-          <p v-else class="text-center text-body1 text-primary q-my-md">
-            Berhasil menemukan
-            <span class="text-bold">{{ searchPaging.total }}</span>
-            ayat dengan kata kunci
-            <span class="text-bold">{{ keywordSearch }}.</span>
-          </p>
-        </template>
-      </div>
+          Berhasil menemukan
+          <span class="text-bold">{{ searchPaging.total }}</span>
+          ayat<br />dengan kata kunci
+          <span class="text-bold">{{ keywordSearch }}</span>
+        </p>
+      </template>
+
       <q-list v-if="searchResults.length > 0" separator>
         <q-item
           v-for="item in searchResults"
@@ -116,6 +135,32 @@
         Sudah ditampilkan semua
       </p>
     </div>
+    <!-- Dialog full match search information -->
+    <q-dialog v-model="fullMatchSearchDialog">
+      <q-card>
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-h6 row items-center">
+            <q-icon name="contact_support" />
+            <span class="q-ml-xs">Pencarian penuh kata</span>
+          </div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+
+        <q-card-section>
+          <p>
+            Secara default, proses pencarian akan mencari kecocokan setiap kata
+            pada kata kunci yang diberikan. Misalnya dengan kata kunci
+            <b>من طين</b>, maka akan mencari ayat yang mengandung kata
+            <b>من</b> atau <b>طين</b>.
+          </p>
+          <p>
+            Apabila fitur <b>pencarian penuh kata</b> diaktifkan, maka hanya
+            akan mencari ayat yang persis mengandung kata <b>من طين</b>.
+          </p>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
     <!-- Go to top -->
     <to-top />
   </div>
@@ -138,6 +183,8 @@ export default {
       keyword: "",
       keywordSearch: "",
       inputFocus: false,
+      fullMatchSearch: this.$store.state.quran.searchAyah.fullMatch,
+      fullMatchSearchDialog: false,
       contentStyles: null
     };
   },
@@ -145,6 +192,15 @@ export default {
     return {
       title: this.pageTitle
     };
+  },
+  watch: {
+    fullMatchSearch(val) {
+      this.$store.dispatch("quran/setFullMatchSearch", val);
+      // Recall the search
+      if (this.searchResults.length > 0) {
+        this.onSearch();
+      }
+    }
   },
   computed: {
     ...mapGetters({

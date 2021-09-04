@@ -12,6 +12,7 @@ export default function() {
       "search-ayah-scroll-position"
     ),
     searchAyah: {
+      fullMatch: false,
       paging: {
         total: 0,
         perPage: 20,

@@ -46,3 +46,7 @@ export function resetSearchAyahPaging(state) {
 export function updateSearchAyahPaging(state, paging) {
   state.searchAyah.paging = paging;
 }
+
+export function setFullMatchSearch(state, value) {
+  state.searchAyah.fullMatch = value;
+}

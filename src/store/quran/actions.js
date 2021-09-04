@@ -1,4 +1,5 @@
 import { LocalStorage } from "quasar";
+import { filterFullMatchSearchResults } from "src/lib/search-helper";
 
 export function fetchSurahList(context) {
   context.commit("showLoading", "fetchSurahList");
@@ -130,14 +131,27 @@ export async function searchByAyah(context, { keyword, page = 1 }) {
           });
           return;
         }
+
         const data = res.data.search;
-        const results = data.results;
         const paging = {
           total: data.total_results,
           perPage: perPage,
           totalPage: data.total_pages,
           currentPage: page
         };
+
+        let results = data.results;
+
+        // Filtering full match keyword
+        if (context.state.searchAyah.fullMatch) {
+          results = filterFullMatchSearchResults(results, keyword);
+
+          // Loop until found any data
+          if (results.length == 0 && page < paging.totalPage) {
+            context.dispatch("searchByAyah", { keyword, page: page + 1 });
+            return;
+          }
+        }
 
         // Appending surah name & ayah
         results.forEach((item, i, arr) => {
@@ -169,4 +183,8 @@ export function resetSearchAyahResults(context) {
 
 export function resetSearchAyahPaging(context) {
   context.commit("resetSearchAyahPaging");
+}
+
+export function setFullMatchSearch(context, value) {
+  context.commit("setFullMatchSearch", value);
 }
