@@ -17,8 +17,12 @@ If you want to run this project into your own development server and maybe makin
 5. Run: `npm run build` for production
 6. Enjoy!
 
-**Note:** 
+**Note:**
 
-For the production build, I use `/quran-id` as the publicPath for building on GitHub Pages. So, maybe you want to change it. Please take a look at `build.publicPath` in quasar.conf.js 
+For the production build, I use `/quran-id` as the publicPath for building on GitHub Pages. So, maybe you want to change it. Please take a look at `build.publicPath` in quasar.conf.js
+
+## Screenshots
+
+![Screenshot](./screenshots/screenshot-combined.png)
 
 Powered by ngekoding.github.io
