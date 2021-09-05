@@ -2,7 +2,10 @@
  * I wrote this function which handles strings with mixed Arabic and English characters,
  * removing special characters (including diacritics) and normalizing
  * some Arabic characters like converting all ة's into ه's.
- * Soruce: https://stackoverflow.com/a/40959537/6829171
+ * Source: https://stackoverflow.com/a/40959537/6829171
+ *
+ * Edited by Nur Muhammad
+ * I make some modifications to fix some mistakes
  */
 const normalizeText = function(text) {
   text = text.replace(/(آ|إ|أ|ٱ|ٲ|ٳ)/g, "ا");
