@@ -155,7 +155,7 @@
     </div>
     <!-- Dialog options -->
     <ayah-options-dialog
-      :show="showAyahOptionsDialog"
+      :show.sync="showAyahOptionsDialog"
       :ayah-number="ayahOptionsDialogData.ayahNumber"
       :surah-name="ayahOptionsDialogData.surahName"
       :arabic="ayahOptionsDialogData.arabic"
