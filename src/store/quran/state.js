@@ -2,7 +2,6 @@ import { LocalStorage } from "quasar";
 
 export default function() {
   return {
-    surahList: [],
     surah: null,
     surahLastRead: LocalStorage.getItem("surah-last-read"),
     quranReaderScrollPosition: LocalStorage.getItem(
@@ -23,7 +22,6 @@ export default function() {
       resultTranslations: []
     },
     loading: {
-      fetchSurahList: false,
       fetchSurah: false,
       searchAyah: false
     }

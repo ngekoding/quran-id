@@ -25,17 +25,16 @@
           <div class="text-center">{{ surahLastRead.id }}</div>
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ surahLastRead.name_simple }}</q-item-label>
+          <q-item-label>{{ surahLastRead.nameSimple }}</q-item-label>
           <q-item-label caption>
-            {{
-              normalizeSurahNameTranslation(surahLastRead.translated_name.name)
-            }}, {{ surahLastRead.verses_count }} ayat
+            {{ normalizeSurahNameTranslation(surahLastRead.nameTranslated) }},
+            {{ surahLastRead.versesCount }} ayat
           </q-item-label>
         </q-item-section>
 
         <q-item-section side top>
           <q-item-label class="text-black text-arabic arabic-surah-name">
-            {{ surahLastRead.name_arabic }}
+            {{ surahLastRead.nameArabic }}
           </q-item-label>
         </q-item-section>
       </q-item>
@@ -51,8 +50,7 @@
         @click="showSurahFilter = !showSurahFilter"
       />
     </div>
-    <quran-reader-skeleton v-if="$store.state.quran.loading.fetchSurahList" />
-    <q-list separator v-else class="bg-white rounded-borders q-mb-lg">
+    <q-list separator class="bg-white rounded-borders q-mb-lg">
       <q-item v-if="showSurahFilter" class="q-pt-md">
         <q-item-section>
           <q-input
@@ -95,21 +93,21 @@
             <div class="text-center">{{ surah.id }}</div>
           </q-item-section>
           <q-item-section>
-            <q-item-label>{{ surah.name_simple }}</q-item-label>
+            <q-item-label>{{ surah.nameSimple }}</q-item-label>
             <q-item-label caption>
-              {{ normalizeSurahNameTranslation(surah.translated_name.name) }},
-              {{ surah.verses_count }} ayat
+              {{ normalizeSurahNameTranslation(surah.nameTranslated) }},
+              {{ surah.versesCount }} ayat
             </q-item-label>
           </q-item-section>
 
           <q-item-section side top>
             <q-item-label class="text-black text-arabic arabic-surah-name">
-              {{ surah.name_arabic }}
+              {{ surah.nameArabic }}
             </q-item-label>
           </q-item-section>
         </q-item>
         <q-separator
-          v-if="index != surahList.length - 1"
+          v-if="index != surahListFiltered.length - 1"
           style="margin-left: 54px"
         />
       </div>
@@ -122,24 +120,24 @@
 <script>
 import { mapGetters } from "vuex";
 import QuranLogo from "src/components/QuranLogo.vue";
-import QuranReaderSkeleton from "./skeletons/QuranReaderSkeleton.vue";
 import ToTop from "src/components/ToTop.vue";
+import surahList from "src/data/surah-list";
 export default {
   name: "QuranReader",
   components: {
     QuranLogo,
-    QuranReaderSkeleton,
     ToTop
   },
   data() {
     return {
       init: true,
+      surahList: surahList,
       surahFilter: "",
       showSurahFilter: false
     };
   },
   watch: {
-    showSurahFilter(val, old) {
+    showSurahFilter(val) {
       this.surahFilter = "";
       if (val) {
         this.$nextTick(() => {
@@ -150,7 +148,6 @@ export default {
   },
   computed: {
     ...mapGetters({
-      surahList: "quran/getSurahList",
       surahLastRead: "quran/getSurahLastRead",
       scrollPosition: "quran/getQuranReaderScrollPosition"
     }),
@@ -159,9 +156,9 @@ export default {
         const q = this.surahFilter.toLowerCase();
         return this.surahList.filter(s => {
           return (
-            s.name_simple.toLowerCase().includes(q) ||
-            s.name_arabic.includes(q) ||
-            s.translated_name.name.toLowerCase().includes(q)
+            s.nameSimple.toLowerCase().includes(q) ||
+            s.nameArabic.toLowerCase().includes(q) ||
+            s.nameTranslated.toLowerCase().includes(q)
           );
         });
       }
@@ -197,13 +194,9 @@ export default {
   },
   mounted() {
     this.track(this.productName);
-  },
-  created() {
-    this.$store.dispatch("quran/fetchSurahList").then(_ => {
-      this.$nextTick(() => {
-        window.scrollTo(0, this.scrollPosition);
-        this.init = false;
-      });
+    this.$nextTick(() => {
+      window.scrollTo(0, this.scrollPosition);
+      this.init = false;
     });
   }
 };

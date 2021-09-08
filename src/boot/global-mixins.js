@@ -19,11 +19,10 @@ export default ({ Vue }) => {
         const regExp = /<sup\s+foot_note=\d+>\d+<\/sup>/gi;
         return str.replaceAll(regExp, "");
       },
-      scrollToElement(el, offsetCorrection = -66) {
+      scrollToElement(el, offsetCorrection = -66, duration = 1000) {
         // 66 is toolbar height
         const target = getScrollTarget(el);
         const offset = el.offsetTop + offsetCorrection;
-        const duration = 1000;
         setScrollPosition(target, offset, duration);
       },
       normalizeSurahNameTranslation(str) {
