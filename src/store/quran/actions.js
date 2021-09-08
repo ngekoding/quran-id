@@ -59,12 +59,12 @@ export async function fetchSurah(context, surahId) {
 
 export function setSurahLastRead(context, { surah, offsetTop }) {
   const surahLastRead = Object.assign({ offsetTop }, surah);
-  LocalStorage.set("surah-last-read", surahLastRead);
+  LocalStorage.set("last-read", surahLastRead);
   context.commit("updateSurahLastRead", surahLastRead);
 }
 
 export function removeSurahLastRead(context) {
-  LocalStorage.remove("surah-last-read");
+  LocalStorage.remove("last-read");
   context.commit("updateSurahLastRead", null);
 }
 

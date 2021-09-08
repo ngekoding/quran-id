@@ -3,7 +3,7 @@ import { LocalStorage } from "quasar";
 export default function() {
   return {
     surah: null,
-    surahLastRead: LocalStorage.getItem("surah-last-read"),
+    surahLastRead: LocalStorage.getItem("last-read"),
     quranReaderScrollPosition: LocalStorage.getItem(
       "surah-list-scroll-position"
     ),
