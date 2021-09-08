@@ -5,7 +5,6 @@ import surahList from "src/data/surah-list";
 export async function fetchSurah(context, surahId) {
   context.commit("showLoading", "fetchSurah");
 
-  // Getting chapter for versesCount
   const chapter = surahList.find(item => item.id == surahId);
 
   const urls = [
