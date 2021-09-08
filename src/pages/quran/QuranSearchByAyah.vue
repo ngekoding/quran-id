@@ -53,7 +53,7 @@
           <div class="row q-pt-sm">
             <div class="text-body1">Pencarian penuh kata</div>
             <div
-              class="row items-center text-primary q-ml-sm"
+              class="row items-center text-primary q-ml-sm cursor-pointer"
               @click="fullMatchSearchDialog = true"
             >
               <q-icon name="contact_support" />
