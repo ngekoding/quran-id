@@ -1,7 +1,7 @@
 <template>
   <div class="quran-reader q-pa-md">
     <!-- Scroll handler -->
-    <q-scroll-observer @scroll="onScroll" />
+    <page-scroll-position-handler :listen="!init" :page="page" />
     <!-- Quran Logo -->
     <quran-logo />
     <!-- Last reading -->
@@ -22,13 +22,14 @@
       </div>
       <q-item class="q-py-md" clickable v-ripple @click="showSurahLastRead()">
         <q-item-section side class="items-center" style="width: 40px">
-          <div class="text-center">{{ surahLastRead.id }}</div>
+          <div class="text-center">{{ surahLastRead.extra.id }}</div>
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ surahLastRead.nameSimple }}</q-item-label>
+          <q-item-label>{{ surahLastRead.extra.nameSimple }}</q-item-label>
           <q-item-label caption>
-            {{ normalizeSurahNameTranslation(surahLastRead.nameTranslated) }},
-            {{ surahLastRead.versesCount }} ayat
+            {{
+              normalizeSurahNameTranslation(surahLastRead.extra.nameTranslated)
+            }}, {{ surahLastRead.extra.versesCount }} ayat
           </q-item-label>
         </q-item-section>
 
@@ -118,19 +119,21 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
 import QuranLogo from "src/components/QuranLogo.vue";
 import ToTop from "src/components/ToTop.vue";
 import surahList from "src/data/surah-list";
+import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.vue";
 export default {
   name: "QuranReader",
   components: {
     QuranLogo,
-    ToTop
+    ToTop,
+    PageScrollPositionHandler
   },
   data() {
     return {
       init: true,
+      page: "quran-reader",
       surahList: surahList,
       surahFilter: "",
       showSurahFilter: false
@@ -147,10 +150,9 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({
-      surahLastRead: "quran/getSurahLastRead",
-      scrollPosition: "quran/getQuranReaderScrollPosition"
-    }),
+    surahLastRead() {
+      return this.getSurahLastRead();
+    },
     surahListFiltered() {
       if (this.surahFilter && this.showSurahFilter) {
         const q = this.surahFilter.toLowerCase();
@@ -166,36 +168,41 @@ export default {
     }
   },
   methods: {
-    onScroll(info) {
-      if (["up", "down"].includes(info.direction) && !this.init) {
-        this.updateScrollPosition(info.position);
-      }
+    getScrollPosition() {
+      return (
+        this.$store.getters["quran/getPageScrollPosition"](this.page)
+          ?.offsetTop ?? 0
+      );
     },
     showSurah(surahId) {
       this.$router.push({ name: "QuranReaderDetail", params: { surahId } });
     },
+    getSurahLastRead() {
+      return this.$store.getters["quran/getPageScrollPosition"](
+        "quran-reader-detail"
+      );
+    },
     showSurahLastRead() {
+      const lastRead = this.getSurahLastRead();
       this.$router.push({
         name: "QuranReaderDetail",
         params: {
-          surahId: this.surahLastRead.id,
-          offsetTop: this.surahLastRead.offsetTop
+          surahId: lastRead.extra.id,
+          offsetTop: lastRead.offsetTop
         }
       });
     },
     clearSurahLastRead() {
-      this.$store.dispatch("quran/removeSurahLastRead");
-    },
-    updateScrollPosition(position) {
-      this.$store.dispatch("quran/setQuranReaderScrollPosition", {
-        offsetTop: position
-      });
+      this.$store.dispatch(
+        "quran/removePageScrollPosition",
+        "quran-reader-detail"
+      );
     }
   },
   mounted() {
     this.track(this.productName);
     this.$nextTick(() => {
-      window.scrollTo(0, this.scrollPosition);
+      window.scrollTo(0, this.getScrollPosition());
       this.init = false;
     });
   }

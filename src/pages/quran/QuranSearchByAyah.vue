@@ -1,7 +1,7 @@
 <template>
   <div class="quran-search-by-ayah">
     <!-- Scroll handler -->
-    <q-scroll-observer @scroll="onScroll" />
+    <page-scroll-position-handler :listen="!init" :page="page" />
     <q-header ref="header" class="bg-transparent">
       <q-toolbar ref="toolbar" class="bg-white text-black q-py-sm">
         <q-btn icon="arrow_back" flat round dense @click="$router.go(-1)" />
@@ -198,16 +198,19 @@ import { LocalStorage } from "quasar";
 import QuranSearchResultSkeleton from "./skeletons/QuranSearchResultSkeleton.vue";
 import AyahOptionsDialog from "src/components/AyahOptionsDialog.vue";
 import ToTop from "src/components/ToTop.vue";
+import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.vue";
 export default {
   name: "QuranSearchByAyah",
   components: {
     QuranSearchResultSkeleton,
     AyahOptionsDialog,
-    ToTop
+    ToTop,
+    PageScrollPositionHandler
   },
   data() {
     return {
       init: true,
+      page: "quran-search-by-ayah",
       keyword: "",
       keywordSearch: "",
       inputFocus: false,
@@ -231,18 +234,14 @@ export default {
   watch: {
     fullMatchSearch(val) {
       this.$store.dispatch("quran/setFullMatchSearch", val);
-      // Recall the search
-      if (this.searchResults.length > 0) {
-        this.onSearch();
-      }
+      this.onSearch();
     }
   },
   computed: {
     ...mapGetters({
       searchResults: "quran/getSearchAyahResults",
       searchResultTranslations: "quran/getSearchAyahResultTranslations",
-      searchPaging: "quran/getSearchAyahPaging",
-      scrollPosition: "quran/getQuranSearchAyahScrollPosition"
+      searchPaging: "quran/getSearchAyahPaging"
     }),
     isLoadMoreAvailable() {
       return this.searchPaging.currentPage < this.searchPaging.totalPage;
@@ -259,21 +258,17 @@ export default {
     }
   },
   methods: {
+    getScrollPosition() {
+      return (
+        this.$store.getters["quran/getPageScrollPosition"](this.page)
+          ?.offsetTop ?? 0
+      );
+    },
     fitContentHeight() {
       const headerHeight = this.$refs.header.$el.clientHeight + "px";
       this.contentStyles = {
         minHeight: `calc(100vh - ${headerHeight})`
       };
-    },
-    onScroll(info) {
-      if (["up", "down"].includes(info.direction) && !this.init) {
-        this.updateScrollPosition(info.position);
-      }
-    },
-    updateScrollPosition(position) {
-      this.$store.dispatch("quran/setQuranSearchAyahScrollPosition", {
-        offsetTop: position
-      });
     },
     saveLastKeyword() {
       LocalStorage.set("search-keyword", this.keywordSearch);
@@ -332,7 +327,7 @@ export default {
     this.fitContentHeight();
 
     this.$nextTick(() => {
-      window.scrollTo(0, this.scrollPosition);
+      window.scrollTo(0, this.getScrollPosition());
       this.init = false;
     });
 

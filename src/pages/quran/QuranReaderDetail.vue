@@ -1,7 +1,11 @@
 <template>
   <div class="quran-reader-detail">
     <!-- Scroll handler -->
-    <q-scroll-observer @scroll="onScroll" />
+    <page-scroll-position-handler
+      :listen="!init"
+      :page="page"
+      :extra="surahSimple"
+    />
     <!-- Quran reader detail skeleton -->
     <quran-reader-detail-skeleton
       v-if="$store.state.quran.loading.fetchSurah"
@@ -153,13 +157,15 @@ import QuranReaderDetailSkeleton from "./skeletons/QuranReaderDetailSkeleton.vue
 import AyahOptionsDialog from "src/components/AyahOptionsDialog.vue";
 import SurahChangerDialog from "src/components/SurahChangerDialog.vue";
 import ToTop from "src/components/ToTop.vue";
+import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.vue";
 export default {
   name: "QuranReaderDetail",
   components: {
     QuranReaderDetailSkeleton,
     AyahOptionsDialog,
     SurahChangerDialog,
-    ToTop
+    ToTop,
+    PageScrollPositionHandler
   },
   props: {
     offsetTop: {
@@ -173,6 +179,7 @@ export default {
   data() {
     return {
       init: true,
+      page: "quran-reader-detail",
       surahId: "",
       showAyahOptionsDialog: false,
       showAyahChangerDialog: false,
@@ -212,7 +219,9 @@ export default {
       );
     },
     surahSimple() {
-      const { ayahs, translations, ...surahSimple } = this.surah;
+      const surahSimple = Object.assign({}, this.surah);
+      delete surahSimple.ayahs;
+      delete surahSimple.translations;
       return surahSimple;
     },
     ayahsChangerFiltered() {
@@ -227,11 +236,6 @@ export default {
     }
   },
   methods: {
-    onScroll(info) {
-      if (["up", "down"].includes(info.direction) && !this.init) {
-        this.updateSurahLastRead(info.position);
-      }
-    },
     fitContentHeight() {
       const headerHeight = this.$refs.header.$el.clientHeight + "px";
       this.contentStyles = {
@@ -279,12 +283,6 @@ export default {
       this.showAyahChangerDialog = false;
       this.currentAyah = this.verseNumberFromKey(ayah.verse_key);
       this.scrollToElement(this.$refs[ayah.verse_key][0].$el);
-    },
-    updateSurahLastRead(position) {
-      this.$store.dispatch("quran/setSurahLastRead", {
-        surah: this.surahSimple,
-        offsetTop: position
-      });
     },
     bookmark() {
       this.$q.notify({

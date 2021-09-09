@@ -1,4 +1,3 @@
-import { LocalStorage } from "quasar";
 import { filterFullMatchSearchResults } from "src/lib/search-helper";
 import surahList from "src/data/surah-list";
 
@@ -56,33 +55,8 @@ export async function fetchSurah(context, surahId) {
     });
 }
 
-export function setSurahLastRead(context, { surah, offsetTop }) {
-  const surahLastRead = Object.assign({ offsetTop }, surah);
-  LocalStorage.set("last-read", surahLastRead);
-  context.commit("updateSurahLastRead", surahLastRead);
-}
-
-export function removeSurahLastRead(context) {
-  LocalStorage.remove("last-read");
-  context.commit("updateSurahLastRead", null);
-}
-
-export function setQuranReaderScrollPosition(context, { offsetTop }) {
-  LocalStorage.set("surah-list-scroll-position", offsetTop);
-  context.commit("updateQuranReaderScrollPosition", offsetTop);
-}
-
-export function setQuranSearchAyahScrollPosition(context, { offsetTop }) {
-  LocalStorage.set("search-ayah-scroll-position", offsetTop);
-  context.commit("updateQuranSearchAyahScrollPosition", offsetTop);
-}
-
 export async function searchByAyah(context, { keyword, page = 1 }) {
   context.commit("showLoading", "searchAyah");
-  const surahList =
-    context.state.surahList.length != 0
-      ? context.state.surahList
-      : await context.dispatch("fetchSurahList").then(res => res.data.chapters);
 
   const perPage = context.state.searchAyah.paging.perPage;
 
@@ -132,7 +106,7 @@ export async function searchByAyah(context, { keyword, page = 1 }) {
           const verseKeys = item.verse_key.split(":");
           const surah = surahList.find(s => s.id == verseKeys[0]);
           results[i].surahId = surah.id;
-          results[i].surahName = surah.name_simple;
+          results[i].surahName = surah.nameSimple;
           results[i].ayahNumber = verseKeys[1];
 
           this.$httpQuran({
@@ -173,4 +147,12 @@ export function resetSearchAyahPaging(context) {
 
 export function setFullMatchSearch(context, value) {
   context.commit("setFullMatchSearch", value);
+}
+
+export function setPageScrollPosition(context, info) {
+  context.commit("updatePageScrollPosition", info);
+}
+
+export function removePageScrollPosition(context, page) {
+  context.commit("removePageScrollPosition", page);
 }

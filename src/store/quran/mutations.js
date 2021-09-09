@@ -1,3 +1,6 @@
+import Vue from "vue";
+import { LocalStorage } from "quasar";
+
 export function showLoading(state, key) {
   state.loading[key] = true;
 }
@@ -8,18 +11,6 @@ export function hideLoading(state, key) {
 
 export function updateSurah(state, surah) {
   state.surah = surah;
-}
-
-export function updateSurahLastRead(state, surah) {
-  state.surahLastRead = surah;
-}
-
-export function updateQuranReaderScrollPosition(state, offsetTop) {
-  state.quranReaderScrollPosition = offsetTop;
-}
-
-export function updateQuranSearchAyahScrollPosition(state, offsetTop) {
-  state.searchAyahScrollPosition = offsetTop;
 }
 
 export function addSearchAyahResults(state, results) {
@@ -49,4 +40,18 @@ export function updateSearchAyahPaging(state, paging) {
 
 export function setFullMatchSearch(state, value) {
   state.searchAyah.fullMatch = value;
+}
+
+export function updatePageScrollPosition(state, info) {
+  const { page, offsetTop } = info;
+  Vue.set(state.pageScrollPosition, page, {
+    offsetTop,
+    extra: { ...info?.extra }
+  });
+  LocalStorage.set("page-scroll-position", state.pageScrollPosition);
+}
+
+export function removePageScrollPosition(state, page) {
+  Vue.delete(state.pageScrollPosition, page);
+  LocalStorage.set("page-scroll-position", state.pageScrollPosition);
 }
