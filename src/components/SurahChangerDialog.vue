@@ -13,6 +13,7 @@
           v-model="keyword"
           placeholder="Filter surah..."
           dense
+          clearable
         >
           <template v-slot:prepend>
             <q-icon name="search" />
@@ -81,6 +82,7 @@ export default {
       immediate: true,
       handler(val) {
         this.showDialog = val;
+        this.keyword = "";
         this.$nextTick(() => {
           if (val && this.activeSurahId) {
             const el = this.$refs["surah-changer-" + this.activeSurahId][0].$el;
