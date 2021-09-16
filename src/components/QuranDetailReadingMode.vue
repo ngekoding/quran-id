@@ -61,7 +61,7 @@ export default {
       for (let page = this.pages[0]; page <= endPage; page++) {
         this.images.push({
           page,
-          url: `/quran-images/${page}.png`
+          url: `quran-images/${page}.png`
         });
       }
     },
@@ -70,7 +70,7 @@ export default {
       if (nextPage <= this.pages[1]) {
         this.images.push({
           page: nextPage,
-          url: `/quran-images/${nextPage}.png`
+          url: `quran-images/${nextPage}.png`
         });
       }
     },
