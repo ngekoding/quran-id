@@ -29,6 +29,7 @@
           </q-item>
           <q-space />
           <q-btn
+            v-if="!readingMode"
             flat
             rounded
             dense
@@ -38,11 +39,24 @@
           >
             {{ currentAyah }}
           </q-btn>
-          <q-btn flat round dense icon="bookmark_border" @click="bookmark()" />
+          <q-btn
+            flat
+            round
+            dense
+            :icon="readingMode ? 'menu_book' : 'import_contacts'"
+            @click="readingMode = !readingMode"
+          />
         </q-toolbar>
         <q-separator />
       </q-header>
+      <!-- Reading mode -->
+      <quran-detail-reading-mode
+        v-if="readingMode"
+        :pages="surah.pages"
+        :header-height="headerHeight"
+      />
       <div
+        v-else
         class="content bg-white"
         :style="[{ 'padding-bottom': '64px' }, contentStyles]"
       >
@@ -153,14 +167,17 @@
 
 <script>
 import { mapGetters } from "vuex";
+import QuranDetailReadingMode from "src/components/QuranDetailReadingMode.vue";
 import QuranReaderDetailSkeleton from "./skeletons/QuranReaderDetailSkeleton.vue";
 import AyahOptionsDialog from "src/components/AyahOptionsDialog.vue";
 import SurahChangerDialog from "src/components/SurahChangerDialog.vue";
 import ToTop from "src/components/ToTop.vue";
 import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.vue";
+
 export default {
   name: "QuranReaderDetail",
   components: {
+    QuranDetailReadingMode,
     QuranReaderDetailSkeleton,
     AyahOptionsDialog,
     SurahChangerDialog,
@@ -180,6 +197,7 @@ export default {
     return {
       init: true,
       page: "quran-reader-detail",
+      headerHeight: 0,
       surahId: "",
       showAyahOptionsDialog: false,
       showAyahChangerDialog: false,
@@ -192,7 +210,8 @@ export default {
       },
       currentAyah: 1,
       ayahChangerKeyword: null,
-      contentStyles: null
+      contentStyles: null,
+      readingMode: false
     };
   },
   meta() {
@@ -237,9 +256,9 @@ export default {
   },
   methods: {
     fitContentHeight() {
-      const headerHeight = this.$refs.header.$el.clientHeight + "px";
+      this.headerHeight = this.$refs.header.$el.clientHeight;
       this.contentStyles = {
-        minHeight: `calc(100vh - ${headerHeight})`
+        minHeight: `calc(100vh - ${this.headerHeight}px)`
       };
     },
     getSurahDetail() {

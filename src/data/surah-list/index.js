@@ -11,7 +11,8 @@ surahListByApi.forEach(item => {
     bismillahPre: item.bismillah_pre,
     nameArabic: correction?.nameArabic ?? item.name_arabic,
     nameSimple: correction?.nameSimple ?? item.name_simple,
-    nameTranslated: correction?.nameTranslated ?? item.translated_name.name
+    nameTranslated: correction?.nameTranslated ?? item.translated_name.name,
+    pages: item.pages
   });
 });
 
