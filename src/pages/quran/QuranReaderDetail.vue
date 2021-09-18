@@ -220,7 +220,10 @@ export default {
     };
   },
   watch: {
-    "$route.params.surahId": "getSurahDetail"
+    "$route.params.surahId": "getSurahDetail",
+    showAyahChangerDialog() {
+      this.ayahChangerKeyword = null;
+    }
   },
   computed: {
     ...mapGetters({
