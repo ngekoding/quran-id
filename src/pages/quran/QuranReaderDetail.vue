@@ -111,7 +111,9 @@ export default {
       handler(val) {
         this.readingMode = val;
       }
-    }
+    },
+    surahId: "trackDetail",
+    readingMode: "trackDetail"
   },
   computed: {
     surah() {
@@ -119,11 +121,13 @@ export default {
     },
     pageTitle() {
       if (!this.surah) return this.productName;
+      const reading = this.readingMode ? " | Reading Mode" : "";
       return (
         "QS. " +
         this.surah.nameSimple +
         " | " +
         this.surah.nameTranslated +
+        reading +
         " | " +
         this.productName
       );
@@ -135,6 +139,9 @@ export default {
     }
   },
   methods: {
+    trackDetail() {
+      this.track(this.pageTitle);
+    },
     onSurahChanged(id) {
       this.$router
         .replace({
@@ -154,6 +161,7 @@ export default {
     this.surahId = parseInt(this.$route.params.surahId);
     this.$nextTick(() => {
       this.headerHeight = this.$refs.header.$el.clientHeight;
+      this.trackDetail();
     });
   }
 };
