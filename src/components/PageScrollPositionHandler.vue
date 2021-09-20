@@ -21,6 +21,7 @@ export default {
   methods: {
     onScroll(info) {
       if (["up", "down"].includes(info.direction) && this.listen) {
+        this.$emit("scroll", info.position);
         this.$store.dispatch("quran/setPageScrollPosition", {
           page: this.page,
           offsetTop: info.position,

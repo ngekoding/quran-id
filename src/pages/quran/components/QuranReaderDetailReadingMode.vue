@@ -1,6 +1,7 @@
 <template>
   <div class="quran-reading-mode bg-white">
     <swiper
+      :key="swiperKey"
       ref="quranPageSwiper"
       :options="swiperOptions"
       dir="rtl"
@@ -25,22 +26,42 @@ export default {
     SwiperSlide
   },
   props: {
+    surah: {
+      type: Object,
+      required: true
+    },
     pages: {
       type: Array,
       required: true
     },
     headerHeight: {
       type: Number,
-      required: true
+      default: 0
+    },
+    activePage: {
+      type: Number,
+      default: 0
     }
   },
   data() {
     return {
+      page: "quran-reader-detail-mode",
+      swiperKey: 1,
       swiperOptions: {},
       pageCount: 0,
       currentPage: this.pages[0],
       images: []
     };
+  },
+  watch: {
+    pages(val) {
+      this.swiperOptions.initialSlide = 0;
+      this.swiperKey = !this.swiperKey;
+
+      this.currentPage = val[0];
+      this.init();
+    },
+    currentPage: "saveScrollPosition"
   },
   computed: {
     swiper() {
@@ -55,8 +76,12 @@ export default {
   },
   methods: {
     init() {
+      this.images = [];
+      this.pageCount = this.pages[1] - this.pages[0] + 1;
+
       // Load three first images
-      let endPage = this.pages[0] + 2;
+      let endPage = this.currentPage + 2;
+
       endPage = endPage > this.pages[1] ? this.pages[1] : endPage;
       for (let page = this.pages[0]; page <= endPage; page++) {
         this.images.push({
@@ -80,13 +105,31 @@ export default {
     },
     onPrev() {
       this.currentPage--;
+    },
+    saveScrollPosition() {
+      this.$store.dispatch("quran/setPageScrollPosition", {
+        page: this.page,
+        offsetTop: 0,
+        extra: {
+          readingMode: true,
+          surah: this.surah,
+          currentPage: this.currentPage
+        }
+      });
     }
   },
   mounted() {
-    this.pageCount = this.pages[1] - this.pages[0] + 1;
+    if (this.activePage != 0) {
+      const activePageIndex = this.activePage - this.pages[0];
+      this.swiperOptions.initialSlide = activePageIndex;
+      this.currentPage = this.activePage;
+      this.swiperKey = !this.swiperKey;
+    }
+
     this.init();
+  },
+  activated() {
+    this.saveScrollPosition();
   }
 };
 </script>
-
-<style></style>

@@ -22,20 +22,24 @@
       </div>
       <q-item class="q-py-md" clickable v-ripple @click="showSurahLastRead()">
         <q-item-section side class="items-center" style="width: 40px">
-          <div class="text-center">{{ surahLastRead.extra.id }}</div>
+          <div class="text-center">{{ surahLastRead.extra.surah.id }}</div>
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ surahLastRead.extra.nameSimple }}</q-item-label>
+          <q-item-label>{{
+            surahLastRead.extra.surah.nameSimple
+          }}</q-item-label>
           <q-item-label caption>
             {{
-              normalizeSurahNameTranslation(surahLastRead.extra.nameTranslated)
-            }}, {{ surahLastRead.extra.versesCount }} ayat
+              normalizeSurahNameTranslation(
+                surahLastRead.extra.surah.nameTranslated
+              )
+            }}, {{ surahLastRead.extra.surah.versesCount }} ayat
           </q-item-label>
         </q-item-section>
 
         <q-item-section side top>
           <q-item-label class="text-black text-arabic arabic-surah-name">
-            {{ surahLastRead.nameArabic }}
+            {{ surahLastRead.extra.surah.nameArabic }}
           </q-item-label>
         </q-item-section>
       </q-item>
@@ -179,7 +183,7 @@ export default {
     },
     getSurahLastRead() {
       return this.$store.getters["quran/getPageScrollPosition"](
-        "quran-reader-detail"
+        "quran-reader-detail-mode"
       );
     },
     showSurahLastRead() {
@@ -187,15 +191,17 @@ export default {
       this.$router.push({
         name: "QuranReaderDetail",
         params: {
-          surahId: lastRead.extra.id,
-          offsetTop: lastRead.offsetTop
+          surahId: lastRead.extra.surah.id,
+          offsetTop: lastRead.offsetTop,
+          readingModeActive: lastRead.extra.readingMode,
+          activePage: lastRead.extra.currentPage
         }
       });
     },
     clearSurahLastRead() {
       this.$store.dispatch(
         "quran/removePageScrollPosition",
-        "quran-reader-detail"
+        "quran-reader-detail-mode"
       );
     }
   },
