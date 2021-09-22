@@ -217,7 +217,7 @@ export default {
   watch: {
     surahId() {
       this.stopAudio();
-      this.player.audios = [];
+      this.player.audios = {};
       this.getSurahDetail();
     },
     showAyahChangerDialog() {
