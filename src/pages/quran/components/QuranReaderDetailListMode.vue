@@ -215,7 +215,11 @@ export default {
     };
   },
   watch: {
-    surahId: "getSurahDetail",
+    surahId() {
+      this.stopAudio();
+      this.player.audios = [];
+      this.getSurahDetail();
+    },
     showAyahChangerDialog() {
       this.ayahChangerKeyword = null;
     }
