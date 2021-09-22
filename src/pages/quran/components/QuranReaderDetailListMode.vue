@@ -364,6 +364,7 @@ export default {
     },
     stopAudio() {
       this.player.audio?.pause();
+      this.player.audio?.currentTime = 0;
       this.player.playing = false;
     },
     onAudioAyahEnded() {
