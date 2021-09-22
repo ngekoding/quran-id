@@ -43,7 +43,12 @@ export async function fetchSurah(context, surahId) {
 
   return Promise.all(requests)
     .then(values => {
-      const arabics = values[0].verses;
+      const arabics = values[0].verses.map(verse => {
+        return {
+          ...verse,
+          verse_number: parseInt(verse.verse_key.split(":")[1])
+        };
+      });
       const translations = values[1].translations;
       const merged = Object.assign({ ayahs: arabics, translations }, chapter);
       context.commit("updateSurah", merged);

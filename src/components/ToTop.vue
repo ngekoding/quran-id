@@ -32,6 +32,14 @@ export default {
       show: false
     };
   },
+  watch: {
+    show: {
+      immediate: true,
+      handler(val) {
+        this.$emit("show", val);
+      }
+    }
+  },
   methods: {
     onScroll(info) {
       if (info.position > 900) {

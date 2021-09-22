@@ -26,7 +26,7 @@ module.exports = function(ctx) {
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
       // 'ionicons-v4',
-      // 'mdi-v5',
+      "mdi-v5",
       // 'fontawesome-v5',
       // 'eva-icons',
       // 'themify',
@@ -103,7 +103,7 @@ module.exports = function(ctx) {
 
     // animations: 'all', // --- includes all animations
     // https://quasar.dev/options/animations
-    animations: ["fadeIn", "fadeOut"],
+    animations: ["fadeIn", "fadeOut", "fadeInUp", "fadeOutDown"],
 
     // https://quasar.dev/quasar-cli/developing-ssr/configuring-ssr
     ssr: {
