@@ -177,6 +177,7 @@ export default {
         audios: {},
         playing: false,
         currentAyah: 0,
+        ayahStartFrom: 0,
         loop: false
       }
     };
@@ -266,6 +267,7 @@ export default {
       this.player.type = type;
       this.player.loop = type == "current-loop";
       this.player.currentAyah = this.ayahPlayOptionsDialogData.ayahNumber;
+      this.player.ayahStartFrom = this.ayahPlayOptionsDialogData.ayahNumber;
 
       this.stopAudio();
       this.playAudio();
@@ -324,7 +326,7 @@ export default {
       this.player.playing = false;
     },
     onAudioAyahEnded() {
-      if (this.player.type == "current-and-continue") {
+      if (this.player.type.startsWith("current-and-continue")) {
         const nextAyah = this.player.currentAyah + 1;
         if (nextAyah <= this.surah.versesCount) {
           // Scroll to next ayah
@@ -332,6 +334,12 @@ export default {
           this.scrollToElement(this.$refs[verseKey][0].$el);
 
           this.player.currentAyah = nextAyah;
+          this.playAudio();
+        } else if (this.player.type.endsWith("loop")) {
+          const verseKey = this.surahId + ":" + this.player.ayahStartFrom;
+          this.scrollToElement(this.$refs[verseKey][0].$el);
+
+          this.player.currentAyah = this.player.ayahStartFrom;
           this.playAudio();
         } else {
           this.stopAudio();

@@ -23,6 +23,11 @@
             Dengarkan mulai dari ayat ini
           </q-item-section>
         </q-item>
+        <q-item clickable v-ripple @click="play('current-and-continue-loop')">
+          <q-item-section>
+            Dengarkan mulai dari ayat ini berulang
+          </q-item-section>
+        </q-item>
       </q-list>
     </q-card>
   </q-dialog>
