@@ -91,6 +91,7 @@
 
     <!-- Playing stop -->
     <ayah-play-bottom-control
+      v-if="surah"
       :show="player.playing"
       :surah-name="surah.nameSimple"
       :ayah-number="player.currentAyah"
@@ -98,48 +99,13 @@
     />
 
     <!-- Dialog ayah changer -->
-    <q-dialog v-model="showAyahChangerDialog">
-      <q-card class="bg-primary" style="width: 80vw">
-        <q-card-section class="row items-center text-white">
-          <div class="text-h6">Pergi ke ayat</div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
-        </q-card-section>
-        <q-card-section class="bg-white">
-          <q-input
-            rounded
-            outlined
-            v-model="ayahChangerKeyword"
-            placeholder="Filter nomor ayat..."
-            dense
-            type="number"
-            min="1"
-          >
-            <template v-slot:prepend>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </q-card-section>
-        <q-list separator class="scroll bg-white" style="max-height: 60vh">
-          <q-item v-if="ayahsChangerFiltered.length == 0">
-            <q-item-section class="text-center text-grey-6">
-              Tidak tersedia
-            </q-item-section>
-          </q-item>
-          <q-item
-            clickable
-            v-ripple
-            v-for="ayah in ayahsChangerFiltered"
-            :key="'ayah-changer-' + ayah.verse_key"
-            @click="onAyahChange(ayah)"
-          >
-            <q-item-section>
-              Ayat {{ verseNumberFromKey(ayah.verse_key) }}
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-card>
-    </q-dialog>
+    <ayah-changer-dialog
+      v-if="surah"
+      :show.sync="showAyahChangerDialog"
+      :surah-id="surahId"
+      :verses-count="surah.versesCount"
+      @item-click="onAyahChange"
+    />
 
     <!-- Go to top -->
     <to-top v-show="!player.playing" @show="show => (toTopShown = show)" />
@@ -151,16 +117,18 @@
 import { mapGetters } from "vuex";
 import QuranReaderDetailSkeleton from "../skeletons/QuranReaderDetailSkeleton.vue";
 import AyahOptionsDialog from "src/components/AyahOptionsDialog.vue";
+import AyahChangerDialog from "src/components/AyahChangerDialog.vue";
 import AyahPlayOptionsDialog from "src/components/AyahPlayOptionsDialog.vue";
+import AyahPlayBottomControl from "src/components/AyahPlayBottomControl.vue";
 import ToTop from "src/components/ToTop.vue";
 import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.vue";
-import AyahPlayBottomControl from "src/components/AyahPlayBottomControl.vue";
 
 export default {
   name: "QuranDetailListMode",
   components: {
     QuranReaderDetailSkeleton,
     AyahOptionsDialog,
+    AyahChangerDialog,
     AyahPlayOptionsDialog,
     ToTop,
     PageScrollPositionHandler,
@@ -202,7 +170,6 @@ export default {
       ayahPlayOptionsDialogData: {
         ayahNumber: 0
       },
-      ayahChangerKeyword: null,
       activeOffsetTop: 0,
       player: {
         type: "current-only", // current-only, current-loop, current-and-continue
@@ -219,9 +186,6 @@ export default {
       this.stopAudio();
       this.player.audios = {};
       this.getSurahDetail();
-    },
-    showAyahChangerDialog() {
-      this.ayahChangerKeyword = null;
     }
   },
   computed: {
@@ -239,16 +203,6 @@ export default {
         readingMode: false,
         surah: surahSimple
       };
-    },
-    ayahsChangerFiltered() {
-      if (this.ayahChangerKeyword) {
-        return this.surah.ayahs.filter(ayah =>
-          this.verseNumberFromKey(ayah.verse_key).startsWith(
-            this.ayahChangerKeyword
-          )
-        );
-      }
-      return this.surah?.ayahs ?? [];
     },
     contentStyles() {
       let paddingBottom = 10;
@@ -295,9 +249,9 @@ export default {
     prepareAyahChange() {
       this.showAyahChangerDialog = true;
     },
-    onAyahChange(ayah) {
+    onAyahChange(verseKey) {
       this.showAyahChangerDialog = false;
-      this.scrollToElement(this.$refs[ayah.verse_key][0].$el);
+      this.scrollToElement(this.$refs[verseKey][0].$el);
     },
     bookmark() {
       this.$q.notify({
