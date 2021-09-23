@@ -122,6 +122,7 @@ import AyahPlayOptionsDialog from "src/components/AyahPlayOptionsDialog.vue";
 import AyahPlayBottomControl from "src/components/AyahPlayBottomControl.vue";
 import ToTop from "src/components/ToTop.vue";
 import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.vue";
+import reciterList from "src/data/reciter-list";
 
 export default {
   name: "QuranDetailListMode",
@@ -171,6 +172,7 @@ export default {
         ayahNumber: 0
       },
       activeOffsetTop: 0,
+      reciterList,
       player: {
         type: "current-only", // current-only, current-loop, current-and-continue
         audio: null,
@@ -187,6 +189,9 @@ export default {
       this.stopAudio();
       this.player.audios = {};
       this.getSurahDetail();
+    },
+    "$store.state.quran.audioReciterId"() {
+      this.player.audios = {};
     }
   },
   computed: {
@@ -275,7 +280,11 @@ export default {
     getAudioUrl(ayahNumber) {
       const surahFixedLen = this.surahId.toString().padStart(3, "0");
       const ayahFixedLen = ayahNumber.toString().padStart(3, "0");
-      return `https://audio.qurancdn.com/Alafasy/mp3/${surahFixedLen}${ayahFixedLen}.mp3`;
+      const audioReciterId = this.$store.getters["quran/getAudioReciterId"];
+      const urlPrefix = reciterList.find(r => r.id == audioReciterId)
+        .audioUrlPrefix;
+
+      return urlPrefix + surahFixedLen + ayahFixedLen + ".mp3";
     },
     getAudio(ayahNumber) {
       if (this.player.audios.hasOwnProperty(ayahNumber)) {

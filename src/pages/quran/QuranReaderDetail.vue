@@ -18,21 +18,37 @@
         </q-item>
         <q-space />
         <q-btn
-          v-if="!readingMode"
-          flat
-          rounded
-          dense
-          icon="format_list_numbered_rtl"
-          @click="prepareAyahChange()"
-          class="nowrap"
-        />
-        <q-btn
           flat
           round
           dense
           :icon="readingMode ? 'menu_book' : 'import_contacts'"
           @click="readingMode = !readingMode"
         />
+        <q-btn icon="mdi-dots-vertical" flat round dense>
+          <q-menu transition-show="jump-down" content-class="no-shadow">
+            <q-list separator bordered>
+              <q-item
+                v-if="!readingMode"
+                clickable
+                v-close-popup
+                @click="prepareAyahChange()"
+              >
+                <q-item-section>
+                  <q-item-label>Pergi ke nomor ayat</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item
+                clickable
+                v-close-popup
+                @click="showSettingsDialog = true"
+              >
+                <q-item-section>
+                  <q-item-label>Pengaturan</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
       </q-toolbar>
       <q-separator />
     </q-header>
@@ -57,12 +73,16 @@
       :active-surah-id="surahId"
       @item-click="onSurahChanged"
     />
+
+    <!-- Settings dialog -->
+    <quran-reader-detail-settings-dialog :show.sync="showSettingsDialog" />
   </div>
 </template>
 
 <script>
 import QuranReaderDetailListMode from "./components/QuranReaderDetailListMode.vue";
 import QuranReaderDetailReadingMode from "./components/QuranReaderDetailReadingMode.vue";
+import QuranReaderDetailSettingsDialog from "src/components/QuranReaderDetailSettingsDialog.vue";
 import SurahChangerDialog from "src/components/SurahChangerDialog.vue";
 import surahList from "src/data/surah-list";
 
@@ -71,6 +91,7 @@ export default {
   components: {
     QuranReaderDetailReadingMode,
     QuranReaderDetailListMode,
+    QuranReaderDetailSettingsDialog,
     SurahChangerDialog
   },
   props: {
@@ -97,7 +118,8 @@ export default {
       surahId: "",
       showSurahChangerDialog: false,
       contentStyles: null,
-      readingMode: false
+      readingMode: false,
+      showSettingsDialog: false
     };
   },
   meta() {

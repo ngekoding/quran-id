@@ -161,3 +161,7 @@ export function setPageScrollPosition(context, info) {
 export function removePageScrollPosition(context, page) {
   context.commit("removePageScrollPosition", page);
 }
+
+export function changeAudioReciterId(context, reciterId) {
+  context.commit("changeAudioReciterId", reciterId);
+}

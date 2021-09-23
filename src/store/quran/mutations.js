@@ -55,3 +55,8 @@ export function removePageScrollPosition(state, page) {
   Vue.delete(state.pageScrollPosition, page);
   LocalStorage.set("page-scroll-position", state.pageScrollPosition);
 }
+
+export function changeAudioReciterId(state, reciterId) {
+  LocalStorage.set("audio-reciter-id", reciterId);
+  state.audioReciterId = reciterId;
+}

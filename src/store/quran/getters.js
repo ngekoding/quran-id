@@ -19,3 +19,7 @@ export function getPageScrollPosition(state) {
     return state.pageScrollPosition[page] ?? 0;
   };
 }
+
+export function getAudioReciterId(state) {
+  return state.audioReciterId;
+}
