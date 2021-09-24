@@ -56,7 +56,13 @@ export function removePageScrollPosition(state, page) {
   LocalStorage.set("page-scroll-position", state.pageScrollPosition);
 }
 
-export function changeAudioReciterId(state, reciterId) {
-  LocalStorage.set("audio-reciter-id", reciterId);
-  state.audioReciterId = reciterId;
+export function updatePlayerSettings(state, settings) {
+  LocalStorage.set("player-settings", settings);
+  state.playerSettings = settings;
+}
+
+export function setSingglePlayerSettings(state, setting) {
+  const { key, value } = setting;
+  Vue.set(state.playerSettings, key, value);
+  LocalStorage.set("player-settings", state.settings);
 }

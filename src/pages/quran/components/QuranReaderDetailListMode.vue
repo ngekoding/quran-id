@@ -180,7 +180,7 @@ export default {
         playing: false,
         currentAyah: 0,
         ayahStartFrom: 0,
-        loop: false
+        loopCounter: 0
       }
     };
   },
@@ -190,14 +190,18 @@ export default {
       this.player.audios = {};
       this.getSurahDetail();
     },
-    "$store.state.quran.audioReciterId"() {
+    audioReciterId() {
       this.player.audios = {};
     }
   },
   computed: {
     ...mapGetters({
-      surah: "quran/getSurah"
+      surah: "quran/getSurah",
+      playerSettings: "quran/getPlayerSettings"
     }),
+    audioReciterId() {
+      return this.playerSettings?.audioReciterId ?? 7;
+    },
     ayahCount() {
       return this.surah?.length;
     },
@@ -270,7 +274,7 @@ export default {
     },
     onAyahPlay(type) {
       this.player.type = type;
-      this.player.loop = type == "current-loop";
+      this.player.loopCounter = 0;
       this.player.currentAyah = this.ayahPlayOptionsDialogData.ayahNumber;
       this.player.ayahStartFrom = this.ayahPlayOptionsDialogData.ayahNumber;
 
@@ -280,8 +284,7 @@ export default {
     getAudioUrl(ayahNumber) {
       const surahFixedLen = this.surahId.toString().padStart(3, "0");
       const ayahFixedLen = ayahNumber.toString().padStart(3, "0");
-      const audioReciterId = this.$store.getters["quran/getAudioReciterId"];
-      const urlPrefix = reciterList.find(r => r.id == audioReciterId)
+      const urlPrefix = reciterList.find(r => r.id == this.audioReciterId)
         .audioUrlPrefix;
 
       return urlPrefix + surahFixedLen + ayahFixedLen + ".mp3";
@@ -316,7 +319,6 @@ export default {
     playAudio() {
       this.player.audio = this.getAudio(this.player.currentAyah);
       this.player.audio.addEventListener("ended", this.onAudioAyahEnded);
-      this.player.audio.loop = this.player.loop;
       this.player.audio.play();
 
       this.player.playing = true;
@@ -335,7 +337,16 @@ export default {
       this.player.playing = false;
     },
     onAudioAyahEnded() {
-      if (this.player.type.startsWith("current-and-continue")) {
+      if (this.player.type == "current-loop") {
+        this.player.loopCounter++;
+        console.log("counter", this.player.loopCounter);
+        console.log("max", this.playerSettings.singleRepeatNumber);
+        if (this.player.loopCounter < this.playerSettings.singleRepeatNumber) {
+          this.playAudio();
+        } else {
+          this.stopAudio();
+        }
+      } else if (this.player.type.startsWith("current-and-continue")) {
         const nextAyah = this.player.currentAyah + 1;
         if (nextAyah <= this.surah.versesCount) {
           // Scroll to next ayah
@@ -345,15 +356,22 @@ export default {
           this.player.currentAyah = nextAyah;
           this.playAudio();
         } else if (this.player.type.endsWith("loop")) {
-          const verseKey = this.surahId + ":" + this.player.ayahStartFrom;
-          this.scrollToElement(this.$refs[verseKey][0].$el);
+          this.player.loopCounter++;
+          if (
+            this.player.loopCounter < this.playerSettings.continuedRepeatNumber
+          ) {
+            const verseKey = this.surahId + ":" + this.player.ayahStartFrom;
+            this.scrollToElement(this.$refs[verseKey][0].$el);
 
-          this.player.currentAyah = this.player.ayahStartFrom;
-          this.playAudio();
+            this.player.currentAyah = this.player.ayahStartFrom;
+            this.playAudio();
+          } else {
+            this.stopAudio();
+          }
         } else {
           this.stopAudio();
         }
-      } else if (!this.player.loop) {
+      } else {
         this.stopAudio();
       }
     }

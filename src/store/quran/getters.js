@@ -20,6 +20,6 @@ export function getPageScrollPosition(state) {
   };
 }
 
-export function getAudioReciterId(state) {
-  return state.audioReciterId;
+export function getPlayerSettings(state) {
+  return state.playerSettings;
 }

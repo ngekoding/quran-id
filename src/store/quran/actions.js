@@ -162,6 +162,10 @@ export function removePageScrollPosition(context, page) {
   context.commit("removePageScrollPosition", page);
 }
 
-export function changeAudioReciterId(context, reciterId) {
-  context.commit("changeAudioReciterId", reciterId);
+export function updatePlayerSettings(context, settings) {
+  context.commit("updatePlayerSettings", settings);
+}
+
+export function setSinglePlayerSettings(context, setting) {
+  context.commit("setSinglePlayerSettings", setting);
 }

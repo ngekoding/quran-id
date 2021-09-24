@@ -3,8 +3,12 @@ import { LocalStorage } from "quasar";
 export default function() {
   return {
     surah: null,
-    audioReciterId: LocalStorage.getItem("audio-reciter-id") ?? 7, // Default: Mishari Rashid al-`Afasy
     pageScrollPosition: LocalStorage.getItem("page-scroll-position") ?? {},
+    playerSettings: LocalStorage.getItem("player-settings") ?? {
+      audioReciterId: 7, // Mishari Rashid al-`Afasy
+      singleRepeatNumber: 999, // Infinite
+      continuedRepeatNumber: 999 // Infinite
+    },
     searchAyah: {
       fullMatch: false,
       paging: {
