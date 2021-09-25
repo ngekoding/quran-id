@@ -12,7 +12,6 @@
     "build": "quasar build -m pwa"
   },
   "dependencies": {
-    "@chenfengyuan/vue-number-input": "^1.2.1",
     "@quasar/extras": "^1.0.0",
     "axios": "^0.18.1",
     "axios-cache-adapter": "^2.7.0",

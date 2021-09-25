@@ -12,7 +12,7 @@
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
-      <q-list class="bg-white q-pb-md">
+      <q-list class="scroll bg-white" style="max-height: 70vh">
         <q-item-label header>Pengaturan pembacaan</q-item-label>
         <q-item>
           <q-item-section>
@@ -38,26 +38,34 @@
             </div>
           </q-item-section>
         </q-item>
+        <q-separator spaced />
         <q-item>
           <q-item-section>
             <q-item-label class="q-mb-sm">
-              Pengulangan ayat ini
+              Pengulangan satu ayat
             </q-item-label>
-            <v-number-input
-              v-if="!singleRepeatNumberInfinite"
-              v-model="singleRepeatNumber"
-              :min="2"
-              :max="998"
-              class="q-mb-sm"
-              controls
-              center
-            />
-            <q-toggle
-              v-model="singleRepeatNumberInfinite"
-              label="Tanpa batas"
-              size="sm"
-              dense
-            />
+            <div class="setting-note text-caption text-grey-7 q-mb-sm">
+              Pengulangan ini akan diterapkan saat memilih
+              <b>dengarkan ayat ini berulang</b>.
+            </div>
+            <div class="row items-center justify-between">
+              <q-toggle
+                v-model="singleRepeatNumberInfinite"
+                label="Tanpa batas"
+                size="xs"
+                :class="[
+                  'q-py-sm',
+                  singleRepeatNumberInfinite ? 'text-grey-10' : 'text-grey'
+                ]"
+                dense
+              />
+              <number-input-spinner
+                v-if="!singleRepeatNumberInfinite"
+                v-model="singleRepeatNumber"
+                :min="2"
+                :max="998"
+              />
+            </div>
           </q-item-section>
         </q-item>
         <q-item>
@@ -65,21 +73,28 @@
             <q-item-label class="q-mb-sm">
               Pengulangan ayat berlanjut
             </q-item-label>
-            <v-number-input
-              v-if="!continuedRepeatNumberInfinite"
-              v-model="continuedRepeatNumber"
-              :min="2"
-              :max="998"
-              class="q-mb-sm"
-              controls
-              center
-            />
-            <q-toggle
-              v-model="continuedRepeatNumberInfinite"
-              label="Tanpa batas"
-              size="sm"
-              dense
-            />
+            <div class="setting-note text-caption text-grey-7 q-mb-sm">
+              Pengulangan ini akan diterapkan saat memilih
+              <b>dengarkan mulai ayat ini berulang</b>.
+            </div>
+            <div class="row items-center justify-between">
+              <q-toggle
+                v-model="continuedRepeatNumberInfinite"
+                label="Tanpa batas"
+                size="xs"
+                :class="[
+                  'q-py-sm',
+                  continuedRepeatNumberInfinite ? 'text-grey-10' : 'text-grey'
+                ]"
+                dense
+              />
+              <number-input-spinner
+                v-if="!continuedRepeatNumberInfinite"
+                v-model="continuedRepeatNumber"
+                :min="2"
+                :max="998"
+              />
+            </div>
           </q-item-section>
         </q-item>
       </q-list>
@@ -93,12 +108,12 @@
 
 <script>
 import reciterList from "src/data/reciter-list";
-import VueNumberInput from "@chenfengyuan/vue-number-input";
+import NumberInputSpinner from "src/components/NumberInputSpinner.vue";
 
 export default {
   name: "QuranReaderDetailSettingsDialog",
   components: {
-    "v-number-input": VueNumberInput
+    NumberInputSpinner
   },
   props: {
     show: {

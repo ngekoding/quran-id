@@ -24,34 +24,17 @@
           :icon="readingMode ? 'menu_book' : 'import_contacts'"
           @click="readingMode = !readingMode"
         />
-        <q-btn icon="mdi-dots-vertical" flat round dense>
-          <q-menu transition-show="jump-down" content-class="no-shadow">
-            <q-list separator bordered>
-              <q-item
-                v-if="!readingMode"
-                clickable
-                v-close-popup
-                @click="prepareAyahChange()"
-              >
-                <q-item-section>
-                  <q-item-label>Pergi ke nomor ayat</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item
-                clickable
-                v-close-popup
-                @click="showSettingsDialog = true"
-              >
-                <q-item-section>
-                  <q-item-label>Pengaturan</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </q-btn>
+        <q-btn
+          icon="mdi-dots-vertical"
+          flat
+          round
+          dense
+          @click="showMenuMoreDialog = true"
+        />
       </q-toolbar>
       <q-separator />
     </q-header>
+
     <!-- Quran detail -->
     <keep-alive v-if="surah">
       <component
@@ -74,6 +57,47 @@
       @item-click="onSurahChanged"
     />
 
+    <!-- Menu more dialog -->
+    <q-dialog v-model="showMenuMoreDialog" position="bottom">
+      <q-card class="full-width">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-h6">Lainnya</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+        <q-list separator padding>
+          <q-item clickable v-ripple v-close-popup @click="prepareAyahChange()">
+            <q-item-section avatar>
+              <q-icon name="mdi-priority-low" />
+            </q-item-section>
+            <q-item-section>Pergi ke nomor ayat</q-item-section>
+          </q-item>
+          <q-item
+            clickable
+            v-ripple
+            v-close-popup
+            @click="showSurahChangerDialog = true"
+          >
+            <q-item-section avatar>
+              <q-icon name="mdi-format-list-text" />
+            </q-item-section>
+            <q-item-section>Pindah surah</q-item-section>
+          </q-item>
+          <q-item
+            clickable
+            v-ripple
+            v-close-popup
+            @click="showSettingsDialog = true"
+          >
+            <q-item-section avatar>
+              <q-icon name="mdi-tune" />
+            </q-item-section>
+            <q-item-section>Pengaturan</q-item-section>
+          </q-item>
+        </q-list>
+      </q-card>
+    </q-dialog>
+
     <!-- Settings dialog -->
     <quran-reader-detail-settings-dialog :show.sync="showSettingsDialog" />
   </div>
@@ -84,6 +108,7 @@ import QuranReaderDetailListMode from "./components/QuranReaderDetailListMode.vu
 import QuranReaderDetailReadingMode from "./components/QuranReaderDetailReadingMode.vue";
 import QuranReaderDetailSettingsDialog from "src/components/QuranReaderDetailSettingsDialog.vue";
 import SurahChangerDialog from "src/components/SurahChangerDialog.vue";
+
 import surahList from "src/data/surah-list";
 
 export default {
@@ -119,7 +144,8 @@ export default {
       showSurahChangerDialog: false,
       contentStyles: null,
       readingMode: false,
-      showSettingsDialog: false
+      showSettingsDialog: false,
+      showMenuMoreDialog: false
     };
   },
   meta() {
@@ -177,6 +203,9 @@ export default {
     },
     prepareAyahChange() {
       this.$refs.quranDetail.prepareAyahChange();
+    },
+    onMenuMore() {
+      this.$refs.menuMore.setState("half");
     }
   },
   created() {
