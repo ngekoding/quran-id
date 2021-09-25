@@ -75,7 +75,7 @@
             </q-item-label>
             <div class="setting-note text-caption text-grey-7 q-mb-sm">
               Pengulangan ini akan diterapkan saat memilih
-              <b>dengarkan mulai ayat ini berulang</b>.
+              <b>dengarkan mulai dari ayat ini berulang</b>.
             </div>
             <div class="row items-center justify-between">
               <q-toggle
