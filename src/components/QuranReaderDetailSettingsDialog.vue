@@ -12,7 +12,7 @@
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
-      <q-list class="scroll bg-white" style="max-height: 70vh">
+      <q-list class="scroll bg-white" style="max-height: 65vh">
         <q-item-label header>Pengaturan pembacaan</q-item-label>
         <q-item>
           <q-item-section>
