@@ -66,7 +66,13 @@
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <q-list separator padding>
-          <q-item clickable v-ripple v-close-popup @click="prepareAyahChange()">
+          <q-item
+            v-if="!readingMode"
+            clickable
+            v-ripple
+            v-close-popup
+            @click="prepareAyahChange()"
+          >
             <q-item-section avatar>
               <q-icon name="mdi-priority-low" />
             </q-item-section>
