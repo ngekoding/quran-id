@@ -12,10 +12,8 @@
           horizontal
         >
           <div class="q-ml-sm">
-            <div class="text-grey">Anda sedang mendengarkan</div>
-            <div class="text-weight-bold">
-              QS. {{ surahName }}: {{ ayahNumber }}
-            </div>
+            <div class="title">{{ title }}</div>
+            <div class="text-grey">{{ caption }}</div>
           </div>
           <q-space />
           <q-btn
@@ -38,12 +36,12 @@ export default {
     show: {
       type: Boolean
     },
-    surahName: {
+    title: {
       type: String,
       required: true
     },
-    ayahNumber: {
-      type: Number,
+    caption: {
+      type: String,
       required: true
     }
   },
@@ -54,3 +52,10 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.title {
+  font-weight: bold;
+  line-height: 15px;
+}
+</style>

@@ -93,8 +93,8 @@
     <ayah-play-bottom-control
       v-if="surah"
       :show="player.playing"
-      :surah-name="surah.nameSimple"
-      :ayah-number="player.currentAyah"
+      :title="ayahPlayBottomControlTitle"
+      :caption="surah.nameSimple + ': ' + player.currentAyah"
       @stop="stopAudio()"
     />
 
@@ -202,6 +202,15 @@ export default {
     audioReciterId() {
       return this.playerSettings?.audioReciterId ?? 7;
     },
+    audioReciter() {
+      return this.reciterList.find(r => r.id == this.audioReciterId);
+    },
+    ayahPlayBottomControlTitle() {
+      return (
+        this.audioReciter.reciterName +
+        (this.audioReciter.style ? ` (${this.audioReciter.style})` : "")
+      );
+    },
     ayahCount() {
       return this.surah?.length;
     },
@@ -284,8 +293,7 @@ export default {
     getAudioUrl(ayahNumber) {
       const surahFixedLen = this.surahId.toString().padStart(3, "0");
       const ayahFixedLen = ayahNumber.toString().padStart(3, "0");
-      const urlPrefix = reciterList.find(r => r.id == this.audioReciterId)
-        .audioUrlPrefix;
+      const urlPrefix = this.audioReciter.audioUrlPrefix;
 
       return urlPrefix + surahFixedLen + ayahFixedLen + ".mp3";
     },

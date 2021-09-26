@@ -34,7 +34,7 @@ const url = "https://api.quran.com/api/v4/resources/recitations";
   }
 
   // Write to json file
-  const filePath = "./../src/data/reciter-list/index.js";
+  const filePath = "./../src/data/reciter-list/reciter-list-by-api.js";
   fs.ensureFileSync(filePath);
   fs.writeFileSync(filePath, JSON.stringify(reciterListFinal, null, "\t"));
 
