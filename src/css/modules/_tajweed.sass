@@ -1,0 +1,49 @@
+.quran-reader-detail tajweed
+  cursor: pointer
+  position: relative
+  &.idgham_wo_ghunnah
+    color: #f57f16
+  &.idgham_ghunnah,
+  &.idgham_shafawi,
+  &.ghunnah
+    color: #e91e63
+  &.ikhafa_shafawi,
+  &.ikhafa
+    color: #4caf50
+  &.iqlab
+    color: #2196f3
+  &.qalaqah
+    color: #9c27b0
+
+// Hide verse number comes from tajweed version
+.quran-reader-detail span.end
+  display: none
+
+.tajweed-tooltip
+  position: fixed
+  z-index: 99
+  font-size: 11px
+  white-space: nowrap
+  background: rgba(0, 0, 0, .8)
+  color: #fff
+  padding: 2px 5px
+  border-radius: 4px
+  &::after
+    content: ''
+    width: 0
+    height: 0
+    border-left: 4px solid transparent
+    border-right: 4px solid transparent
+    border-top: 4px solid rgba(0, 0, 0, .8)
+    position: absolute
+    top: 100%
+    left: 50%
+    transform: translateX(-50%)
+  &.left::after
+    left: 4px
+    right: auto
+    transform: translateX(0)
+  &.right::after
+    right: 4px
+    left: auto
+    transform: translateX(0)
