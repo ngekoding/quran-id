@@ -5,10 +5,11 @@ export async function fetchSurah(context, surahId) {
   context.commit("showLoading", "fetchSurah");
 
   const chapter = surahList.find(item => item.id == surahId);
+  const tajweedMode = context.state.tajweedMode;
 
   const urls = [
     {
-      url: "quran/verses/uthmani_tajweed",
+      url: "quran/verses/uthmani" + (tajweedMode ? "_tajweed" : ""),
       params: {
         chapter_number: surahId
       }
@@ -46,7 +47,7 @@ export async function fetchSurah(context, surahId) {
       const arabics = values[0].verses.map(verse => {
         return {
           ...verse,
-          text_uthmani: verse.text_uthmani_tajweed,
+          ...(tajweedMode && { text_uthmani: verse.text_uthmani_tajweed }),
           verse_number: parseInt(verse.verse_key.split(":")[1])
         };
       });

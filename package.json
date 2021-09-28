@@ -19,6 +19,7 @@
     "localforage": "^1.9.0",
     "quasar": "^1.0.0",
     "swiper": "^5.4.5",
+    "tapjs": "^1.0.9",
     "vue-awesome-swiper": "^4.1.1",
     "vue-gtag": "^1.16.1"
   },

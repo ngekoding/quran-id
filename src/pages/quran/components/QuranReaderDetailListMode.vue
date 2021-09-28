@@ -1,7 +1,5 @@
 <template>
-  <div
-    :class="['quran-reader-detail-list-mode', { 'tajweed-mode': tajweedMode }]"
-  >
+  <div class="quran-reader-detail-list-mode">
     <!-- Scroll handler -->
     <page-scroll-position-handler
       :listen="!init && active"
@@ -45,7 +43,7 @@
           >
             <q-item-section>
               <q-item-label class="text-arabic text-right">
-                <span v-html="ayah.text_uthmani"></span>
+                <span v-html="ayah.text_uthmani" />
                 <span
                   class="text-arabic-number q-mr-xs"
                   v-html="arabicNumber(ayah.verse_number)"
@@ -142,6 +140,8 @@ import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.
 import reciterList from "src/data/reciter-list";
 import tajweedList from "src/data/tajweed";
 
+import "tapjs";
+
 export default {
   name: "QuranDetailListMode",
   components: {
@@ -221,6 +221,13 @@ export default {
     },
     audioReciterId() {
       this.player.audios = {};
+    },
+    tajweedMode(val) {
+      if (val) this.setTajweedListener();
+      else this.removeTajweedListener();
+
+      this.tajweedTooltip.show = false;
+      this.getSurahDetail();
     }
   },
   computed: {
@@ -396,8 +403,6 @@ export default {
     onAudioAyahEnded() {
       if (this.player.type == "current-loop") {
         this.player.loopCounter++;
-        console.log("counter", this.player.loopCounter);
-        console.log("max", this.playerSettings.singleRepeatNumber);
         if (this.player.loopCounter < this.playerSettings.singleRepeatNumber) {
           this.playAudio();
         } else {
@@ -435,7 +440,7 @@ export default {
     handleWindowResize(e) {
       this.tajweedTooltip.show = false;
     },
-    handleBodyClick(e) {
+    handleReaderDetailTap(e) {
       this.tajweedTooltip.show = false;
 
       const tagName = e.target.tagName.toLowerCase();
@@ -448,6 +453,9 @@ export default {
       );
 
       if (tagName == "tajweed" && handledTajweed) {
+        e.preventDefault();
+        e.stopPropagation();
+
         this.tajweedTooltip.content = handledTajweed.name;
         this.tajweedTooltip.top = tagRect.top;
         this.tajweedTooltip.left = tagRect.left;
@@ -480,18 +488,22 @@ export default {
     },
     setTajweedListener() {
       window.addEventListener("resize", this.handleWindowResize);
-      document.body.addEventListener("click", this.handleBodyClick);
+      document
+        .querySelector(".quran-reader-detail-list-mode")
+        .addEventListener("tap", this.handleReaderDetailTap);
     },
     removeTajweedListener() {
       window.removeEventListener("resize", this.handleWindowResize);
-      document.body.removeEventListener("click", this.handleBodyClick);
+      document
+        .querySelector(".quran-reader-detail-list-mode")
+        .removeEventListener("tap", this.handleReaderDetailTap);
     }
   },
   created() {
     this.getSurahDetail();
   },
   mounted() {
-    this.setTajweedListener();
+    if (this.tajweedMode) this.setTajweedListener();
   },
   activated() {
     this.active = true;
