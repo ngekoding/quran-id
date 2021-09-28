@@ -13,6 +13,16 @@
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
       <q-list class="scroll bg-white" style="max-height: 65vh">
+        <q-item class="q-pt-md">
+          <q-item-section>
+            <q-item-label>Tajwid</q-item-label>
+            <q-item-label caption>Tampilkan warna hukum bacaan</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-toggle size="xs" dense v-model="tajweedMode" />
+          </q-item-section>
+        </q-item>
+        <q-separator spaced />
         <q-item-label header>Pengaturan pembacaan</q-item-label>
         <q-item>
           <q-item-section>
@@ -129,7 +139,8 @@ export default {
       singleRepeatNumber: 2,
       singleRepeatNumberInfinite: true,
       continuedRepeatNumber: 2,
-      continuedRepeatNumberInfinite: true
+      continuedRepeatNumberInfinite: true,
+      tajweedMode: false
     };
   },
   watch: {
@@ -137,7 +148,7 @@ export default {
       immediate: true,
       handler(val) {
         this.showDialog = val;
-        this.getStoredPlayerSettings();
+        this.getStoredSettings();
       }
     },
     showDialog(val) {
@@ -155,13 +166,15 @@ export default {
     }
   },
   methods: {
-    getStoredPlayerSettings() {
+    getStoredSettings() {
       const playerSettings = this.$store.getters["quran/getPlayerSettings"];
       this.audioReciterId = playerSettings.audioReciterId;
       this.singleRepeatNumber = playerSettings.singleRepeatNumber;
       this.singleRepeatNumberInfinite = this.singleRepeatNumber == 999;
       this.continuedRepeatNumber = playerSettings.continuedRepeatNumber;
       this.continuedRepeatNumberInfinite = this.continuedRepeatNumber == 999;
+
+      this.tajweedMode = this.$store.getters["quran/getTajweedMode"];
     },
     save() {
       const playerSettings = {
@@ -174,6 +187,7 @@ export default {
           : this.continuedRepeatNumber
       };
       this.$store.dispatch("quran/updatePlayerSettings", playerSettings);
+      this.$store.dispatch("quran/setTajweedMode", this.tajweedMode);
       this.$refs.dialog.hide();
     }
   }

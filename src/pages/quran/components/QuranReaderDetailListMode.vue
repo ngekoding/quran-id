@@ -1,5 +1,7 @@
 <template>
-  <div class="quran-reader-detail-list-mode">
+  <div
+    :class="['quran-reader-detail-list-mode', { 'tajweed-mode': tajweedMode }]"
+  >
     <!-- Scroll handler -->
     <page-scroll-position-handler
       :listen="!init && active"
@@ -14,9 +16,13 @@
     <template v-else>
       <!-- Tajweed tooltip -->
       <div
-        v-show="tajweedTooltip.show"
+        v-show="tajweedMode && tajweedTooltip.show"
         ref="tajweedTooltip"
-        :class="['tajweed-tooltip', tajweedTooltip.horizontal]"
+        :class="[
+          'tajweed-tooltip',
+          tajweedTooltip.horizontal,
+          tajweedTooltip.name
+        ]"
         :style="tajweedTooltipStyle"
       >
         {{ tajweedTooltip.content }}
@@ -129,8 +135,10 @@ import AyahOptionsDialog from "src/components/AyahOptionsDialog.vue";
 import AyahChangerDialog from "src/components/AyahChangerDialog.vue";
 import AyahPlayOptionsDialog from "src/components/AyahPlayOptionsDialog.vue";
 import AyahPlayBottomControl from "src/components/AyahPlayBottomControl.vue";
+
 import ToTop from "src/components/ToTop.vue";
 import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.vue";
+
 import reciterList from "src/data/reciter-list";
 import tajweedList from "src/data/tajweed";
 
@@ -193,8 +201,10 @@ export default {
         ayahStartFrom: 0,
         loopCounter: 0
       },
+      showTajwidDialog: false,
       tajweedTooltip: {
         show: false,
+        name: "",
         content: "Content Here",
         horizontal: "",
         top: 0,
@@ -216,7 +226,8 @@ export default {
   computed: {
     ...mapGetters({
       surah: "quran/getSurah",
-      playerSettings: "quran/getPlayerSettings"
+      playerSettings: "quran/getPlayerSettings",
+      tajweedMode: "quran/getTajweedMode"
     }),
     audioReciterId() {
       return this.playerSettings?.audioReciterId ?? 7;
@@ -261,7 +272,7 @@ export default {
           ? this.tajweedTooltip.right + "px"
           : this.tajweedTooltip.right;
       return {
-        top: this.tajweedTooltip.top - 34 + "px",
+        top: this.tajweedTooltip.top - 35 + "px",
         left,
         right
       };
@@ -273,7 +284,6 @@ export default {
         this.$nextTick(() => {
           this.init = false;
           window.scrollTo(0, this.offsetTop);
-          this.setTajweedListener();
           if (this.verseKey) {
             this.scrollToElement(this.$refs[this.verseKey][0].$el);
           }
@@ -442,6 +452,7 @@ export default {
         this.tajweedTooltip.top = tagRect.top;
         this.tajweedTooltip.left = tagRect.left;
         this.tajweedTooltip.right = "auto";
+        this.tajweedTooltip.name = tagClass;
         this.tajweedTooltip.show = true;
 
         // Calculating x position after content changed
@@ -478,6 +489,9 @@ export default {
   },
   created() {
     this.getSurahDetail();
+  },
+  mounted() {
+    this.setTajweedListener();
   },
   activated() {
     this.active = true;

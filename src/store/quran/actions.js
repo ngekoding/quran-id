@@ -170,3 +170,7 @@ export function updatePlayerSettings(context, settings) {
 export function setSinglePlayerSettings(context, setting) {
   context.commit("setSinglePlayerSettings", setting);
 }
+
+export function setTajweedMode(context, value) {
+  context.commit("setTajweedMode", value);
+}

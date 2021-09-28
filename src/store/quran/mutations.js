@@ -66,3 +66,8 @@ export function setSingglePlayerSettings(state, setting) {
   Vue.set(state.playerSettings, key, value);
   LocalStorage.set("player-settings", state.settings);
 }
+
+export function setTajweedMode(state, value) {
+  LocalStorage.set("tajweed-mode", value);
+  state.tajweedMode = value;
+}
