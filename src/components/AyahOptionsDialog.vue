@@ -75,15 +75,22 @@ export default {
       this.$emit("update:show", val);
     }
   },
+  computed: {
+    arabicNormalized() {
+      return this.arabic
+        .replace(/<span.*?>.*?<\/span>/gi, "") // Remove verse number (end)
+        .replace(/(<([^>]+)>)/gi, ""); // Remove HTML tags
+    }
+  },
   methods: {
     copy(type) {
       let text;
       if (type == "ayah") {
-        text = this.arabic;
+        text = this.arabicNormalized;
       } else if (type == "translation") {
         text = this.translation;
       } else if (type == "both") {
-        text = this.arabic + "\n\n" + this.translation;
+        text = this.arabicNormalized + "\n\n" + this.translation;
       }
 
       text += "\n\n";
