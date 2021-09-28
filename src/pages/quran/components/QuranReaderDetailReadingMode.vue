@@ -50,6 +50,7 @@ export default {
       swiperOptions: {},
       pageCount: 0,
       currentPage: this.pages[0],
+      quranImageBaseUrl: "https://android.quran.com/data/width_1024/page",
       images: []
     };
   },
@@ -86,7 +87,8 @@ export default {
       for (let page = this.pages[0]; page <= endPage; page++) {
         this.images.push({
           page,
-          url: `quran-images/${page}.png`
+          url:
+            this.quranImageBaseUrl + page.toString().padStart(3, "0") + ".png"
         });
       }
     },
@@ -95,7 +97,10 @@ export default {
       if (nextPage <= this.pages[1]) {
         this.images.push({
           page: nextPage,
-          url: `quran-images/${nextPage}.png`
+          url:
+            this.quranImageBaseUrl +
+            nextPage.toString().padStart(3, "0") +
+            ".png"
         });
       }
     },
