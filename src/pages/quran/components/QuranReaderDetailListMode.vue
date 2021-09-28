@@ -1,17 +1,32 @@
 <template>
-  <div class="quran-reader-detail-list-mode">
+  <div
+    :class="['quran-reader-detail-list-mode', { 'tajweed-mode': tajweedMode }]"
+  >
     <!-- Scroll handler -->
     <page-scroll-position-handler
       :listen="!init && active"
       :page="page"
       :extra="scrollExtra"
-      @scroll="position => (activeOffsetTop = position)"
+      @scroll="onPageScroll"
     />
     <!-- Quran reader detail skeleton -->
     <quran-reader-detail-skeleton
       v-if="$store.state.quran.loading.fetchSurah"
     />
     <template v-else>
+      <!-- Tajweed tooltip -->
+      <div
+        v-show="tajweedMode && tajweedTooltip.show"
+        ref="tajweedTooltip"
+        :class="[
+          'tajweed-tooltip',
+          tajweedTooltip.horizontal,
+          tajweedTooltip.name
+        ]"
+        :style="tajweedTooltipStyle"
+      >
+        {{ tajweedTooltip.content }}
+      </div>
       <div class="content bg-white" :style="contentStyles">
         <!-- Basmallah -->
         <div
@@ -30,7 +45,7 @@
           >
             <q-item-section>
               <q-item-label class="text-arabic text-right">
-                {{ ayah.text_uthmani }}
+                <span v-html="ayah.text_uthmani"></span>
                 <span
                   class="text-arabic-number q-mr-xs"
                   v-html="arabicNumber(ayah.verse_number)"
@@ -120,9 +135,12 @@ import AyahOptionsDialog from "src/components/AyahOptionsDialog.vue";
 import AyahChangerDialog from "src/components/AyahChangerDialog.vue";
 import AyahPlayOptionsDialog from "src/components/AyahPlayOptionsDialog.vue";
 import AyahPlayBottomControl from "src/components/AyahPlayBottomControl.vue";
+
 import ToTop from "src/components/ToTop.vue";
 import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.vue";
+
 import reciterList from "src/data/reciter-list";
+import tajweedList from "src/data/tajweed";
 
 export default {
   name: "QuranDetailListMode",
@@ -173,6 +191,7 @@ export default {
       },
       activeOffsetTop: 0,
       reciterList,
+      tajweedList,
       player: {
         type: "current-only", // current-only, current-loop, current-and-continue
         audio: null,
@@ -181,6 +200,16 @@ export default {
         currentAyah: 0,
         ayahStartFrom: 0,
         loopCounter: 0
+      },
+      showTajwidDialog: false,
+      tajweedTooltip: {
+        show: false,
+        name: "",
+        content: "Content Here",
+        horizontal: "",
+        top: 0,
+        left: 0,
+        right: 0
       }
     };
   },
@@ -197,7 +226,8 @@ export default {
   computed: {
     ...mapGetters({
       surah: "quran/getSurah",
-      playerSettings: "quran/getPlayerSettings"
+      playerSettings: "quran/getPlayerSettings",
+      tajweedMode: "quran/getTajweedMode"
     }),
     audioReciterId() {
       return this.playerSettings?.audioReciterId ?? 7;
@@ -231,6 +261,21 @@ export default {
         minHeight: `calc(100vh - ${this.headerHeight}px)`,
         paddingBottom: `${paddingBottom}px`
       };
+    },
+    tajweedTooltipStyle() {
+      const left =
+        typeof this.tajweedTooltip.left == "number"
+          ? this.tajweedTooltip.left + "px"
+          : this.tajweedTooltip.left;
+      const right =
+        typeof this.tajweedTooltip.right == "number"
+          ? this.tajweedTooltip.right + "px"
+          : this.tajweedTooltip.right;
+      return {
+        top: this.tajweedTooltip.top - 35 + "px",
+        left,
+        right
+      };
     }
   },
   methods: {
@@ -244,6 +289,10 @@ export default {
           }
         });
       });
+    },
+    onPageScroll(position) {
+      this.activeOffsetTop = position;
+      this.tajweedTooltip.show = false;
     },
     verseNumberFromKey(key) {
       return key.split(":")[1];
@@ -382,10 +431,67 @@ export default {
       } else {
         this.stopAudio();
       }
+    },
+    handleWindowResize(e) {
+      this.tajweedTooltip.show = false;
+    },
+    handleBodyClick(e) {
+      this.tajweedTooltip.show = false;
+
+      const tagName = e.target.tagName.toLowerCase();
+      const tagClass = e.target.className;
+      const tagRects = e.target.getClientRects();
+      const tagRect = tagRects[0];
+      const windowWidth = window.innerWidth;
+      const handledTajweed = this.tajweedList.find(
+        item => item.key == tagClass
+      );
+
+      if (tagName == "tajweed" && handledTajweed) {
+        this.tajweedTooltip.content = handledTajweed.name;
+        this.tajweedTooltip.top = tagRect.top;
+        this.tajweedTooltip.left = tagRect.left;
+        this.tajweedTooltip.right = "auto";
+        this.tajweedTooltip.name = tagClass;
+        this.tajweedTooltip.show = true;
+
+        // Calculating x position after content changed
+        this.$nextTick(() => {
+          const tooltip = this.$refs.tajweedTooltip;
+          const tooltipRect = tooltip.getBoundingClientRect();
+          const left = tagRect.left - tooltipRect.width / 2 + tagRect.width / 2;
+          const right = left + tooltipRect.width;
+
+          if (left > 1 && right < windowWidth - 1) {
+            this.tajweedTooltip.left = left;
+            this.tajweedTooltip.right = "auto";
+            this.tajweedTooltip.horizontal = "";
+          } else if (left <= 1) {
+            this.tajweedTooltip.horizontal = "left";
+            this.tajweedTooltip.left = tagRect.left;
+            this.tajweedTooltip.right = "auto";
+          } else if (right >= windowWidth - 1) {
+            this.tajweedTooltip.horizontal = "right";
+            this.tajweedTooltip.right = windowWidth - tagRect.right;
+            this.tajweedTooltip.left = "auto";
+          }
+        });
+      }
+    },
+    setTajweedListener() {
+      window.addEventListener("resize", this.handleWindowResize);
+      document.body.addEventListener("click", this.handleBodyClick);
+    },
+    removeTajweedListener() {
+      window.removeEventListener("resize", this.handleWindowResize);
+      document.body.removeEventListener("click", this.handleBodyClick);
     }
   },
   created() {
     this.getSurahDetail();
+  },
+  mounted() {
+    this.setTajweedListener();
   },
   activated() {
     this.active = true;
@@ -393,6 +499,9 @@ export default {
   },
   deactivated() {
     this.active = false;
+  },
+  beforeDestroy() {
+    this.removeTajweedListener();
   }
 };
 </script>

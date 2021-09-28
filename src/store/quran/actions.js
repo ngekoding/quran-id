@@ -8,7 +8,7 @@ export async function fetchSurah(context, surahId) {
 
   const urls = [
     {
-      url: "quran/verses/uthmani",
+      url: "quran/verses/uthmani_tajweed",
       params: {
         chapter_number: surahId
       }
@@ -46,6 +46,7 @@ export async function fetchSurah(context, surahId) {
       const arabics = values[0].verses.map(verse => {
         return {
           ...verse,
+          text_uthmani: verse.text_uthmani_tajweed,
           verse_number: parseInt(verse.verse_key.split(":")[1])
         };
       });
@@ -168,4 +169,8 @@ export function updatePlayerSettings(context, settings) {
 
 export function setSinglePlayerSettings(context, setting) {
   context.commit("setSinglePlayerSettings", setting);
+}
+
+export function setTajweedMode(context, value) {
+  context.commit("setTajweedMode", value);
 }

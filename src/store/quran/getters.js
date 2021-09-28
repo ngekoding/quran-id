@@ -23,3 +23,7 @@ export function getPageScrollPosition(state) {
 export function getPlayerSettings(state) {
   return state.playerSettings;
 }
+
+export function getTajweedMode(state) {
+  return state.tajweedMode;
+}

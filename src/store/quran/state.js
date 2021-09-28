@@ -3,6 +3,7 @@ import { LocalStorage } from "quasar";
 export default function() {
   return {
     surah: null,
+    tajweedMode: LocalStorage.getItem("tajweed-mode") ?? false,
     pageScrollPosition: LocalStorage.getItem("page-scroll-position") ?? {},
     playerSettings: LocalStorage.getItem("player-settings") ?? {
       audioReciterId: 7, // Mishari Rashid al-`Afasy

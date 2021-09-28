@@ -93,6 +93,17 @@
             clickable
             v-ripple
             v-close-popup
+            @click="showTajweedDialog = true"
+          >
+            <q-item-section avatar>
+              <q-icon name="mdi-palette" />
+            </q-item-section>
+            <q-item-section>Keterangan warna tajwid</q-item-section>
+          </q-item>
+          <q-item
+            clickable
+            v-ripple
+            v-close-popup
             @click="showSettingsDialog = true"
           >
             <q-item-section avatar>
@@ -106,6 +117,9 @@
 
     <!-- Settings dialog -->
     <quran-reader-detail-settings-dialog :show.sync="showSettingsDialog" />
+
+    <!-- Tajweed information dialog -->
+    <tajweed-information-dialog :show.sync="showTajweedDialog" />
   </div>
 </template>
 
@@ -114,6 +128,7 @@ import QuranReaderDetailListMode from "./components/QuranReaderDetailListMode.vu
 import QuranReaderDetailReadingMode from "./components/QuranReaderDetailReadingMode.vue";
 import QuranReaderDetailSettingsDialog from "src/components/QuranReaderDetailSettingsDialog.vue";
 import SurahChangerDialog from "src/components/SurahChangerDialog.vue";
+import TajweedInformationDialog from "src/components/TajweedInformationDialog.vue";
 
 import surahList from "src/data/surah-list";
 
@@ -123,7 +138,8 @@ export default {
     QuranReaderDetailReadingMode,
     QuranReaderDetailListMode,
     QuranReaderDetailSettingsDialog,
-    SurahChangerDialog
+    SurahChangerDialog,
+    TajweedInformationDialog
   },
   props: {
     offsetTop: {
@@ -151,7 +167,8 @@ export default {
       contentStyles: null,
       readingMode: false,
       showSettingsDialog: false,
-      showMenuMoreDialog: false
+      showMenuMoreDialog: false,
+      showTajweedDialog: false
     };
   },
   meta() {
