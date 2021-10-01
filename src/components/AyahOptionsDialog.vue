@@ -9,24 +9,16 @@
       </q-card-section>
       <q-list separator class="bg-white">
         <q-item clickable v-ripple @click="copy('ayah')">
-          <q-item-section>
-            Salin ayat
-          </q-item-section>
+          <q-item-section> Salin ayat </q-item-section>
         </q-item>
         <q-item clickable v-ripple @click="copy('translation')">
-          <q-item-section>
-            Salin terjemahan
-          </q-item-section>
+          <q-item-section> Salin terjemahan </q-item-section>
         </q-item>
         <q-item clickable v-ripple @click="copy('both')">
-          <q-item-section>
-            Salin ayat dan terjemahan
-          </q-item-section>
+          <q-item-section> Salin ayat dan terjemahan </q-item-section>
         </q-item>
         <q-item clickable v-ripple @click="bookmark()">
-          <q-item-section>
-            Bookmark
-          </q-item-section>
+          <q-item-section> Bookmark </q-item-section>
         </q-item>
       </q-list>
     </q-card>
@@ -40,28 +32,29 @@ export default {
   props: {
     show: {
       type: Boolean,
-      default: false
+      default: false,
     },
     surahName: {
       type: String,
-      required: true
+      required: true,
     },
     ayahNumber: {
       type: [Number, String],
-      required: true
+      required: true,
     },
     arabic: {
       type: String,
-      required: true
+      required: true,
     },
     translation: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
+  emits: ["update:show"],
   data() {
     return {
-      showDialog: false
+      showDialog: false,
     };
   },
   watch: {
@@ -69,18 +62,18 @@ export default {
       immediate: true,
       handler(val) {
         this.showDialog = val;
-      }
+      },
     },
     showDialog(val) {
       this.$emit("update:show", val);
-    }
+    },
   },
   computed: {
     arabicNormalized() {
       return this.arabic
         .replace(/<span.*?>.*?<\/span>/gi, "") // Remove verse number (end)
         .replace(/(<([^>]+)>)/gi, ""); // Remove HTML tags
-    }
+    },
   },
   methods: {
     copy(type) {
@@ -101,22 +94,22 @@ export default {
         .then(() => {
           this.$q.notify({
             type: "toast",
-            message: "Berhasil disalin."
+            message: "Berhasil disalin.",
           });
         })
         .catch(() => {
           this.$q.notify({
             type: "toast-error",
-            message: "Gagal! Terjadi kesalahan."
+            message: "Gagal! Terjadi kesalahan.",
           });
         });
     },
     bookmark() {
       this.$q.notify({
         type: "toast-warning",
-        message: "Maaf fitur ini belum tersedia."
+        message: "Maaf fitur ini belum tersedia.",
       });
-    }
-  }
+    },
+  },
 };
 </script>

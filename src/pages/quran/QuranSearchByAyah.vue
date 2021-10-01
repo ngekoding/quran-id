@@ -155,7 +155,7 @@
     </div>
     <!-- Dialog options -->
     <ayah-options-dialog
-      :show.sync="showAyahOptionsDialog"
+      v-model:show="showAyahOptionsDialog"
       :ayah-number="ayahOptionsDialogData.ayahNumber"
       :surah-name="ayahOptionsDialogData.surahName"
       :arabic="ayahOptionsDialogData.arabic"
@@ -205,7 +205,7 @@ export default {
     QuranSearchResultSkeleton,
     AyahOptionsDialog,
     ToTop,
-    PageScrollPositionHandler
+    PageScrollPositionHandler,
   },
   data() {
     return {
@@ -222,26 +222,26 @@ export default {
         ayahNumber: "",
         surahName: "",
         arabic: "",
-        translation: ""
-      }
+        translation: "",
+      },
     };
   },
   meta() {
     return {
-      title: this.pageTitle
+      title: this.pageTitle,
     };
   },
   watch: {
     fullMatchSearch(val) {
       this.$store.dispatch("quran/setFullMatchSearch", val);
       this.onSearch();
-    }
+    },
   },
   computed: {
     ...mapGetters({
       searchResults: "quran/getSearchAyahResults",
       searchResultTranslations: "quran/getSearchAyahResultTranslations",
-      searchPaging: "quran/getSearchAyahPaging"
+      searchPaging: "quran/getSearchAyahPaging",
     }),
     isLoadMoreAvailable() {
       return this.searchPaging.currentPage < this.searchPaging.totalPage;
@@ -255,7 +255,7 @@ export default {
         (this.keywordSearch ? this.keywordSearch + " | " : "") +
         this.productName
       );
-    }
+    },
   },
   methods: {
     getScrollPosition() {
@@ -267,7 +267,7 @@ export default {
     fitContentHeight() {
       const headerHeight = this.$refs.header.$el.clientHeight + "px";
       this.contentStyles = {
-        minHeight: `calc(100vh - ${headerHeight})`
+        minHeight: `calc(100vh - ${headerHeight})`,
       };
     },
     saveLastKeyword() {
@@ -288,10 +288,10 @@ export default {
 
       this.$store
         .dispatch("quran/searchByAyah", { keyword: this.keywordSearch, page })
-        .then(res => {
+        .then((res) => {
           console.log(res);
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
@@ -303,13 +303,13 @@ export default {
         name: "QuranReaderDetail",
         params: {
           surahId: item.surahId,
-          verseKey: item.surahId + ":" + item.ayahNumber
-        }
+          verseKey: item.surahId + ":" + item.ayahNumber,
+        },
       });
     },
     getTranslation(verse_key) {
       return this.searchResultTranslations.find(
-        item => item.verse_key == verse_key
+        (item) => item.verse_key == verse_key
       )?.text;
     },
     onOptionClicked(item) {
@@ -317,10 +317,10 @@ export default {
         ayahNumber: item.ayahNumber,
         surahName: item.surahName,
         arabic: item.text,
-        translation: this.getTranslation(item.verse_key)
+        translation: this.getTranslation(item.verse_key),
       };
       this.showAyahOptionsDialog = true;
-    }
+    },
   },
   mounted() {
     this.track(this.pageTitle);
@@ -335,6 +335,6 @@ export default {
       this.keywordSearch = this.getLastKeyword();
       this.keyword = this.getLastKeyword();
     }
-  }
+  },
 };
 </script>

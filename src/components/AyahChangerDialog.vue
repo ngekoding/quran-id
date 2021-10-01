@@ -42,25 +42,37 @@
 </template>
 
 <script>
+import { ref, toRefs, watch } from "vue";
+
 export default {
   name: "AyahChangerDialog",
   props: {
     show: {
-      type: Boolean
+      type: Boolean,
     },
     surahId: {
       type: Number,
-      required: true
+      required: true,
     },
     versesCount: {
       type: Number,
-      required: true
-    }
+      required: true,
+    },
+  },
+  emits: ["update:show"],
+  setup(props) {
+    const { show } = toRefs(props);
+
+    const keyword = ref(null);
+    watch(show, () => {
+      keyword.value = null;
+    });
+
+    return { keyword };
   },
   data() {
     return {
       showDialog: false,
-      keyword: ""
     };
   },
   watch: {
@@ -69,35 +81,35 @@ export default {
       handler(val) {
         this.showDialog = val;
         this.keyword = "";
-      }
+      },
     },
     showDialog(val) {
       this.$emit("update:show", val);
-    }
+    },
   },
   computed: {
     ayahList() {
       return Array.from({ length: this.versesCount }, (_, i) => {
         return {
           ayahNumber: i + 1,
-          verseKey: `${this.surahId}:${i + 1}`
+          verseKey: `${this.surahId}:${i + 1}`,
         };
       });
     },
     ayahListFiltered() {
       const q = this.keyword.toString();
       if (q) {
-        return this.ayahList.filter(ayah =>
+        return this.ayahList.filter((ayah) =>
           ayah.ayahNumber.toString().startsWith(q)
         );
       }
       return this.ayahList;
-    }
+    },
   },
   methods: {
     click(ayah) {
       this.$emit("item-click", ayah.verseKey);
-    }
-  }
+    },
+  },
 };
 </script>

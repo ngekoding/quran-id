@@ -70,6 +70,7 @@ export default {
       default: ""
     }
   },
+  emits: ["update:show"],
   data() {
     return {
       surahList: surahList,

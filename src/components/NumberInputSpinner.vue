@@ -29,37 +29,37 @@
 export default {
   name: "NumberInputSpinner",
   props: {
-    value: {
+    modelValue: {
       type: Number,
-      default: 0
+      default: 0,
     },
     min: {
       type: Number,
-      default: undefined
+      default: undefined,
     },
     max: {
       type: Number,
-      default: undefined
+      default: undefined,
     },
     width: {
-      type: [Number, String]
-    }
+      type: [Number, String],
+    },
   },
   data() {
     return {
-      number: 0
+      number: 0,
     };
   },
   watch: {
-    value: {
+    modelValue: {
       immediate: true,
       handler(val) {
         this.number = val;
-      }
+      },
     },
     number(val) {
-      this.$emit("input", val);
-    }
+      this.$emit("update:modelValue", val);
+    },
   },
   computed: {
     allowIncrement() {
@@ -73,9 +73,9 @@ export default {
       const width =
         typeof this.width === "number" ? this.width + "px" : this.width;
       return {
-        width
+        width,
       };
-    }
+    },
   },
   methods: {
     increment() {
@@ -87,8 +87,8 @@ export default {
       if (this.allowDecrement) {
         this.number--;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -27,9 +27,10 @@
 <script>
 export default {
   name: "ToTop",
+  emits: ["show"],
   data() {
     return {
-      show: false
+      show: false,
     };
   },
   watch: {
@@ -37,8 +38,8 @@ export default {
       immediate: true,
       handler(val) {
         this.$emit("show", val);
-      }
-    }
+      },
+    },
   },
   methods: {
     onScroll(info) {
@@ -51,7 +52,7 @@ export default {
     toTop() {
       const el = document.getElementsByTagName("body")[0];
       this.scrollToElement(el);
-    }
-  }
+    },
+  },
 };
 </script>

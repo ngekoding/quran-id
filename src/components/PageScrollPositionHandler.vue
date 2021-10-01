@@ -7,17 +7,18 @@ export default {
   name: "PageScrollPositionHandler",
   props: {
     listen: {
-      type: Boolean
+      type: Boolean,
     },
     page: {
       type: String,
-      required: true
+      required: true,
     },
     extra: {
       type: Object,
-      default: () => {}
-    }
+      default: () => {},
+    },
   },
+  emits: ["scroll"],
   methods: {
     onScroll(info) {
       if (["up", "down"].includes(info.direction) && this.listen) {
@@ -25,10 +26,10 @@ export default {
         this.$store.dispatch("quran/setPageScrollPosition", {
           page: this.page,
           offsetTop: info.position,
-          extra: this.extra
+          extra: this.extra,
         });
       }
-    }
-  }
+    },
+  },
 };
 </script>

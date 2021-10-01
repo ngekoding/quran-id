@@ -1,9 +1,6 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import { createStore } from "vuex";
 
 import quran from "./quran";
-
-Vue.use(Vuex);
 
 /*
  * If not building with SSR mode, you can
@@ -14,15 +11,15 @@ Vue.use(Vuex);
  * with the Store instance.
  */
 
-export default function(/* { ssrContext } */) {
-  const Store = new Vuex.Store({
+export default function (/* { ssrContext } */) {
+  const Store = createStore({
     modules: {
-      quran
+      quran,
     },
 
     // enable strict mode (adds overhead!)
-    // for dev mode only
-    strict: process.env.DEBUGGING
+    // for dev mode and --debug builds only
+    strict: process.env.DEBUGGING,
   });
 
   return Store;

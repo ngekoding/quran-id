@@ -34,22 +34,23 @@ export default {
   name: "AyahPlayBottomControl",
   props: {
     show: {
-      type: Boolean
+      type: Boolean,
     },
     title: {
       type: String,
-      required: true
+      required: true,
     },
     caption: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
+  emits: ["stop"],
   methods: {
     stop() {
       this.$emit("stop");
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -9,19 +9,13 @@
       </q-card-section>
       <q-list separator class="bg-white">
         <q-item clickable v-ripple @click="play('current-only')">
-          <q-item-section>
-            Dengarkan ayat ini
-          </q-item-section>
+          <q-item-section> Dengarkan ayat ini </q-item-section>
         </q-item>
         <q-item clickable v-ripple @click="play('current-loop')">
-          <q-item-section>
-            Dengarkan ayat ini berulang
-          </q-item-section>
+          <q-item-section> Dengarkan ayat ini berulang </q-item-section>
         </q-item>
         <q-item clickable v-ripple @click="play('current-and-continue')">
-          <q-item-section>
-            Dengarkan mulai dari ayat ini
-          </q-item-section>
+          <q-item-section> Dengarkan mulai dari ayat ini </q-item-section>
         </q-item>
         <q-item clickable v-ripple @click="play('current-and-continue-loop')">
           <q-item-section>
@@ -39,16 +33,17 @@ export default {
   props: {
     show: {
       type: Boolean,
-      default: false
+      default: false,
     },
     ayahNumber: {
       type: [Number, String],
-      required: true
-    }
+      required: true,
+    },
   },
+  emits: ["update:show"],
   data() {
     return {
-      showDialog: false
+      showDialog: false,
     };
   },
   watch: {
@@ -56,17 +51,17 @@ export default {
       immediate: true,
       handler(val) {
         this.showDialog = val;
-      }
+      },
     },
     showDialog(val) {
       this.$emit("update:show", val);
-    }
+    },
   },
   methods: {
     play(type) {
       this.showDialog = false;
       this.$emit("item-click", type);
-    }
-  }
+    },
+  },
 };
 </script>

@@ -1,4 +1,3 @@
-import Vue from "vue";
 import { LocalStorage } from "quasar";
 
 export function showLoading(state, key) {
@@ -44,15 +43,15 @@ export function setFullMatchSearch(state, value) {
 
 export function updatePageScrollPosition(state, info) {
   const { page, offsetTop } = info;
-  Vue.set(state.pageScrollPosition, page, {
-    offsetTop,
-    extra: { ...info?.extra }
-  });
+  // Vue.set(state.pageScrollPosition, page, {
+  //   offsetTop,
+  //   extra: { ...info?.extra }
+  // });
   LocalStorage.set("page-scroll-position", state.pageScrollPosition);
 }
 
 export function removePageScrollPosition(state, page) {
-  Vue.delete(state.pageScrollPosition, page);
+  // Vue.delete(state.pageScrollPosition, page);
   LocalStorage.set("page-scroll-position", state.pageScrollPosition);
 }
 

@@ -1,17 +1,14 @@
 import { scroll } from "quasar";
 const { getScrollTarget, setScrollPosition } = scroll;
-import {
-  productName,
-  description as productDescription
-} from "../../package.json";
+import packageInfo from "../../package.json";
 
-export default ({ Vue }) => {
-  Vue.mixin({
+export default ({ app }) => {
+  app.mixin({
     data() {
       return {
         basmalahArabic: "﷽",
-        productName: productName,
-        productDescription: productDescription
+        productName: packageInfo.productName,
+        productDescription: packageInfo.description,
       };
     },
     methods: {
@@ -36,7 +33,7 @@ export default ({ Vue }) => {
           number
             .toString()
             .split("")
-            .map(num => arabicNums[num])
+            .map((num) => arabicNums[num])
             .join("")
         );
       },
@@ -45,7 +42,7 @@ export default ({ Vue }) => {
         const page_path = path ?? window.location.pathname;
         const page_location = loc ?? window.location.href;
         this.$gtag.pageview({ page_title, page_path, page_location });
-      }
-    }
+      },
+    },
   });
 };

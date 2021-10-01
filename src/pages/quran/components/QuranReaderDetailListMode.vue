@@ -88,7 +88,7 @@
 
     <!-- Ayah options dialog -->
     <ayah-options-dialog
-      :show.sync="showAyahOptionsDialog"
+      v-model:show="showAyahOptionsDialog"
       :ayah-number="ayahOptionsDialogData.ayahNumber"
       :surah-name="ayahOptionsDialogData.surahName"
       :arabic="ayahOptionsDialogData.arabic"
@@ -97,7 +97,7 @@
 
     <!-- Dialog play options -->
     <ayah-play-options-dialog
-      :show.sync="showAyahPlayOptionsDialog"
+      v-model:show="showAyahPlayOptionsDialog"
       :ayah-number="ayahPlayOptionsDialogData.ayahNumber"
       @item-click="onAyahPlay"
     />
@@ -114,7 +114,7 @@
     <!-- Dialog ayah changer -->
     <ayah-changer-dialog
       v-if="surah"
-      :show.sync="showAyahChangerDialog"
+      v-model:show="showAyahChangerDialog"
       :surah-id="surahId"
       :verses-count="surah.versesCount"
       @item-click="onAyahChange"
@@ -512,7 +512,7 @@ export default {
   deactivated() {
     this.active = false;
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.removeTajweedListener();
   }
 };

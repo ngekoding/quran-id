@@ -33,7 +33,7 @@
               v-model="audioReciterId"
               :options="reciterList"
               :option-label="
-                item =>
+                (item) =>
                   item.style
                     ? `${item.reciterName} (${item.style})`
                     : item.reciterName
@@ -51,9 +51,7 @@
         <q-separator spaced />
         <q-item>
           <q-item-section>
-            <q-item-label class="q-mb-sm">
-              Pengulangan satu ayat
-            </q-item-label>
+            <q-item-label class="q-mb-sm"> Pengulangan satu ayat </q-item-label>
             <div class="setting-note text-caption text-grey-7 q-mb-sm">
               Pengulangan ini akan diterapkan saat memilih
               <b>dengarkan ayat ini berulang</b>.
@@ -65,7 +63,7 @@
                 size="xs"
                 :class="[
                   'q-py-sm',
-                  singleRepeatNumberInfinite ? 'text-grey-10' : 'text-grey'
+                  singleRepeatNumberInfinite ? 'text-grey-10' : 'text-grey',
                 ]"
                 dense
               />
@@ -94,7 +92,7 @@
                 size="xs"
                 :class="[
                   'q-py-sm',
-                  continuedRepeatNumberInfinite ? 'text-grey-10' : 'text-grey'
+                  continuedRepeatNumberInfinite ? 'text-grey-10' : 'text-grey',
                 ]"
                 dense
               />
@@ -123,14 +121,15 @@ import NumberInputSpinner from "src/components/NumberInputSpinner.vue";
 export default {
   name: "QuranReaderDetailSettingsDialog",
   components: {
-    NumberInputSpinner
+    NumberInputSpinner,
   },
   props: {
     show: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
+  emits: ["update:show"],
   data() {
     return {
       showDialog: false,
@@ -140,7 +139,7 @@ export default {
       singleRepeatNumberInfinite: true,
       continuedRepeatNumber: 2,
       continuedRepeatNumberInfinite: true,
-      tajweedMode: false
+      tajweedMode: false,
     };
   },
   watch: {
@@ -149,7 +148,7 @@ export default {
       handler(val) {
         this.showDialog = val;
         this.getStoredSettings();
-      }
+      },
     },
     showDialog(val) {
       this.$emit("update:show", val);
@@ -163,7 +162,7 @@ export default {
       if (!val) {
         this.continuedRepeatNumber = 2;
       }
-    }
+    },
   },
   methods: {
     getStoredSettings() {
@@ -184,13 +183,13 @@ export default {
           : this.singleRepeatNumber,
         continuedRepeatNumber: this.continuedRepeatNumberInfinite
           ? 999
-          : this.continuedRepeatNumber
+          : this.continuedRepeatNumber,
       };
       this.$store.dispatch("quran/updatePlayerSettings", playerSettings);
       this.$store.dispatch("quran/setTajweedMode", this.tajweedMode);
       this.$refs.dialog.hide();
-    }
-  }
+    },
+  },
 };
 </script>
 

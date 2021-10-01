@@ -9,39 +9,46 @@
       @slidePrevTransitionEnd="onPrev"
     >
       <swiper-slide v-for="image in images" :key="`page-${image.page}`">
-        <q-img :src="image.url" :style="imageStyle" contain />
+        <q-img :src="image.url" :style="imageStyle" fit="contain">
+          <template v-slot:loading>
+            <div class="text-grey" dir="ltr">
+              <q-spinner-ios />
+              <div class="q-mt-md">Memuat...</div>
+            </div>
+          </template>
+        </q-img>
       </swiper-slide>
     </swiper>
   </div>
 </template>
 
 <script>
-import { Swiper, SwiperSlide } from "vue-awesome-swiper";
-import "swiper/css/swiper.css";
+import { Swiper, SwiperSlide } from "swiper/vue";
+import "swiper/css";
 
 export default {
   name: "QuranDetailReadingMode",
   components: {
     Swiper,
-    SwiperSlide
+    SwiperSlide,
   },
   props: {
     surah: {
       type: Object,
-      required: true
+      required: true,
     },
     pages: {
       type: Array,
-      required: true
+      required: true,
     },
     headerHeight: {
       type: Number,
-      default: 0
+      default: 0,
     },
     activePage: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
   data() {
     return {
@@ -51,7 +58,7 @@ export default {
       pageCount: 0,
       currentPage: this.pages[0],
       quranImageBaseUrl: "https://android.quran.com/data/width_1024/page",
-      images: []
+      images: [],
     };
   },
   watch: {
@@ -62,7 +69,7 @@ export default {
       this.currentPage = val[0];
       this.init();
     },
-    currentPage: "saveScrollPosition"
+    currentPage: "saveScrollPosition",
   },
   computed: {
     swiper() {
@@ -71,9 +78,9 @@ export default {
     imageStyle() {
       return {
         height: `calc(100vh - ${this.headerHeight}px - 10px)`,
-        marginTop: "10px"
+        marginTop: "10px",
       };
-    }
+    },
   },
   methods: {
     init() {
@@ -88,7 +95,7 @@ export default {
         this.images.push({
           page,
           url:
-            this.quranImageBaseUrl + page.toString().padStart(3, "0") + ".png"
+            this.quranImageBaseUrl + page.toString().padStart(3, "0") + ".png",
         });
       }
     },
@@ -100,7 +107,7 @@ export default {
           url:
             this.quranImageBaseUrl +
             nextPage.toString().padStart(3, "0") +
-            ".png"
+            ".png",
         });
       }
     },
@@ -118,10 +125,10 @@ export default {
         extra: {
           readingMode: true,
           surah: this.surah,
-          currentPage: this.currentPage
-        }
+          currentPage: this.currentPage,
+        },
       });
-    }
+    },
   },
   mounted() {
     if (this.activePage != 0) {
@@ -135,6 +142,6 @@ export default {
   },
   activated() {
     this.saveScrollPosition();
-  }
+  },
 };
 </script>

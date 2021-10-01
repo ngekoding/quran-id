@@ -52,7 +52,7 @@
 
     <!-- Surah changer dialog -->
     <surah-changer-dialog
-      :show.sync="showSurahChangerDialog"
+      v-model:show="showSurahChangerDialog"
       :active-surah-id="surahId"
       @item-click="onSurahChanged"
     />
@@ -116,10 +116,10 @@
     </q-dialog>
 
     <!-- Settings dialog -->
-    <quran-reader-detail-settings-dialog :show.sync="showSettingsDialog" />
+    <quran-reader-detail-settings-dialog v-model:show="showSettingsDialog" />
 
     <!-- Tajweed information dialog -->
-    <tajweed-information-dialog :show.sync="showTajweedDialog" />
+    <tajweed-information-dialog v-model:show="showTajweedDialog" />
   </div>
 </template>
 
@@ -139,24 +139,24 @@ export default {
     QuranReaderDetailListMode,
     QuranReaderDetailSettingsDialog,
     SurahChangerDialog,
-    TajweedInformationDialog
+    TajweedInformationDialog,
   },
   props: {
     offsetTop: {
       type: Number,
-      default: 0
+      default: 0,
     },
     verseKey: {
-      type: String
+      type: String,
     },
     readingModeActive: {
       type: Boolean,
-      default: false
+      default: false,
     },
     activePage: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
   data() {
     return {
@@ -168,12 +168,12 @@ export default {
       readingMode: false,
       showSettingsDialog: false,
       showMenuMoreDialog: false,
-      showTajweedDialog: false
+      showTajweedDialog: false,
     };
   },
   meta() {
     return {
-      title: this.pageTitle
+      title: this.pageTitle,
     };
   },
   watch: {
@@ -181,14 +181,14 @@ export default {
       immediate: true,
       handler(val) {
         this.readingMode = val;
-      }
+      },
     },
     surahId: "trackDetail",
-    readingMode: "trackDetail"
+    readingMode: "trackDetail",
   },
   computed: {
     surah() {
-      return this.surahList.find(item => item.id == this.surahId);
+      return this.surahList.find((item) => item.id == this.surahId);
     },
     pageTitle() {
       if (!this.surah) return this.productName;
@@ -207,7 +207,7 @@ export default {
       return this.readingMode
         ? "quran-reader-detail-reading-mode"
         : "quran-reader-detail-list-mode";
-    }
+    },
   },
   methods: {
     trackDetail() {
@@ -217,8 +217,8 @@ export default {
       this.$router
         .replace({
           params: {
-            surahId: id
-          }
+            surahId: id,
+          },
         })
         .then(() => {
           this.surahId = id;
@@ -229,7 +229,7 @@ export default {
     },
     onMenuMore() {
       this.$refs.menuMore.setState("half");
-    }
+    },
   },
   created() {
     this.surahId = parseInt(this.$route.params.surahId);
@@ -237,6 +237,6 @@ export default {
       this.headerHeight = this.$refs.header.$el.clientHeight;
       this.trackDetail();
     });
-  }
+  },
 };
 </script>

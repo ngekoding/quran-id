@@ -61,14 +61,15 @@ export default {
   name: "TajweedInformationDialog",
   props: {
     show: {
-      type: Boolean
-    }
+      type: Boolean,
+    },
   },
+  emits: ["update:show"],
   data() {
     return {
       showDialog: false,
       tajweedGroups,
-      headerHeight: 50
+      headerHeight: 50,
     };
   },
   watch: {
@@ -76,23 +77,23 @@ export default {
       immediate: true,
       handler(val) {
         this.showDialog = val;
-      }
+      },
     },
     showDialog(val) {
       this.$emit("update:show", val);
-    }
+    },
   },
   computed: {
     tajweedContentStyle() {
       return {
-        maxHeight: `calc(100vh - ${this.headerHeight}px)`
+        maxHeight: `calc(100vh - ${this.headerHeight}px)`,
       };
-    }
+    },
   },
   methods: {
     getItemsSimpleStr(items) {
       if (items.length == 1) return items[0].name;
-      const simples = items.map(item => item.name);
+      const simples = items.map((item) => item.name);
       const sub = simples.slice(0, -1);
       const last = simples.slice(-1);
       return sub.join(", ") + " dan " + last;
@@ -104,10 +105,10 @@ export default {
           clearInterval(interval);
         }
       }, 50);
-    }
+    },
   },
   mounted() {
     this.getTajweedHeaderHeight();
-  }
+  },
 };
 </script>
