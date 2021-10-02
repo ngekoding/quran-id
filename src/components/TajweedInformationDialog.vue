@@ -21,7 +21,7 @@
           :class="'tajweed-' + group.name"
         >
           <!-- <div class="color-rect">&nbsp;</div> -->
-          <div class="descritpion q-px-md q-pt-sm q-pb-md">
+          <div class="col-grow descritpion q-px-md q-pt-sm q-pb-md">
             <div class="text-subtitle1 text-weight-bold">{{ group.color }}</div>
             <p class="text-body2">
               {{ group.color }} mewakili bacaan
