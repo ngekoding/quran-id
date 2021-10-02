@@ -26,7 +26,9 @@
 </template>
 
 <script>
-import { copyToClipboard } from "quasar";
+import { computed } from "vue";
+import { copyToClipboard, useQuasar } from "quasar";
+
 export default {
   name: "AyahOptionsDialog",
   props: {
@@ -52,64 +54,63 @@ export default {
     },
   },
   emits: ["update:show"],
-  data() {
-    return {
-      showDialog: false,
-    };
-  },
-  watch: {
-    show: {
-      immediate: true,
-      handler(val) {
-        this.showDialog = val;
-      },
-    },
-    showDialog(val) {
-      this.$emit("update:show", val);
-    },
-  },
-  computed: {
-    arabicNormalized() {
-      return this.arabic
+  setup(props, { emit }) {
+    const $q = useQuasar();
+
+    const showDialog = computed({
+      get: () => props.show,
+      set: (val) => emit("update:show", val),
+    });
+
+    const arabicNormalized = computed(() => {
+      return props.arabic
         .replace(/<span.*?>.*?<\/span>/gi, "") // Remove verse number (end)
         .replace(/(<([^>]+)>)/gi, ""); // Remove HTML tags
-    },
-  },
-  methods: {
-    copy(type) {
+    });
+
+    const copy = (type) => {
+      const arabic = arabicNormalized.value;
+      const translation = props.translation;
       let text;
       if (type == "ayah") {
-        text = this.arabicNormalized;
+        text = arabic;
       } else if (type == "translation") {
-        text = this.translation;
+        text = translation;
       } else if (type == "both") {
-        text = this.arabicNormalized + "\n\n" + this.translation;
+        text = arabic + "\n\n" + translation;
       }
 
       text += "\n\n";
-      text += `QS. ${this.surahName}: ${this.ayahNumber}`;
-      text = this.removeFootNote(text);
+      text += `QS. ${props.surahName}: ${props.ayahNumber}`;
+      text = this.removeFootNote(text); // Call mixins: not working
 
       copyToClipboard(text)
         .then(() => {
-          this.$q.notify({
+          $q.notify({
             type: "toast",
             message: "Berhasil disalin.",
           });
         })
         .catch(() => {
-          this.$q.notify({
+          $q.notify({
             type: "toast-error",
             message: "Gagal! Terjadi kesalahan.",
           });
         });
-    },
-    bookmark() {
-      this.$q.notify({
+    };
+
+    const bookmark = () => {
+      $q.notify({
         type: "toast-warning",
         message: "Maaf fitur ini belum tersedia.",
       });
-    },
+    };
+
+    return {
+      showDialog,
+      copy,
+      bookmark,
+    };
   },
 };
 </script>

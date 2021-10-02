@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { ref, toRefs, watch } from "vue";
+import { ref, watch, computed } from "vue";
 
 export default {
   name: "AyahChangerDialog",
@@ -59,57 +59,43 @@ export default {
       required: true,
     },
   },
-  emits: ["update:show"],
-  setup(props) {
-    const { show } = toRefs(props);
-
-    const keyword = ref(null);
-    watch(show, () => {
-      keyword.value = null;
+  emits: ["update:show", "item-click"],
+  setup(props, { emit }) {
+    const showDialog = computed({
+      get: () => props.show,
+      set: (val) => emit("update:show", val),
     });
 
-    return { keyword };
-  },
-  data() {
-    return {
-      showDialog: false,
-    };
-  },
-  watch: {
-    show: {
-      immediate: true,
-      handler(val) {
-        this.showDialog = val;
-        this.keyword = "";
-      },
-    },
-    showDialog(val) {
-      this.$emit("update:show", val);
-    },
-  },
-  computed: {
-    ayahList() {
-      return Array.from({ length: this.versesCount }, (_, i) => {
+    const keyword = ref("");
+    watch(showDialog, () => (keyword.value = ""));
+
+    const ayahList = computed(() => {
+      return Array.from({ length: props.versesCount }, (_, i) => {
         return {
           ayahNumber: i + 1,
-          verseKey: `${this.surahId}:${i + 1}`,
+          verseKey: `${props.surahId}:${i + 1}`,
         };
       });
-    },
-    ayahListFiltered() {
-      const q = this.keyword.toString();
+    });
+
+    const ayahListFiltered = computed(() => {
+      const q = keyword.value.toString();
       if (q) {
-        return this.ayahList.filter((ayah) =>
+        return ayahList.value.filter((ayah) =>
           ayah.ayahNumber.toString().startsWith(q)
         );
       }
-      return this.ayahList;
-    },
-  },
-  methods: {
-    click(ayah) {
-      this.$emit("item-click", ayah.verseKey);
-    },
+      return ayahList.value;
+    });
+
+    const click = (ayah) => emit("item-click", ayah.verseKey);
+
+    return {
+      keyword,
+      showDialog,
+      ayahListFiltered,
+      click,
+    };
   },
 };
 </script>

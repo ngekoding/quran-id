@@ -19,7 +19,7 @@
         :class="[
           'tajweed-tooltip',
           tajweedTooltip.horizontal,
-          tajweedTooltip.name
+          tajweedTooltip.name,
         ]"
         :style="tajweedTooltipStyle"
       >
@@ -121,7 +121,7 @@
     />
 
     <!-- Go to top -->
-    <to-top v-show="!player.playing" @show="show => (toTopShown = show)" />
+    <to-top v-show="!player.playing" @show="(show) => (toTopShown = show)" />
     <!--  -->
   </div>
 </template>
@@ -151,24 +151,24 @@ export default {
     AyahPlayOptionsDialog,
     ToTop,
     PageScrollPositionHandler,
-    AyahPlayBottomControl
+    AyahPlayBottomControl,
   },
   props: {
     surahId: {
       type: Number,
-      required: true
+      required: true,
     },
     offsetTop: {
       type: Number,
-      default: 0
+      default: 0,
     },
     verseKey: {
-      type: String
+      type: String,
     },
     headerHeight: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
   data() {
     return {
@@ -183,11 +183,11 @@ export default {
         ayahNumber: "",
         surahName: "",
         arabic: "",
-        translation: ""
+        translation: "",
       },
       showAyahPlayOptionsDialog: false,
       ayahPlayOptionsDialogData: {
-        ayahNumber: 0
+        ayahNumber: 0,
       },
       activeOffsetTop: 0,
       reciterList,
@@ -199,7 +199,7 @@ export default {
         playing: false,
         currentAyah: 0,
         ayahStartFrom: 0,
-        loopCounter: 0
+        loopCounter: 0,
       },
       showTajwidDialog: false,
       tajweedTooltip: {
@@ -209,8 +209,8 @@ export default {
         horizontal: "",
         top: 0,
         left: 0,
-        right: 0
-      }
+        right: 0,
+      },
     };
   },
   watch: {
@@ -228,19 +228,19 @@ export default {
 
       this.tajweedTooltip.show = false;
       this.getSurahDetail();
-    }
+    },
   },
   computed: {
     ...mapGetters({
       surah: "quran/getSurah",
       playerSettings: "quran/getPlayerSettings",
-      tajweedMode: "quran/getTajweedMode"
+      tajweedMode: "quran/getTajweedMode",
     }),
     audioReciterId() {
       return this.playerSettings?.audioReciterId ?? 7;
     },
     audioReciter() {
-      return this.reciterList.find(r => r.id == this.audioReciterId);
+      return this.reciterList.find((r) => r.id == this.audioReciterId);
     },
     ayahPlayBottomControlTitle() {
       return (
@@ -257,7 +257,7 @@ export default {
       delete surahSimple.translations;
       return {
         readingMode: false,
-        surah: surahSimple
+        surah: surahSimple,
       };
     },
     contentStyles() {
@@ -266,7 +266,7 @@ export default {
       if (this.player.playing) paddingBottom = 74;
       return {
         minHeight: `calc(100vh - ${this.headerHeight}px)`,
-        paddingBottom: `${paddingBottom}px`
+        paddingBottom: `${paddingBottom}px`,
       };
     },
     tajweedTooltipStyle() {
@@ -281,18 +281,18 @@ export default {
       return {
         top: this.tajweedTooltip.top - 35 + "px",
         left,
-        right
+        right,
       };
-    }
+    },
   },
   methods: {
     getSurahDetail() {
-      this.$store.dispatch("quran/fetchSurah", this.surahId).then(_ => {
+      this.$store.dispatch("quran/fetchSurah", this.surahId).then((_) => {
         this.$nextTick(() => {
           this.init = false;
           window.scrollTo(0, this.offsetTop);
           if (this.verseKey) {
-            this.scrollToElement(this.$refs[this.verseKey][0].$el);
+            this.scrollToElement(this.$refs[this.verseKey]);
           }
         });
       });
@@ -309,7 +309,7 @@ export default {
         surahName: this.surah.nameSimple,
         ayahNumber: translation.verse_number,
         arabic: arabic.text_uthmani,
-        translation: translation.text
+        translation: translation.text,
       };
       this.showAyahOptionsDialog = true;
     },
@@ -326,12 +326,12 @@ export default {
     },
     onAyahChange(verseKey) {
       this.showAyahChangerDialog = false;
-      this.scrollToElement(this.$refs[verseKey][0].$el);
+      this.scrollToElement(this.$refs[verseKey].$el);
     },
     bookmark() {
       this.$q.notify({
         type: "toast-warning",
-        message: "Maaf fitur ini belum tersedia."
+        message: "Maaf fitur ini belum tersedia.",
       });
     },
     isAyahPlaying(ayahNumber) {
@@ -413,7 +413,7 @@ export default {
         if (nextAyah <= this.surah.versesCount) {
           // Scroll to next ayah
           const verseKey = this.surahId + ":" + nextAyah;
-          this.scrollToElement(this.$refs[verseKey][0].$el);
+          this.scrollToElement(this.$refs[verseKey]);
 
           this.player.currentAyah = nextAyah;
           this.playAudio();
@@ -423,7 +423,7 @@ export default {
             this.player.loopCounter < this.playerSettings.continuedRepeatNumber
           ) {
             const verseKey = this.surahId + ":" + this.player.ayahStartFrom;
-            this.scrollToElement(this.$refs[verseKey][0].$el);
+            this.scrollToElement(this.$refs[verseKey][0]);
 
             this.player.currentAyah = this.player.ayahStartFrom;
             this.playAudio();
@@ -449,7 +449,7 @@ export default {
       const tagRect = tagRects[0];
       const windowWidth = window.innerWidth;
       const handledTajweed = this.tajweedList.find(
-        item => item.key == tagClass
+        (item) => item.key == tagClass
       );
 
       if (tagName == "tajweed" && handledTajweed) {
@@ -497,7 +497,7 @@ export default {
       document
         .querySelector(".quran-reader-detail-list-mode")
         .removeEventListener("tap", this.handleReaderDetailTap);
-    }
+    },
   },
   created() {
     this.getSurahDetail();
@@ -514,6 +514,6 @@ export default {
   },
   beforeUnmount() {
     this.removeTajweedListener();
-  }
+  },
 };
 </script>

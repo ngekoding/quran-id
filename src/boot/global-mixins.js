@@ -1,5 +1,5 @@
 import { scroll } from "quasar";
-const { getScrollTarget, setScrollPosition } = scroll;
+const { getScrollTarget, setVerticalScrollPosition } = scroll;
 import packageInfo from "../../package.json";
 
 export default ({ app }) => {
@@ -20,7 +20,7 @@ export default ({ app }) => {
         // 66 is toolbar height
         const target = getScrollTarget(el);
         const offset = el.offsetTop + offsetCorrection;
-        setScrollPosition(target, offset, duration);
+        setVerticalScrollPosition(target, offset, duration);
       },
       normalizeSurahNameTranslation(str) {
         return str.replace(/\\/g, "");
