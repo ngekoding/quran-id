@@ -4,22 +4,33 @@ $color-tajweed-group-3: 76 175 80
 $color-tajweed-group-4: 33 150 243
 $color-tajweed-group-5: 156 39 176
 
+.color-tajweed-group-1
+  color: rgb($color-tajweed-group-1)
+.color-tajweed-group-2
+  color: rgb($color-tajweed-group-2)
+.color-tajweed-group-3
+  color: rgb($color-tajweed-group-3)
+.color-tajweed-group-4
+  color: rgb($color-tajweed-group-4)
+.color-tajweed-group-5
+  color: rgb($color-tajweed-group-5)
+
 .quran-reader-detail-list-mode tajweed
   cursor: pointer
   position: relative
   &.idgham_wo_ghunnah
-    color: rgb($color-tajweed-group-1)
+    @extend .color-tajweed-group-1
   &.idgham_ghunnah,
   &.idgham_shafawi,
   &.ghunnah
-    color: rgb($color-tajweed-group-2)
+    @extend .color-tajweed-group-2
   &.ikhafa_shafawi,
   &.ikhafa
-    color: rgb($color-tajweed-group-3)
+    @extend .color-tajweed-group-3
   &.iqlab
-    color: rgb($color-tajweed-group-4)
+    @extend .color-tajweed-group-4
   &.qalaqah
-    color: rgb($color-tajweed-group-5)
+    @extend .color-tajweed-group-5
 
 // Hide verse number comes from tajweed version
 .quran-reader-detail span.end
@@ -81,24 +92,59 @@ $color-tajweed-group-5: 156 39 176
 
 .tajweed-information
   .tajweed-item
-    margin-bottom: 15px
+    border: 1px solid #ccc
+    border-top-width: 20px
+    border-radius: 10px
+    margin: 10px 15px
+    position: relative
+    &::after
+      content: ''
+      width: 100%
+      height: 0
+      position: absolute
+      top: -10px
+      border-top: 10px solid #fff
+      border-top-left-radius: 15px
+      border-top-right-radius: 15px
     .color-rect
       width: 8px
       flex-shrink: 0
-      border-top-right-radius: 8px
-      border-bottom-right-radius: 8px
     .group-item:not(:last-child)
       margin-bottom: 15px
-    .group-item-description .arabic
+    .group-item-description .text-arabic
       font-size: 18px
-      font-family: "ZekrQuran"
-  .tajweed-group-1 .color-rect
-    background: rgb($color-tajweed-group-1)
-  .tajweed-group-2 .color-rect
-    background: rgb($color-tajweed-group-2)
-  .tajweed-group-3 .color-rect
-    background: rgb($color-tajweed-group-3)
-  .tajweed-group-4 .color-rect
-    background: rgb($color-tajweed-group-4)
-  .tajweed-group-5 .color-rect
-    background: rgb($color-tajweed-group-5)
+    .group-item-example .text-arabic
+      font-size: 22px
+    &.tajweed-group-1
+      border-color: rgb($color-tajweed-group-1)
+      .color-rect
+        background: rgb($color-tajweed-group-1)
+      .example-idgham_wo_ghunnah .idgham_wo_ghunnah
+        @extend .color-tajweed-group-1
+    &.tajweed-group-2
+      border-color: rgb($color-tajweed-group-2)
+      .color-rect
+        background: rgb($color-tajweed-group-2)
+      .example-idgham_ghunnah .idgham_ghunnah,
+      .example-idgham_shafawi .idgham_shafawi,
+      .example-ghunnah .ghunnah
+        @extend .color-tajweed-group-2
+    &.tajweed-group-3
+      border-color: rgb($color-tajweed-group-3)
+      .color-rect
+        background: rgb($color-tajweed-group-3)
+      .example-ikhafa_shafawi .ikhafa_shafawi,
+      .example-ikhafa .ikhafa
+        @extend .color-tajweed-group-3
+    &.tajweed-group-4
+      border-color: rgb($color-tajweed-group-4)
+      .color-rect
+        background: rgb($color-tajweed-group-4)
+      .example-iqlab .iqlab
+        @extend .color-tajweed-group-4
+    &.tajweed-group-5
+      border-color: rgb($color-tajweed-group-5)
+      .color-rect
+        background: rgb($color-tajweed-group-5)
+      .example-qalaqah .qalaqah
+        @extend .color-tajweed-group-5

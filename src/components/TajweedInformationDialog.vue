@@ -7,23 +7,21 @@
     transition-hide="slide-down"
   >
     <q-card class="tajweed-information">
-      <q-card-section
-        ref="tajweedHeader"
-        class="row items-center bg-primary text-white"
-      >
+      <q-card-section ref="tajweedHeader" class="row items-center">
         <div class="text-h6">Tajwid</div>
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
-      <div class="scroll" :style="tajweedContentStyle">
+      <q-separator />
+      <div class="scroll q-pt-sm" :style="tajweedContentStyle">
         <div
           v-for="group in tajweedGroups"
           :key="'group-' + group.name"
-          class="tajweed-item row items-stretch no-wrap q-mt-md"
+          class="tajweed-item row items-stretch no-wrap"
           :class="'tajweed-' + group.name"
         >
-          <div class="color-rect">&nbsp;</div>
-          <div class="descritpion q-pa-md">
+          <!-- <div class="color-rect">&nbsp;</div> -->
+          <div class="descritpion q-px-md q-pt-sm q-pb-md">
             <div class="text-subtitle1 text-weight-bold">{{ group.color }}</div>
             <p class="text-body2">
               {{ group.color }} mewakili bacaan
@@ -40,15 +38,36 @@
                 class="text-body2 group-item-description"
                 v-html="item.description"
               />
+              <div
+                class="group-item-example q-mt-md row"
+                :class="'example-' + item.key"
+              >
+                <div
+                  class="col-grow q-mr-sm text-arabic"
+                  v-html="item.example.arabic"
+                />
+                <q-btn
+                  color="primary"
+                  icon="mdi-motion-play"
+                  flat
+                  rounded
+                  dense
+                  @click="playExample(item.example.meta.verseKey)"
+                />
+              </div>
             </div>
           </div>
         </div>
-        <div class="q-pa-lg text-body2 text-center text-primary">
+        <div class="q-px-lg q-py-md text-body2 text-center text-primary">
           Anda dapat melihat hukum bacaan pada kata atau kalimat tertentu saat
-          membaca dengan cara meng-klik pada bagian yang berwarna.
+          membaca dengan cara mengklik pada bagian yang berwarna.
         </div>
-        <div class="q-pa-lg text-caption text-center text-grey">
-          Penjelasan ini disadur dari buku <b>Metode Asy-Syafi'i</b>
+        <div
+          class="q-px-lg q-pb-lg text-caption text-center text-grey"
+          style="line-height: 15px"
+        >
+          Penjelasan ini disadur dari<br />
+          <b>Buku Metode Asy-Syafi'i - Kelas Tajwid</b>
         </div>
       </div>
     </q-card>
@@ -68,7 +87,8 @@ export default {
     return {
       showDialog: false,
       tajweedGroups,
-      headerHeight: 50
+      headerHeight: 50,
+      audio: null
     };
   },
   watch: {
@@ -104,6 +124,20 @@ export default {
           clearInterval(interval);
         }
       }, 50);
+    },
+    playExample(verseKey) {
+      const [surahId, ayahNumber] = verseKey.split(":");
+      const surahFixedLen = surahId.padStart(3, "0");
+      const ayahFixedLen = ayahNumber.padStart(3, "0");
+      const urlPrefix = "https://everyayah.com/data/Ayman_Sowaid_64kbps/";
+
+      const audioUrl = urlPrefix + surahFixedLen + ayahFixedLen + ".mp3";
+
+      // Stop previous audio if exists
+      if (this.audio) this.audio.pause();
+
+      this.audio = new Audio(audioUrl);
+      this.audio.play();
     }
   },
   mounted() {
