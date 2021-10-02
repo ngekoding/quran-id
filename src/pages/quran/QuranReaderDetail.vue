@@ -85,7 +85,7 @@
             @click="showSurahChangerDialog = true"
           >
             <q-item-section avatar>
-              <q-icon name="mdi-format-list-text" />
+              <q-icon name="mdi-format-align-bottom" />
             </q-item-section>
             <q-item-section>Pindah surah</q-item-section>
           </q-item>
@@ -96,7 +96,7 @@
             @click="showTajweedDialog = true"
           >
             <q-item-section avatar>
-              <q-icon name="mdi-palette" />
+              <q-icon name="mdi-bookmark-outline" />
             </q-item-section>
             <q-item-section>Keterangan warna tajwid</q-item-section>
           </q-item>
@@ -107,7 +107,7 @@
             @click="showSettingsDialog = true"
           >
             <q-item-section avatar>
-              <q-icon name="mdi-tune" />
+              <q-icon name="mdi-tune-variant" />
             </q-item-section>
             <q-item-section>Pengaturan</q-item-section>
           </q-item>
