@@ -27,13 +27,7 @@
       </div>
       <div class="content bg-white" :style="contentStyles">
         <!-- Basmallah -->
-        <div
-          class="text-basmalah text-center q-py-md"
-          style="font-size: 22pt"
-          v-if="surah.bismillahPre"
-        >
-          {{ basmalahArabic }}
-        </div>
+        <div v-if="surah.bismillahPre" class="basmalah" />
         <q-list separator>
           <q-item
             v-for="(ayah, index) in surah.ayahs"
