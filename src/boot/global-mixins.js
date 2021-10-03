@@ -30,15 +30,11 @@ export default ({ Vue }) => {
       },
       arabicNumber(number) {
         const arabicNums = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
-        const frame = "&#1757;";
-        return (
-          frame +
-          number
-            .toString()
-            .split("")
-            .map(num => arabicNums[num])
-            .join("")
-        );
+        return number
+          .toString()
+          .split("")
+          .map(num => arabicNums[num])
+          .join("");
       },
       track(title, path, loc) {
         const page_title = title;

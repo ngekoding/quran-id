@@ -106,7 +106,7 @@
               <q-item-label class="text-arabic text-right">
                 <span v-html="item.text" />
                 <span
-                  class="text-arabic-number q-mr-xs"
+                  class="text-arabic-number q-mr-sm"
                   v-html="arabicNumber(item.ayahNumber)"
                 />
               </q-item-label>

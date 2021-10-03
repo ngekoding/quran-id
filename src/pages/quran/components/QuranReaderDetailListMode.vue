@@ -39,7 +39,7 @@
               <q-item-label class="text-arabic text-right">
                 <span v-html="ayah.text_uthmani" />
                 <span
-                  class="text-arabic-number q-mr-xs"
+                  class="text-arabic-number q-mr-sm"
                   v-html="arabicNumber(ayah.verse_number)"
                 />
               </q-item-label>
