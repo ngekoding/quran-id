@@ -77,9 +77,7 @@ export default {
   },
   computed: {
     arabicNormalized() {
-      return this.arabic
-        .replace(/<span.*?>.*?<\/span>/gi, "") // Remove verse number (end)
-        .replace(/(<([^>]+)>)/gi, ""); // Remove HTML tags
+      return this.arabic.replace(/(<([^>]+)>)/gi, ""); // Remove HTML tags
     }
   },
   methods: {

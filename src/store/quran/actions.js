@@ -45,9 +45,13 @@ export async function fetchSurah(context, surahId) {
   return Promise.all(requests)
     .then(values => {
       const arabics = values[0].verses.map(verse => {
+        // Remove verse number (end) & fix spacing
+        const text_uthmani = (verse.text_uthmani || verse.text_uthmani_tajweed)
+          .replace(/<span.*?>.*?<\/span>/gi, "")
+          .trim();
         return {
           ...verse,
-          ...(tajweedMode && { text_uthmani: verse.text_uthmani_tajweed }),
+          text_uthmani,
           verse_number: parseInt(verse.verse_key.split(":")[1])
         };
       });
