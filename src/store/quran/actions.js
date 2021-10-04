@@ -45,10 +45,22 @@ export async function fetchSurah(context, surahId) {
   return Promise.all(requests)
     .then(values => {
       const arabics = values[0].verses.map(verse => {
-        // Remove verse number (end) & fix spacing
-        const text_uthmani = (verse.text_uthmani || verse.text_uthmani_tajweed)
-          .replace(/<span.*?>.*?<\/span>/gi, "")
-          .trim();
+        let text_uthmani;
+
+        /**
+         * Special cases for tajweed
+         * - Remove verse number (end) & fix spacing
+         * - Fix some madda_normal weird character
+         */
+        if (tajweedMode) {
+          text_uthmani = verse.text_uthmani_tajweed
+            .replace(/<span.*?>.*?<\/span>/gi, "")
+            .replace("ٲ", String.fromCharCode(1648))
+            .trim();
+        } else {
+          text_uthmani = verse.text_uthmani.trim();
+        }
+
         return {
           ...verse,
           text_uthmani,
