@@ -21,8 +21,8 @@
           flat
           round
           dense
-          :icon="readingMode ? 'menu_book' : 'import_contacts'"
-          @click="readingMode = !readingMode"
+          icon="import_contacts"
+          @click="showModeSwitcherDialog = true"
         />
         <q-btn
           icon="mdi-dots-vertical"
@@ -67,7 +67,7 @@
         </q-card-section>
         <q-list separator padding>
           <q-item
-            v-if="!readingMode"
+            v-if="mode != 'reading'"
             clickable
             v-ripple
             v-close-popup
@@ -120,12 +120,50 @@
 
     <!-- Tajweed information dialog -->
     <tajweed-information-dialog :show.sync="showTajweedDialog" />
+
+    <!-- Mode switcher dialog -->
+    <q-dialog v-model="showModeSwitcherDialog">
+      <q-card class="bg-primary" style="width: 80vw">
+        <q-card-section class="row items-center text-white">
+          <div class="text-h6">Pilih mode</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+        <q-list separator class="bg-white">
+          <q-item clickable v-ripple @click="changeMode('list')">
+            <q-item-section>
+              Reguler
+            </q-item-section>
+            <q-item-section v-if="mode == 'list'" side>
+              <q-icon name="verified" class="text-primary" />
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-ripple @click="changeMode('reading')">
+            <q-item-section>
+              Pembacaan
+            </q-item-section>
+            <q-item-section v-if="mode == 'reading'" side>
+              <q-icon name="verified" class="text-primary" />
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-ripple @click="changeMode('wbw')">
+            <q-item-section>
+              Per kata
+            </q-item-section>
+            <q-item-section v-if="mode == 'wbw'" side>
+              <q-icon name="verified" class="text-primary" />
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
 <script>
 import QuranReaderDetailListMode from "./components/QuranReaderDetailListMode.vue";
 import QuranReaderDetailReadingMode from "./components/QuranReaderDetailReadingMode.vue";
+import QuranReaderDetailWordByWordMode from "./components/QuranReaderDetailWordByWordMode.vue";
 import QuranReaderDetailSettingsDialog from "src/components/QuranReaderDetailSettingsDialog.vue";
 import SurahChangerDialog from "src/components/SurahChangerDialog.vue";
 import TajweedInformationDialog from "src/components/TajweedInformationDialog.vue";
@@ -137,6 +175,7 @@ export default {
   components: {
     QuranReaderDetailReadingMode,
     QuranReaderDetailListMode,
+    QuranReaderDetailWordByWordMode,
     QuranReaderDetailSettingsDialog,
     SurahChangerDialog,
     TajweedInformationDialog
@@ -149,9 +188,10 @@ export default {
     verseKey: {
       type: String
     },
-    readingModeActive: {
-      type: Boolean,
-      default: false
+    activeMode: {
+      type: String,
+      default: "list",
+      validator: val => ["list", "reading", "wbw"].includes(val)
     },
     activePage: {
       type: Number,
@@ -165,10 +205,12 @@ export default {
       surahId: "",
       showSurahChangerDialog: false,
       contentStyles: null,
-      readingMode: false,
+      modeList: ["list", "reading", "wbw"],
+      mode: "list",
       showSettingsDialog: false,
       showMenuMoreDialog: false,
-      showTajweedDialog: false
+      showTajweedDialog: false,
+      showModeSwitcherDialog: false
     };
   },
   meta() {
@@ -177,36 +219,51 @@ export default {
     };
   },
   watch: {
-    readingModeActive: {
+    activeMode: {
       immediate: true,
       handler(val) {
-        this.readingMode = val;
+        this.mode = val;
       }
     },
     surahId: "trackDetail",
-    readingMode: "trackDetail"
+    mode: "trackDetail"
   },
   computed: {
     surah() {
       return this.surahList.find(item => item.id == this.surahId);
     },
+    modeText() {
+      switch (this.mode) {
+        case "reading":
+          return "Reading";
+        case "wbw":
+          return "Word by Word";
+        default:
+          return "List";
+      }
+    },
     pageTitle() {
       if (!this.surah) return this.productName;
-      const reading = this.readingMode ? " | Reading Mode" : "";
       return (
         "QS. " +
         this.surah.nameSimple +
         " | " +
         this.surah.nameTranslated +
-        reading +
+        " | " +
+        this.modeText +
         " | " +
         this.productName
       );
     },
     quranDetailComponent() {
-      return this.readingMode
-        ? "quran-reader-detail-reading-mode"
-        : "quran-reader-detail-list-mode";
+      switch (this.mode) {
+        case "reading":
+          return "quran-reader-detail-reading-mode";
+        case "wbw":
+          return "quran-reader-detail-word-by-word-mode";
+        default:
+          return "quran-reader-detail-list-mode";
+      }
     }
   },
   methods: {
@@ -226,6 +283,10 @@ export default {
     },
     prepareAyahChange() {
       this.$refs.quranDetail.prepareAyahChange();
+    },
+    changeMode(mode) {
+      this.mode = mode;
+      this.showModeSwitcherDialog = false;
     },
     onMenuMore() {
       this.$refs.menuMore.setState("half");

@@ -116,7 +116,7 @@ export default {
         page: this.page,
         offsetTop: 0,
         extra: {
-          readingMode: true,
+          mode: "reading",
           surah: this.surah,
           currentPage: this.currentPage
         }

@@ -78,6 +78,60 @@ export async function fetchSurah(context, surahId) {
     });
 }
 
+export async function fetchSurahWBW(context, surahId) {
+  context.commit("showLoading", "fetchSurahWBW");
+
+  const chapter = surahList.find(item => item.id == surahId);
+
+  // We can only fetch 50 ayah per request
+  const perPage = 50;
+  const requestCount = Math.ceil(chapter.versesCount / perPage);
+  const urls = [];
+  for (let page = 1; page <= requestCount; page++) {
+    urls.push({
+      url: "verses/by_chapter/" + surahId,
+      params: {
+        language: "id",
+        words: true,
+        word_fields: "text_uthmani",
+        page: page,
+        per_page: perPage
+      }
+    });
+  }
+
+  const requests = [];
+  urls.forEach(url => {
+    requests.push(
+      new Promise((resolve, reject) => {
+        this.$httpQuran({
+          url: url.url,
+          params: url.params
+        })
+          .then(res => {
+            resolve(res.data);
+          })
+          .catch(err => {
+            console.log(err);
+            reject(err);
+          });
+      })
+    );
+  });
+
+  return Promise.all(requests)
+    .then(values => {
+      const verses = values.reduce((acc, res) => acc.concat(res.verses), []);
+      const merged = Object.assign({ ayahs: verses }, chapter);
+      context.commit("updateSurahWBW", merged);
+      context.commit("hideLoading", "fetchSurahWBW");
+    })
+    .catch(err => {
+      console.log(err);
+      context.commit("hideLoading", "fetchSurahWBW");
+    });
+}
+
 export async function searchByAyah(context, { keyword, page = 1 }) {
   context.commit("showLoading", "searchAyah");
 

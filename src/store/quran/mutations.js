@@ -13,6 +13,10 @@ export function updateSurah(state, surah) {
   state.surah = surah;
 }
 
+export function updateSurahWBW(state, surah) {
+  state.surahWBW = surah;
+}
+
 export function addSearchAyahResults(state, results) {
   state.searchAyah.results.push(...results);
 }

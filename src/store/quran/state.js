@@ -3,6 +3,7 @@ import { LocalStorage } from "quasar";
 export default function() {
   return {
     surah: null,
+    surahWBW: null,
     tajweedMode: LocalStorage.getItem("tajweed-mode") ?? false,
     pageScrollPosition: LocalStorage.getItem("page-scroll-position") ?? {},
     playerSettings: LocalStorage.getItem("player-settings") ?? {
@@ -23,6 +24,7 @@ export default function() {
     },
     loading: {
       fetchSurah: false,
+      fetchSurahWBW: false,
       searchAyah: false
     }
   };

@@ -2,6 +2,10 @@ export function getSurah(state) {
   return state.surah;
 }
 
+export function getSurahWBW(state) {
+  return state.surahWBW;
+}
+
 export function getSearchAyahResults(state) {
   return state.searchAyah.results;
 }

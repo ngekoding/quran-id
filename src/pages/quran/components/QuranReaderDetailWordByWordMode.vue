@@ -1,5 +1,5 @@
 <template>
-  <div class="quran-reader-detail-list-mode">
+  <div class="quran-reader-detail-word-by-word-mode">
     <!-- Scroll handler -->
     <page-scroll-position-handler
       :listen="!init && active"
@@ -9,43 +9,39 @@
     />
     <!-- Quran reader detail skeleton -->
     <quran-reader-detail-skeleton
-      v-if="$store.state.quran.loading.fetchSurah"
+      v-if="$store.state.quran.loading.fetchSurahWBW"
     />
     <template v-else>
-      <!-- Tajweed tooltip -->
-      <div
-        v-show="tajweedMode && tajweedTooltip.show"
-        ref="tajweedTooltip"
-        :class="[
-          'tajweed-tooltip',
-          tajweedTooltip.horizontal,
-          tajweedTooltip.name
-        ]"
-        :style="tajweedTooltipStyle"
-      >
-        {{ tajweedTooltip.content }}
-      </div>
       <div class="content bg-white" :style="contentStyles">
         <!-- Basmallah -->
         <div v-if="surah.bismillahPre" class="basmalah" />
         <q-list separator>
           <q-item
-            v-for="(ayah, index) in surah.ayahs"
+            v-for="ayah in surah.ayahs"
             :key="ayah.verse_key"
             class="q-pt-md"
             :ref="ayah.verse_key"
           >
             <q-item-section>
               <q-item-label class="text-arabic text-right">
-                <span v-html="ayah.text_uthmani" />
                 <span
-                  class="text-arabic-number q-mr-sm"
-                  v-html="arabicNumber(ayah.verse_number)"
-                />
-              </q-item-label>
-              <q-item-label class="q-pt-sm translation-wrap">
-                <span>{{ ayah.verse_number + ". " }}</span>
-                <span v-html="surah.translations[index].text" />
+                  v-for="(word, wordIndex) in ayah.words.slice(0, -1)"
+                  :key="'wbw-' + word.id"
+                  class="wbw-wrap q-pl-md q-mb-md"
+                >
+                  <span>
+                    <span class="wbw-arabic" v-html="word.text_uthmani" />
+                    <!-- Show ayah number at the end of words -->
+                    <span
+                      v-if="wordIndex == ayah.words.length - 2"
+                      class="text-arabic-number q-mr-sm"
+                      v-html="arabicNumber(ayah.verse_number)"
+                    />
+                  </span>
+                  <span class="wbw-translation">
+                    {{ word.translation.text }}
+                  </span>
+                </span>
               </q-item-label>
               <q-item-label class="q-pt-sm row justify-end">
                 <q-btn
@@ -63,31 +59,12 @@
                   unelevated
                   @click="onAyahPlayClicked(ayah.verse_number)"
                 />
-                <q-btn
-                  size="sm"
-                  icon="mdi-dots-vertical-circle-outline"
-                  color="grey-3"
-                  text-color="black"
-                  class="q-ml-sm"
-                  round
-                  unelevated
-                  @click="onOptionClicked(ayah, surah.translations[index])"
-                />
               </q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
       </div>
     </template>
-
-    <!-- Ayah options dialog -->
-    <ayah-options-dialog
-      :show.sync="showAyahOptionsDialog"
-      :ayah-number="ayahOptionsDialogData.ayahNumber"
-      :surah-name="ayahOptionsDialogData.surahName"
-      :arabic="ayahOptionsDialogData.arabic"
-      :translation="ayahOptionsDialogData.translation"
-    />
 
     <!-- Dialog play options -->
     <ayah-play-options-dialog
@@ -123,7 +100,6 @@
 <script>
 import { mapGetters } from "vuex";
 import QuranReaderDetailSkeleton from "../skeletons/QuranReaderDetailSkeleton.vue";
-import AyahOptionsDialog from "src/components/AyahOptionsDialog.vue";
 import AyahChangerDialog from "src/components/AyahChangerDialog.vue";
 import AyahPlayOptionsDialog from "src/components/AyahPlayOptionsDialog.vue";
 import AyahPlayBottomControl from "src/components/AyahPlayBottomControl.vue";
@@ -132,7 +108,6 @@ import ToTop from "src/components/ToTop.vue";
 import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.vue";
 
 import reciterList from "src/data/reciter-list";
-import tajweedList from "src/data/tajweed";
 
 import "tapjs";
 
@@ -140,7 +115,6 @@ export default {
   name: "QuranDetailListMode",
   components: {
     QuranReaderDetailSkeleton,
-    AyahOptionsDialog,
     AyahChangerDialog,
     AyahPlayOptionsDialog,
     ToTop,
@@ -172,20 +146,12 @@ export default {
       toTopShown: false,
       showAyahChangerDialog: false,
       showSurahChangerDialog: false,
-      showAyahOptionsDialog: false,
-      ayahOptionsDialogData: {
-        ayahNumber: "",
-        surahName: "",
-        arabic: "",
-        translation: ""
-      },
       showAyahPlayOptionsDialog: false,
       ayahPlayOptionsDialogData: {
         ayahNumber: 0
       },
       activeOffsetTop: 0,
       reciterList,
-      tajweedList,
       player: {
         type: "current-only", // current-only, current-loop, current-and-continue
         audio: null,
@@ -194,16 +160,6 @@ export default {
         currentAyah: 0,
         ayahStartFrom: 0,
         loopCounter: 0
-      },
-      showTajwidDialog: false,
-      tajweedTooltip: {
-        show: false,
-        name: "",
-        content: "Content Here",
-        horizontal: "",
-        top: 0,
-        left: 0,
-        right: 0
       }
     };
   },
@@ -215,20 +171,12 @@ export default {
     },
     audioReciterId() {
       this.player.audios = {};
-    },
-    tajweedMode(val) {
-      if (val) this.setTajweedListener();
-      else this.removeTajweedListener();
-
-      this.tajweedTooltip.show = false;
-      this.getSurahDetail();
     }
   },
   computed: {
     ...mapGetters({
-      surah: "quran/getSurah",
-      playerSettings: "quran/getPlayerSettings",
-      tajweedMode: "quran/getTajweedMode"
+      surah: "quran/getSurahWBW",
+      playerSettings: "quran/getPlayerSettings"
     }),
     audioReciterId() {
       return this.playerSettings?.audioReciterId ?? 7;
@@ -250,7 +198,7 @@ export default {
       delete surahSimple.ayahs;
       delete surahSimple.translations;
       return {
-        mode: "list",
+        mode: "wbw",
         surah: surahSimple
       };
     },
@@ -262,26 +210,11 @@ export default {
         minHeight: `calc(100vh - ${this.headerHeight}px)`,
         paddingBottom: `${paddingBottom}px`
       };
-    },
-    tajweedTooltipStyle() {
-      const left =
-        typeof this.tajweedTooltip.left == "number"
-          ? this.tajweedTooltip.left + "px"
-          : this.tajweedTooltip.left;
-      const right =
-        typeof this.tajweedTooltip.right == "number"
-          ? this.tajweedTooltip.right + "px"
-          : this.tajweedTooltip.right;
-      return {
-        top: this.tajweedTooltip.top - 35 + "px",
-        left,
-        right
-      };
     }
   },
   methods: {
     getSurahDetail() {
-      this.$store.dispatch("quran/fetchSurah", this.surahId).then(_ => {
+      this.$store.dispatch("quran/fetchSurahWBW", this.surahId).then(_ => {
         this.$nextTick(() => {
           this.init = false;
           window.scrollTo(0, this.offsetTop);
@@ -293,19 +226,9 @@ export default {
     },
     onPageScroll(position) {
       this.activeOffsetTop = position;
-      this.tajweedTooltip.show = false;
     },
     verseNumberFromKey(key) {
       return key.split(":")[1];
-    },
-    onOptionClicked(arabic, translation) {
-      this.ayahOptionsDialogData = {
-        surahName: this.surah.nameSimple,
-        ayahNumber: translation.verse_number,
-        arabic: arabic.text_uthmani,
-        translation: translation.text
-      };
-      this.showAyahOptionsDialog = true;
     },
     onAyahPlayClicked(ayahNumber) {
       if (this.isAyahPlaying(ayahNumber)) {
@@ -430,84 +353,18 @@ export default {
       } else {
         this.stopAudio();
       }
-    },
-    handleWindowResize(e) {
-      this.tajweedTooltip.show = false;
-    },
-    handleReaderDetailTap(e) {
-      this.tajweedTooltip.show = false;
-
-      const tagName = e.target.tagName.toLowerCase();
-      const tagClass = e.target.className;
-      const tagRects = e.target.getClientRects();
-      const tagRect = tagRects[0];
-      const windowWidth = window.innerWidth;
-      const handledTajweed = this.tajweedList.find(
-        item => item.key == tagClass
-      );
-
-      if (tagName == "tajweed" && handledTajweed) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        this.tajweedTooltip.content = handledTajweed.name;
-        this.tajweedTooltip.top = tagRect.top;
-        this.tajweedTooltip.left = tagRect.left;
-        this.tajweedTooltip.right = "auto";
-        this.tajweedTooltip.name = tagClass;
-        this.tajweedTooltip.show = true;
-
-        // Calculating x position after content changed
-        this.$nextTick(() => {
-          const tooltip = this.$refs.tajweedTooltip;
-          const tooltipRect = tooltip.getBoundingClientRect();
-          const left = tagRect.left - tooltipRect.width / 2 + tagRect.width / 2;
-          const right = left + tooltipRect.width;
-
-          if (left > 1 && right < windowWidth - 1) {
-            this.tajweedTooltip.left = left;
-            this.tajweedTooltip.right = "auto";
-            this.tajweedTooltip.horizontal = "";
-          } else if (left <= 1) {
-            this.tajweedTooltip.horizontal = "left";
-            this.tajweedTooltip.left = tagRect.left;
-            this.tajweedTooltip.right = "auto";
-          } else if (right >= windowWidth - 1) {
-            this.tajweedTooltip.horizontal = "right";
-            this.tajweedTooltip.right = windowWidth - tagRect.right;
-            this.tajweedTooltip.left = "auto";
-          }
-        });
-      }
-    },
-    setTajweedListener() {
-      window.addEventListener("resize", this.handleWindowResize);
-      document
-        .querySelector(".quran-reader-detail-list-mode")
-        .addEventListener("tap", this.handleReaderDetailTap);
-    },
-    removeTajweedListener() {
-      window.removeEventListener("resize", this.handleWindowResize);
-      document
-        .querySelector(".quran-reader-detail-list-mode")
-        .removeEventListener("tap", this.handleReaderDetailTap);
     }
   },
   created() {
     this.getSurahDetail();
   },
-  mounted() {
-    if (this.tajweedMode) this.setTajweedListener();
-  },
+  mounted() {},
   activated() {
     this.active = true;
     window.scrollTo(0, this.activeOffsetTop);
   },
   deactivated() {
     this.active = false;
-  },
-  beforeDestroy() {
-    this.removeTajweedListener();
   }
 };
 </script>

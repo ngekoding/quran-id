@@ -193,7 +193,7 @@ export default {
         params: {
           surahId: lastRead.extra.surah.id,
           offsetTop: lastRead.offsetTop,
-          readingModeActive: lastRead.extra.readingMode,
+          activeMode: lastRead.extra.mode,
           activePage: lastRead.extra.currentPage
         }
       });
