@@ -134,6 +134,9 @@ import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.
 import reciterList from "src/data/reciter-list";
 import tajweedList from "src/data/tajweed";
 
+import Player from "src/lib/player";
+import { EventBus } from "src/lib/event-bus";
+
 import "tapjs";
 
 export default {
@@ -187,9 +190,8 @@ export default {
       reciterList,
       tajweedList,
       player: {
+        player: null,
         type: "current-only", // current-only, current-loop, current-and-continue
-        audio: null,
-        audios: {},
         playing: false,
         currentAyah: 0,
         ayahStartFrom: 0,
@@ -204,17 +206,16 @@ export default {
         top: 0,
         left: 0,
         right: 0
-      }
+      },
+      playerNew: null
     };
   },
   watch: {
     surahId() {
-      this.stopAudio();
-      this.player.audios = {};
       this.getSurahDetail();
     },
     audioReciterId() {
-      this.player.audios = {};
+      this.setupPlayer();
     },
     tajweedMode(val) {
       if (val) this.setTajweedListener();
@@ -241,9 +242,6 @@ export default {
         this.audioReciter.reciterName +
         (this.audioReciter.style ? ` (${this.audioReciter.style})` : "")
       );
-    },
-    ayahCount() {
-      return this.surah?.length;
     },
     scrollExtra() {
       const surahSimple = Object.assign({}, this.surah);
@@ -289,14 +287,14 @@ export default {
             this.scrollToElement(this.$refs[this.verseKey][0].$el);
           }
         });
+
+        this.setupPlayer();
+        this.setupPlayerListener();
       });
     },
     onPageScroll(position) {
       this.activeOffsetTop = position;
       this.tajweedTooltip.show = false;
-    },
-    verseNumberFromKey(key) {
-      return key.split(":")[1];
     },
     onOptionClicked(arabic, translation) {
       this.ayahOptionsDialogData = {
@@ -347,52 +345,16 @@ export default {
 
       return urlPrefix + surahFixedLen + ayahFixedLen + ".mp3";
     },
-    getAudio(ayahNumber) {
-      if (this.player.audios.hasOwnProperty(ayahNumber)) {
-        return this.player.audios[ayahNumber];
-      } else {
-        return new Audio(this.getAudioUrl(ayahNumber));
-      }
-    },
-    prepareNextAudio() {
-      let endNextAyah = this.player.currentAyah + 2; // This will add one ayah after
-      if (endNextAyah > this.surah.versesCount) {
-        endNextAyah = this.surah.versesCount;
-      }
-
-      for (
-        let ayahNumber = this.player.currentAyah + 1;
-        ayahNumber <= endNextAyah;
-        ayahNumber++
-      ) {
-        if (!this.player.audios.hasOwnProperty(ayahNumber)) {
-          this.$set(
-            this.player.audios,
-            ayahNumber,
-            new Audio(this.getAudioUrl(ayahNumber))
-          );
-        }
-      }
-    },
     playAudio() {
-      this.player.audio = this.getAudio(this.player.currentAyah);
-      this.player.audio.addEventListener("ended", this.onAudioAyahEnded);
-      this.player.audio.play();
-
+      const trackIndex = this.player.currentAyah - 1;
+      this.player.player.play(trackIndex);
       this.player.playing = true;
-
-      // Fetch next ayah file
-      // So we don't need wait when playing it
-      if (this.player.type == "current-and-continue") {
-        this.prepareNextAudio();
-      }
     },
     stopAudio() {
-      if (this.player.audio) {
-        this.player.audio.pause();
-        this.player.audio.currentTime = 0;
+      if (this.player.playing) {
+        this.player.player.stop();
+        this.player.playing = false;
       }
-      this.player.playing = false;
     },
     onAudioAyahEnded() {
       if (this.player.type == "current-loop") {
@@ -491,6 +453,24 @@ export default {
       document
         .querySelector(".quran-reader-detail-list-mode")
         .removeEventListener("tap", this.handleReaderDetailTap);
+    },
+    setupPlayer() {
+      this.stopAudio();
+
+      const playlist = [];
+      for (
+        let ayahNumber = 1;
+        ayahNumber <= this.surah.versesCount;
+        ayahNumber++
+      ) {
+        playlist.push({
+          src: this.getAudioUrl(ayahNumber)
+        });
+      }
+      this.player.player = new Player(playlist);
+    },
+    setupPlayerListener() {
+      EventBus.$on("player:end", this.onAudioAyahEnded);
     }
   },
   created() {

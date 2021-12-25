@@ -16,6 +16,7 @@
     "axios": "^0.18.1",
     "axios-cache-adapter": "^2.7.0",
     "core-js": "^3.6.5",
+    "howler": "^2.2.3",
     "localforage": "^1.9.0",
     "quasar": "^1.0.0",
     "swiper": "^5.4.5",
