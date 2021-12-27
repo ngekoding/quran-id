@@ -165,6 +165,7 @@ export default {
   },
   watch: {
     surahId() {
+      this.stopAudio();
       this.getSurahDetail();
     },
     audioReciterId() {
@@ -314,8 +315,6 @@ export default {
       }
     },
     setupPlayer() {
-      this.stopAudio();
-
       const playlist = [];
       for (
         let ayahNumber = 1;
