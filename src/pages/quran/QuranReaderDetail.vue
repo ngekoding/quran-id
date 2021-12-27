@@ -130,29 +130,23 @@
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <q-list separator class="bg-white">
-          <q-item clickable v-ripple @click="changeMode('list')">
-            <q-item-section>
-              Reguler
+          <q-item tag="label" v-ripple>
+            <q-item-section avatar>
+              <q-radio v-model="mode" val="list" />
             </q-item-section>
-            <q-item-section v-if="mode == 'list'" side>
-              <q-icon name="verified" class="text-primary" />
-            </q-item-section>
+            <q-item-section>Reguler</q-item-section>
           </q-item>
-          <q-item clickable v-ripple @click="changeMode('reading')">
-            <q-item-section>
-              Pembacaan
+          <q-item tag="label" v-ripple>
+            <q-item-section avatar>
+              <q-radio v-model="mode" val="reading" />
             </q-item-section>
-            <q-item-section v-if="mode == 'reading'" side>
-              <q-icon name="verified" class="text-primary" />
-            </q-item-section>
+            <q-item-section>Pembacaan</q-item-section>
           </q-item>
-          <q-item clickable v-ripple @click="changeMode('wbw')">
-            <q-item-section>
-              Per kata
+          <q-item tag="label" v-ripple>
+            <q-item-section avatar>
+              <q-radio v-model="mode" val="wbw" />
             </q-item-section>
-            <q-item-section v-if="mode == 'wbw'" side>
-              <q-icon name="verified" class="text-primary" />
-            </q-item-section>
+            <q-item-section>Per kata</q-item-section>
           </q-item>
         </q-list>
       </q-card>
@@ -226,7 +220,10 @@ export default {
       }
     },
     surahId: "trackDetail",
-    mode: "trackDetail"
+    mode() {
+      this.showModeSwitcherDialog = false;
+      this.trackDetail();
+    }
   },
   computed: {
     surah() {
@@ -283,10 +280,6 @@ export default {
     },
     prepareAyahChange() {
       this.$refs.quranDetail.prepareAyahChange();
-    },
-    changeMode(mode) {
-      this.mode = mode;
-      this.showModeSwitcherDialog = false;
     },
     onMenuMore() {
       this.$refs.menuMore.setState("half");
