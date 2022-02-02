@@ -130,23 +130,38 @@
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <q-list separator class="bg-white">
-          <q-item tag="label" v-ripple>
-            <q-item-section avatar>
-              <q-radio v-model="mode" val="list" />
-            </q-item-section>
+          <q-item clickable v-ripple @click="mode = 'list'">
             <q-item-section>Reguler</q-item-section>
-          </q-item>
-          <q-item tag="label" v-ripple>
-            <q-item-section avatar>
-              <q-radio v-model="mode" val="reading" />
+            <q-item-section v-if="mode == 'list'" avatar>
+              <q-avatar
+                color="primary"
+                text-color="white"
+                icon="done"
+                size="sm"
+              />
             </q-item-section>
+          </q-item>
+          <q-item clickable v-ripple @click="mode = 'reading'">
             <q-item-section>Pembacaan</q-item-section>
-          </q-item>
-          <q-item tag="label" v-ripple>
-            <q-item-section avatar>
-              <q-radio v-model="mode" val="wbw" />
+            <q-item-section v-if="mode == 'reading'" avatar>
+              <q-avatar
+                color="primary"
+                text-color="white"
+                icon="done"
+                size="sm"
+              />
             </q-item-section>
+          </q-item>
+          <q-item clickable v-ripple @click="mode = 'wbw'">
             <q-item-section>Per kata</q-item-section>
+            <q-item-section v-if="mode == 'wbw'" avatar>
+              <q-avatar
+                color="primary"
+                text-color="white"
+                icon="done"
+                size="sm"
+              />
+            </q-item-section>
           </q-item>
         </q-list>
       </q-card>
