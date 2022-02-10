@@ -7389,9 +7389,9 @@
   "version" "6.7.0"
 
 "quasar@^1.0.0":
-  "integrity" "sha512-w+XajlXYi1dRYHHD/oRydTv1G3G2edtZ+tWJjnPk4vYUlllUiVsredqrBwqoOogn8qRhpLVS6Og6pona+zIg5A=="
-  "resolved" "https://registry.npmjs.org/quasar/-/quasar-1.16.0.tgz"
-  "version" "1.16.0"
+  "integrity" "sha512-T/PLWrRuM+1KRvfZASjvXwmSxmebOJGDa37sDuAv2Fb7TUe+iG6+6RhUGRWgasQAqWaTS4E5++MEoTyHqJzsNg=="
+  "resolved" "https://registry.npmjs.org/quasar/-/quasar-1.18.5.tgz"
+  "version" "1.18.5"
 
 "query-string@^4.1.0":
   "integrity" "sha1-u7aTucqRXCMlFbIosaArYJBD2+s="
