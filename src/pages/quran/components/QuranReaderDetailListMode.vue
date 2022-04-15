@@ -29,53 +29,62 @@
         <!-- Basmallah -->
         <div v-if="surah.bismillahPre" class="basmalah" />
         <q-list separator>
-          <q-item
-            v-for="(ayah, index) in surah.ayahs"
-            :key="ayah.verse_key"
-            class="q-pt-md"
-            :ref="ayah.verse_key"
-          >
-            <q-item-section>
-              <q-item-label class="text-arabic text-right">
-                <span v-html="ayah.text_uthmani" />
-                <span
-                  class="text-arabic-number q-mr-sm"
-                  v-html="arabicNumber(ayah.verse_number)"
-                />
-              </q-item-label>
-              <q-item-label class="q-pt-sm translation-wrap">
-                <span>{{ ayah.verse_number + ". " }}</span>
-                <span v-html="surah.translations[index].text" />
-              </q-item-label>
-              <q-item-label class="q-pt-sm row justify-end">
-                <q-btn
-                  size="sm"
-                  :color="
-                    isAyahPlaying(ayah.verse_number) ? 'primary' : 'grey-3'
-                  "
-                  :text-color="isAyahPlaying(ayah.verse_number) ? '' : 'black'"
-                  :icon="
-                    isAyahPlaying(ayah.verse_number)
-                      ? 'mdi-stop-circle-outline'
-                      : 'mdi-motion-play-outline'
-                  "
-                  round
-                  unelevated
-                  @click="onAyahPlayClicked(ayah.verse_number)"
-                />
-                <q-btn
-                  size="sm"
-                  icon="mdi-dots-vertical-circle-outline"
-                  color="grey-3"
-                  text-color="black"
-                  class="q-ml-sm"
-                  round
-                  unelevated
-                  @click="onOptionClicked(ayah, surah.translations[index])"
-                />
-              </q-item-label>
-            </q-item-section>
-          </q-item>
+          <q-infinite-scroll ref="ayahScroll" @load="onLoadMore" :offset="250">
+            <q-item
+              v-for="(ayah, index) in loadedAyahs"
+              :key="ayah.verse_key"
+              class="q-pt-md"
+              :ref="ayah.verse_key"
+            >
+              <q-item-section>
+                <q-item-label class="text-arabic text-right">
+                  <span v-html="ayah.text_uthmani" />
+                  <span
+                    class="text-arabic-number q-mr-sm"
+                    v-html="arabicNumber(ayah.verse_number)"
+                  />
+                </q-item-label>
+                <q-item-label class="q-pt-sm translation-wrap">
+                  <span>{{ ayah.verse_number + ". " }}</span>
+                  <span v-html="surah.translations[index].text" />
+                </q-item-label>
+                <q-item-label class="q-pt-sm row justify-end">
+                  <q-btn
+                    size="sm"
+                    :color="
+                      isAyahPlaying(ayah.verse_number) ? 'primary' : 'grey-3'
+                    "
+                    :text-color="
+                      isAyahPlaying(ayah.verse_number) ? '' : 'black'
+                    "
+                    :icon="
+                      isAyahPlaying(ayah.verse_number)
+                        ? 'mdi-stop-circle-outline'
+                        : 'mdi-motion-play-outline'
+                    "
+                    round
+                    unelevated
+                    @click="onAyahPlayClicked(ayah.verse_number)"
+                  />
+                  <q-btn
+                    size="sm"
+                    icon="mdi-dots-vertical-circle-outline"
+                    color="grey-3"
+                    text-color="black"
+                    class="q-ml-sm"
+                    round
+                    unelevated
+                    @click="onOptionClicked(ayah, surah.translations[index])"
+                  />
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+            <template v-slot:loading>
+              <div class="row justify-center q-my-md">
+                <q-spinner-dots color="primary" size="40px" />
+              </div>
+            </template>
+          </q-infinite-scroll>
         </q-list>
       </div>
     </template>
@@ -173,6 +182,7 @@ export default {
       active: false,
       page: "quran-reader-detail-mode",
       toTopShown: false,
+      loadedAyahs: [],
       showAyahChangerDialog: false,
       showSurahChangerDialog: false,
       showAyahOptionsDialog: false,
@@ -281,6 +291,22 @@ export default {
   methods: {
     getSurahDetail() {
       this.$store.dispatch("quran/fetchSurah", this.surahId).then(_ => {
+        // Load first 10 ayahs or last available ayah if defined
+        const firstLoadNumber = Math.min(
+          this.verseKey ? parseInt(this.verseKey.split(":")[1]) : 10,
+          this.surah.ayahs.length
+        );
+
+        this.loadedAyahs = [];
+        for (let i = 0; i < firstLoadNumber; i++) {
+          this.loadedAyahs.push(this.surah.ayahs[i]);
+        }
+
+        // There is no ayah again, just stop the scroll listener
+        if (firstLoadNumber == this.surah.ayahs.length) {
+          this.$refs.ayahScroll.stop();
+        }
+
         this.$nextTick(() => {
           this.init = false;
           window.scrollTo(0, this.offsetTop);
@@ -292,6 +318,21 @@ export default {
         this.setupPlayer();
         this.setupPlayerListener();
       });
+    },
+    onLoadMore(index, done) {
+      const loadedLength = this.loadedAyahs.length;
+
+      // All ayah already loaded
+      if (loadedLength == this.surah.ayahs.length) {
+        this.$refs.ayahScroll.stop();
+        return;
+      }
+
+      const loadEndIndex = Math.min(loadedLength + 10, this.surah.ayahs.length);
+      for (let i = loadedLength; i < loadEndIndex; i++) {
+        this.loadedAyahs.push(this.surah.ayahs[i]);
+      }
+      done();
     },
     onPageScroll(position) {
       this.activeOffsetTop = position;
@@ -453,7 +494,7 @@ export default {
       window.removeEventListener("resize", this.handleWindowResize);
       document
         .querySelector(".quran-reader-detail-list-mode")
-        .removeEventListener("tap", this.handleReaderDetailTap);
+        ?.removeEventListener("tap", this.handleReaderDetailTap);
     },
     setupPlayer() {
       const playlist = [];
