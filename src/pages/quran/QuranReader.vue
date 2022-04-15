@@ -122,10 +122,17 @@
     <!-- Author information -->
     <footer class="q-pb-md text-center text-body2 text-grey-7">
       Situs atau aplikasi ini dikembangkan dan dikelola oleh
-      <a href="https://ngekoding.github.io" target="_blank" class="text-grey-9"
+      <a
+        href="https://ngekoding.github.io"
+        target="_blank"
+        class="text-grey-9 text-no-wrap"
         >Nur Muhammad, S.Kom</a
       >, dengan sumber data merujuk pada
-      <a href="https://quran.api-docs.io" target="_blank" class="text-grey-9">
+      <a
+        href="https://quran.api-docs.io"
+        target="_blank"
+        class="text-grey-9 text-no-wrap"
+      >
         API Quran.com
       </a>
     </footer>
