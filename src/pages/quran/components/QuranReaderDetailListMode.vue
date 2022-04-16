@@ -29,7 +29,7 @@
         <!-- Basmallah -->
         <div v-if="surah.bismillahPre" class="basmalah" />
         <q-list separator>
-          <q-infinite-scroll ref="ayahScroll" @load="onLoadMore" :offset="250">
+          <q-infinite-scroll ref="ayahScroll" @load="onLoadMore" :offset="300">
             <q-item
               v-for="(ayah, index) in loadedAyahs"
               :key="ayah.verse_key"
@@ -223,6 +223,7 @@ export default {
   watch: {
     surahId() {
       this.stopAudio();
+      this.resetLoadMore();
       this.getSurahDetail();
     },
     audioReciterId() {
@@ -233,6 +234,7 @@ export default {
       else this.removeTajweedListener();
 
       this.tajweedTooltip.show = false;
+      this.resetLoadMore();
       this.getSurahDetail();
     }
   },
@@ -302,11 +304,6 @@ export default {
           this.loadedAyahs.push(this.surah.ayahs[i]);
         }
 
-        // There is no ayah again, just stop the scroll listener
-        if (firstLoadNumber == this.surah.ayahs.length) {
-          this.$refs.ayahScroll.stop();
-        }
-
         this.$nextTick(() => {
           this.init = false;
           window.scrollTo(0, this.offsetTop);
@@ -319,19 +316,25 @@ export default {
         this.setupPlayerListener();
       });
     },
+    resetLoadMore() {
+      this.$refs.ayahScroll?.stop();
+      this.loadedAyahs = [];
+    },
     onLoadMore(index, done) {
+      const ayahLength = this.surah.ayahs.length;
       const loadedLength = this.loadedAyahs.length;
 
       // All ayah already loaded
-      if (loadedLength == this.surah.ayahs.length) {
+      if (loadedLength == ayahLength) {
         this.$refs.ayahScroll.stop();
         return;
       }
 
-      const loadEndIndex = Math.min(loadedLength + 10, this.surah.ayahs.length);
+      const loadEndIndex = Math.min(loadedLength + 10, ayahLength);
       for (let i = loadedLength; i < loadEndIndex; i++) {
         this.loadedAyahs.push(this.surah.ayahs[i]);
       }
+
       done();
     },
     onPageScroll(position) {
@@ -360,7 +363,19 @@ export default {
     },
     onAyahChange(verseKey) {
       this.showAyahChangerDialog = false;
-      this.scrollToElement(this.$refs[verseKey][0].$el);
+
+      // Make sure the destination ayah is loaded
+      const loadedLength = this.loadedAyahs.length;
+      const ayahNumber = parseInt(verseKey.split(":")[1]);
+      if (loadedLength < ayahNumber) {
+        for (let i = loadedLength; i < ayahNumber; i++) {
+          this.loadedAyahs.push(this.surah.ayahs[i]);
+        }
+      }
+
+      this.$nextTick(() => {
+        this.scrollToElement(this.$refs[verseKey][0].$el);
+      });
     },
     bookmark() {
       this.$q.notify({
