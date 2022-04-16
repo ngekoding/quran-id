@@ -17,40 +17,34 @@
       <q-separator />
     </q-header>
     <div class="content bg-white" :style="contentStyles">
-      <div class="q-px-md q-pt-md q-pb-sm bg-grey-1">
-        <div class="row">
-          <q-input
-            v-model="keyword"
-            type="search"
-            :placeholder="!inputFocusReady ? 'Masukkan kata kunci...' : ''"
-            :input-class="['q-px-sm', { 'text-right': inputFocusReady }]"
-            :dir="inputFocusReady ? 'rtl' : 'ltr'"
-            rounded
-            outlined
-            dense
-            clearable
-            :dark="false"
-            bg-color="white"
-            class="col-grow q-mr-sm"
-            @focus="() => (inputFocus = true)"
-            @blur="() => (inputFocus = false)"
-          >
-            <template v-if="inputFocusReady" v-slot:prepend>
-              <q-icon name="spellcheck" />
-            </template>
-          </q-input>
-          <q-btn
-            rounded
-            unelevated
-            color="primary"
-            icon="search"
-            @click="onSearch"
-          />
-        </div>
+      <div class="q-px-md q-py-md bg-grey-1">
+        <q-input
+          v-model="keyword"
+          type="search"
+          :placeholder="!inputFocusReady ? 'Masukkan kata kunci...' : ''"
+          :input-class="['q-px-sm', { 'text-right': inputFocusReady }]"
+          :dir="inputFocusReady ? 'rtl' : 'ltr'"
+          outlined
+          dense
+          clearable
+          :dark="false"
+          bg-color="white"
+          @focus="() => (inputFocus = true)"
+          @blur="() => (inputFocus = false)"
+        >
+          <template v-slot:prepend>
+            <q-avatar>
+              <q-img src="~assets/images/icons/abjad_arabic_icon.svg" />
+            </q-avatar>
+          </template>
+          <template v-slot:after>
+            <q-btn round dense flat icon="search" @click="onSearch" />
+          </template>
+        </q-input>
         <!-- Search options -->
-        <div class="row items-start">
-          <q-toggle v-model="fullMatchSearch" />
-          <div class="row q-pt-sm">
+        <div class="row items-center q-mt-sm">
+          <q-toggle v-model="fullMatchSearch" dense />
+          <div class="row q-ml-sm">
             <div class="text-body1">Pencarian penuh kata</div>
             <div
               class="row items-center text-primary q-ml-sm cursor-pointer"
