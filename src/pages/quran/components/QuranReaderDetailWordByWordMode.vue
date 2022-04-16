@@ -16,52 +16,61 @@
         <!-- Basmallah -->
         <div v-if="surah.bismillahPre" class="basmalah" />
         <q-list separator>
-          <q-item
-            v-for="ayah in surah.ayahs"
-            :key="ayah.verse_key"
-            class="q-pt-md"
-            :ref="ayah.verse_key"
-          >
-            <q-item-section>
-              <q-item-label class="text-arabic text-right">
-                <span
-                  v-for="(word, wordIndex) in ayah.words.slice(0, -1)"
-                  :key="'wbw-' + word.id"
-                  class="wbw-wrap q-pl-md q-mb-md"
-                >
-                  <span>
-                    <span class="wbw-arabic" v-html="word.text_uthmani" />
-                    <!-- Show ayah number at the end of words -->
-                    <span
-                      v-if="wordIndex == ayah.words.length - 2"
-                      class="text-arabic-number q-mr-sm"
-                      v-html="arabicNumber(ayah.verse_number)"
-                    />
+          <q-infinite-scroll ref="ayahScroll" @load="onLoadMore" :offset="300">
+            <q-item
+              v-for="ayah in loadedAyahs"
+              :key="ayah.verse_key"
+              class="q-pt-md"
+              :ref="ayah.verse_key"
+            >
+              <q-item-section>
+                <q-item-label class="text-arabic text-right">
+                  <span
+                    v-for="(word, wordIndex) in ayah.words.slice(0, -1)"
+                    :key="'wbw-' + word.id"
+                    class="wbw-wrap q-pl-md q-mb-md"
+                  >
+                    <span>
+                      <span class="wbw-arabic" v-html="word.text_uthmani" />
+                      <!-- Show ayah number at the end of words -->
+                      <span
+                        v-if="wordIndex == ayah.words.length - 2"
+                        class="text-arabic-number q-mr-sm"
+                        v-html="arabicNumber(ayah.verse_number)"
+                      />
+                    </span>
+                    <span class="wbw-translation">
+                      {{ word.translation.text }}
+                    </span>
                   </span>
-                  <span class="wbw-translation">
-                    {{ word.translation.text }}
-                  </span>
-                </span>
-              </q-item-label>
-              <q-item-label class="q-pt-sm row justify-end">
-                <q-btn
-                  size="sm"
-                  :color="
-                    isAyahPlaying(ayah.verse_number) ? 'primary' : 'grey-3'
-                  "
-                  :text-color="isAyahPlaying(ayah.verse_number) ? '' : 'black'"
-                  :icon="
-                    isAyahPlaying(ayah.verse_number)
-                      ? 'mdi-stop-circle-outline'
-                      : 'mdi-motion-play-outline'
-                  "
-                  round
-                  unelevated
-                  @click="onAyahPlayClicked(ayah.verse_number)"
-                />
-              </q-item-label>
-            </q-item-section>
-          </q-item>
+                </q-item-label>
+                <q-item-label class="q-pt-sm row justify-end">
+                  <q-btn
+                    size="sm"
+                    :color="
+                      isAyahPlaying(ayah.verse_number) ? 'primary' : 'grey-3'
+                    "
+                    :text-color="
+                      isAyahPlaying(ayah.verse_number) ? '' : 'black'
+                    "
+                    :icon="
+                      isAyahPlaying(ayah.verse_number)
+                        ? 'mdi-stop-circle-outline'
+                        : 'mdi-motion-play-outline'
+                    "
+                    round
+                    unelevated
+                    @click="onAyahPlayClicked(ayah.verse_number)"
+                  />
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+            <template v-slot:loading>
+              <div class="row justify-center q-my-md">
+                <q-spinner-dots color="primary" size="40px" />
+              </div>
+            </template>
+          </q-infinite-scroll>
         </q-list>
       </div>
     </template>
@@ -145,6 +154,7 @@ export default {
       active: false,
       page: "quran-reader-detail-mode",
       toTopShown: false,
+      loadedAyahs: [],
       showAyahChangerDialog: false,
       showSurahChangerDialog: false,
       showAyahPlayOptionsDialog: false,
@@ -166,6 +176,7 @@ export default {
   watch: {
     surahId() {
       this.stopAudio();
+      this.resetLoadMore();
       this.getSurahDetail();
     },
     audioReciterId() {
@@ -211,6 +222,17 @@ export default {
   methods: {
     getSurahDetail() {
       this.$store.dispatch("quran/fetchSurahWBW", this.surahId).then(_ => {
+        // Load first 10 ayahs or last available ayah if defined
+        const firstLoadNumber = Math.min(
+          this.verseKey ? parseInt(this.verseKey.split(":")[1]) : 10,
+          this.surah.ayahs.length
+        );
+
+        this.loadedAyahs = [];
+        for (let i = 0; i < firstLoadNumber; i++) {
+          this.loadedAyahs.push(this.surah.ayahs[i]);
+        }
+
         this.$nextTick(() => {
           this.init = false;
           window.scrollTo(0, this.offsetTop);
@@ -222,6 +244,27 @@ export default {
         this.setupPlayer();
         this.setupPlayerListener();
       });
+    },
+    resetLoadMore() {
+      this.$refs.ayahScroll?.stop();
+      this.loadedAyahs = [];
+    },
+    onLoadMore(index, done) {
+      const ayahLength = this.surah.ayahs.length;
+      const loadedLength = this.loadedAyahs.length;
+
+      // All ayah already loaded
+      if (loadedLength == ayahLength) {
+        this.$refs.ayahScroll.stop();
+        return;
+      }
+
+      const loadEndIndex = Math.min(loadedLength + 10, ayahLength);
+      for (let i = loadedLength; i < loadEndIndex; i++) {
+        this.loadedAyahs.push(this.surah.ayahs[i]);
+      }
+
+      done();
     },
     onPageScroll(position) {
       this.activeOffsetTop = position;
