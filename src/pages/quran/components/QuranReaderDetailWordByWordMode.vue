@@ -282,7 +282,19 @@ export default {
     },
     onAyahChange(verseKey) {
       this.showAyahChangerDialog = false;
-      this.scrollToElement(this.$refs[verseKey][0].$el);
+
+      // Make sure the destination ayah is loaded
+      const loadedLength = this.loadedAyahs.length;
+      const ayahNumber = parseInt(verseKey.split(":")[1]);
+      if (loadedLength < ayahNumber) {
+        for (let i = loadedLength; i < ayahNumber; i++) {
+          this.loadedAyahs.push(this.surah.ayahs[i]);
+        }
+      }
+
+      this.$nextTick(() => {
+        this.scrollToElement(this.$refs[verseKey][0].$el);
+      });
     },
     bookmark() {
       this.$q.notify({
