@@ -9,7 +9,8 @@
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
     "dev": "NODE_OPTIONS=--openssl-legacy-provider && quasar dev -m pwa",
-    "build": "NODE_OPTIONS=--openssl-legacy-provider && quasar build -m pwa"
+    "build": "NODE_OPTIONS=--openssl-legacy-provider && quasar build -m pwa",
+    "build-vercel": "NODE_OPTIONS=--openssl-legacy-provider && PUBLIC_PATH=/ quasar build -m pwa"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
