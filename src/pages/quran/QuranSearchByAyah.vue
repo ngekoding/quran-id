@@ -37,11 +37,28 @@
               <q-img src="~assets/images/icons/abjad_arabic_icon.svg" />
             </q-avatar>
           </template>
-          <template v-slot:after>
-            <q-btn round dense flat icon="search" @click="onSearch" />
-          </template>
         </q-input>
         <!-- Search options -->
+        <q-select
+          v-model="specificSurahs"
+          :options="specificSurahOptions"
+          option-value="id"
+          option-label="nameSimple"
+          placeholder="Pada surah..."
+          class="q-mt-xs"
+          use-chips
+          outlined
+          dense
+          :dark="false"
+          bg-color="white"
+          multiple
+          emit-value
+          map-options
+          behavior="menu"
+          use-input
+          :input-debounce="0"
+          @filter="filterSpecificSurahOptions"
+        />
         <div class="row items-center q-mt-sm">
           <q-toggle v-model="fullMatchSearch" dense />
           <div class="row q-ml-sm">
@@ -55,6 +72,13 @@
             </div>
           </div>
         </div>
+        <q-btn
+          color="primary"
+          label="Mulai Pencarian"
+          class="full-width q-mt-md"
+          rounded
+          @click="onSearch"
+        />
       </div>
       <!-- Search results information -->
       <div v-if="!keywordSearch" class="column items-center q-pa-lg">
@@ -193,6 +217,8 @@ import QuranSearchResultSkeleton from "./skeletons/QuranSearchResultSkeleton.vue
 import AyahOptionsDialog from "src/components/AyahOptionsDialog.vue";
 import ToTop from "src/components/ToTop.vue";
 import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.vue";
+import surahList from "src/data/surah-list";
+
 export default {
   name: "QuranSearchByAyah",
   components: {
@@ -207,6 +233,8 @@ export default {
       page: "quran-search-by-ayah",
       keyword: "",
       keywordSearch: "",
+      specificSurahs: [],
+      specificSurahOptions: surahList,
       inputFocus: false,
       fullMatchSearch: this.$store.state.quran.searchAyah.fullMatch,
       fullMatchSearchDialog: false,
@@ -264,6 +292,14 @@ export default {
         minHeight: `calc(100vh - ${headerHeight})`
       };
     },
+    filterSpecificSurahOptions(val, update) {
+      update(() => {
+        const q = val.toLowerCase();
+        this.specificSurahOptions = surahList.filter(item => {
+          return item.nameSimple.toLowerCase().includes(q);
+        });
+      });
+    },
     saveLastKeyword() {
       LocalStorage.set("search-keyword", this.keywordSearch);
     },
@@ -281,7 +317,11 @@ export default {
       this.saveLastKeyword();
 
       this.$store
-        .dispatch("quran/searchByAyah", { keyword: this.keywordSearch, page })
+        .dispatch("quran/searchByAyah", {
+          keyword: this.keywordSearch,
+          page,
+          specificSurahs: this.specificSurahs
+        })
         .then(res => {
           console.log(res);
         })

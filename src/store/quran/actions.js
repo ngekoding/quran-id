@@ -132,7 +132,10 @@ export async function fetchSurahWBW(context, surahId) {
     });
 }
 
-export async function searchByAyah(context, { keyword, page = 1 }) {
+export async function searchByAyah(
+  context,
+  { keyword, page = 1, specificSurahs = [] }
+) {
   context.commit("showLoading", "searchAyah");
 
   const perPage = context.state.searchAyah.paging.perPage;
@@ -164,6 +167,13 @@ export async function searchByAyah(context, { keyword, page = 1 }) {
         };
 
         let results = data.results;
+
+        if (specificSurahs.length) {
+          results = results.filter(item => {
+            const surahId = parseInt(item.verse_key.split(":")[0]);
+            return specificSurahs.includes(surahId);
+          });
+        }
 
         // Filtering full match keyword
         if (context.state.searchAyah.fullMatch) {
@@ -198,6 +208,14 @@ export async function searchByAyah(context, { keyword, page = 1 }) {
             });
           });
         }
+
+        // Sort by surah and ayah number
+        results = results.sort((a, b) => {
+          if (a.surahId != b.surahId) {
+            return a.surahId - b.surahId;
+          }
+          return a.ayahNumber - b.ayahNumber;
+        });
 
         context.commit("updateSearchAyahPaging", paging);
         context.commit("addSearchAyahResults", results);
