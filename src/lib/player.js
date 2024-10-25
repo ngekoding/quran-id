@@ -6,24 +6,31 @@ export default class Player {
   index = 0;
 
   constructor(playlist) {
+    // Clear previous listeners
+    EventBus.$off();
+
     this.playlist = [];
+    this.index = 0;
     playlist.forEach(track => {
       this.playlist.push({
         src: track.src,
-        howl: track.howl ?? null
+        howl: null
       });
     });
   }
 
   play(index) {
+    // Stop current
+    this.stop();
+
     let sound;
-    let soundIndex = typeof index === "number" ? index : this.index;
-    let data = this.playlist[soundIndex];
+    const soundIndex = typeof index === "number" ? index : this.index;
+    const data = this.playlist[soundIndex];
 
     if (data.howl) {
       sound = data.howl;
     } else {
-      sound = data.howl = new Howl({
+      sound = new Howl({
         src: data.src,
         html5: true,
 
@@ -31,31 +38,53 @@ export default class Player {
         onload: () => EventBus.$emit("player:load"),
         onpause: () => EventBus.$emit("player:pause"),
         onstop: () => EventBus.$emit("player:stop"),
-        onend: () => EventBus.$emit("player:end")
+        onend: () => EventBus.$emit("player:end"),
+
+        onplayerror: () => {
+          this.playlist[soundIndex].howl = null;
+        },
+
+        onloaderror: () => {
+          this.playlist[soundIndex].howl = null;
+        }
       });
+
+      this.playlist[soundIndex].howl = sound;
     }
 
-    sound.play();
+    if (sound.state() === "unloaded") {
+      sound.load();
+      sound.on("load", () => sound.play());
+    } else {
+      sound.play();
+    }
 
     this.index = soundIndex;
   }
 
   pause() {
-    let sound = this.playlist[this.index].howl;
-    sound.pause();
+    switch (this.playlist[this.index]?.howl?.state()) {
+      case "loaded":
+        this.playlist[this.index].howl.pause();
+        break;
+      case "loading":
+        this.playlist[this.index].howl.unload();
+        break;
+    }
   }
 
   stop() {
-    let sound = this.playlist[this.index].howl;
-    sound.stop();
+    switch (this.playlist[this.index]?.howl?.state()) {
+      case "loaded":
+        this.playlist[this.index].howl.stop();
+        break;
+      case "loading":
+        this.playlist[this.index].howl.unload();
+        break;
+    }
   }
 
   next() {
-    // Stop the current track
-    if (this.playlist[this.index].howl) {
-      this.playlist[this.index].howl.stop();
-    }
-
     this.play(this.index + 1);
   }
 }
