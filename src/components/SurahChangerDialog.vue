@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import surahList from "src/data/surah-list";
+import { getFilteredSurahList } from "src/data/surah-list";
 export default {
   name: "SurahChangerDialog",
   props: {
@@ -72,7 +72,6 @@ export default {
   },
   data() {
     return {
-      surahList: surahList,
       showDialog: false,
       keyword: ""
     };
@@ -97,17 +96,7 @@ export default {
   },
   computed: {
     surahListFiltered() {
-      if (this.keyword) {
-        const q = this.keyword.toLowerCase();
-        return this.surahList.filter(s => {
-          return (
-            s.nameSimple.toLowerCase().includes(q) ||
-            s.nameArabic.toLowerCase().includes(q) ||
-            s.nameTranslated.toLowerCase().includes(q)
-          );
-        });
-      }
-      return this.surahList;
+      return getFilteredSurahList(this.keyword);
     }
   },
   methods: {

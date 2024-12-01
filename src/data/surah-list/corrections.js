@@ -1,6 +1,6 @@
 /**
  * We make some corrections for the surah list
- * E.g. Follows Indonesian Ministry of Religion naming
+ * by comparing naming from some printed Mushaf, the API and Kemenag
  *
  * Data structures
  * We use surah id as object key for performance access
@@ -13,75 +13,115 @@
 // }
 
 export default {
-  9: {
-    nameSimple: "At-Taubah"
+  1: {
+    nameTranslated: "Pembukaan"
   },
-  21: {
-    nameSimple: "Al-Anbiya’"
+  2: {
+    nameTranslated: "Sapi Betina"
   },
-  26: {
-    nameSimple: "Asy-Syu'ara'"
+  30: {
+    nameTranslated: "Bangsa Romawi"
   },
   34: {
-    nameSimple: "Saba’"
+    nameTranslated: "Kaum Saba'"
   },
-  36: {
-    nameSimple: "Yasin"
+  41: {
+    nameTranslated: "Yang Dijelaskan"
   },
-  42: {
-    nameSimple: "Asy-Syura"
+  43: {
+    nameTranslated: "Perhiasan"
+  },
+  44: {
+    nameTranslated: "Kabut"
   },
   45: {
-    nameSimple: "Al-Jasiyah"
+    nameTranslated: "Yang Berlutut"
+  },
+  46: {
+    nameTranslated: "Bukit-Bukit Pasir"
   },
   51: {
-    nameSimple: "Adz-Dzariyat"
+    nameTranslated: "Angin Yang Menerbangkan"
   },
-  58: {
-    nameSimple: "Al-Mujadalah"
+  52: {
+    nameTranslated: "Bukit"
   },
-  59: {
-    nameSimple: "Al-Hasyr"
+  55: {
+    nameTranslated: "Yang Maha Pemurah"
   },
-  61: {
-    nameSimple: "Ash-Shaf"
+  56: {
+    nameTranslated: "Hari Kiamat"
+  },
+  62: {
+    nameTranslated: "Hari Jum'at"
+  },
+  64: {
+    nameTranslated: "Hari Dinampakkan Kesalahan"
+  },
+  66: {
+    nameTranslated: "Mengharamkan"
+  },
+  69: {
+    nameTranslated: "Hari Kiamat"
+  },
+  73: {
+    nameTranslated: "Orang Yang Berselimut"
   },
   74: {
-    nameSimple: "Al-Muddassir"
+    nameTranslated: "Orang Yang Berkemul"
   },
   78: {
-    nameSimple: "An-Naba'"
+    nameTranslated: "Berita Besar"
   },
-  84: {
-    nameSimple: "Al-Insyiqaq"
+  79: {
+    nameTranslated: "Malaikat Yang Mencabut"
+  },
+  80: {
+    nameTranslated: "Bermuka Masam"
+  },
+  81: {
+    nameTranslated: "Menggulung"
+  },
+  86: {
+    nameTranslated: "Yang Datang di Malam Hari"
+  },
+  87: {
+    nameTranslated: "Yang Paling Tinggi"
   },
   88: {
-    nameSimple: "Al-Gasyiyah"
+    nameTranslated: "Hari Pembalasan"
   },
-  91: {
-    nameSimple: "Asy-Syams"
-  },
-  92: {
-    nameSimple: "Al-Lail"
+  93: {
+    nameTranslated: "Waktu Matahari Sepenggalahan Naik"
   },
   94: {
-    nameSimple: "Asy-Syarh"
+    nameTranslated: "Melapangkan"
+  },
+  97: {
+    nameTranslated: "Kemuliaan"
+  },
+  98: {
+    nameTranslated: "Pembuktian"
+  },
+  99: {
+    nameTranslated: "Kegoncangan"
+  },
+  101: {
+    nameTranslated: "Hari Kiamat"
   },
   102: {
-    nameSimple: "At-Takasur"
+    nameTranslated: "Bermegah-Megahan"
   },
   106: {
-    nameSimple: "Quraisy"
+    nameTranslated: "Suku Quraisy"
   },
-  108: {
-    nameSimple: "Al-Kausar"
+  107: {
+    nameTranslated: "Barang-Barang Yang Berguna"
   },
-  111: {
-    nameArabic: "اللهب",
-    nameSimple: "Al-Lahab",
-    nameTranslated: "Gejolak Api"
+  109: {
+    nameTranslated: "Orang-Orang Kafir"
   },
-  112: {
-    nameTranslated: "Ikhlas"
+  113: {
+    nameTranslated: "Waktu Subuh"
   }
 };

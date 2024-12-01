@@ -144,8 +144,9 @@
 <script>
 import QuranLogo from "src/components/QuranLogo.vue";
 import ToTop from "src/components/ToTop.vue";
-import surahList from "src/data/surah-list";
 import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.vue";
+import { getFilteredSurahList } from "src/data/surah-list";
+
 export default {
   name: "QuranReader",
   components: {
@@ -157,7 +158,6 @@ export default {
     return {
       init: true,
       page: "quran-reader",
-      surahList: surahList,
       surahFilter: "",
       showSurahFilter: false
     };
@@ -177,17 +177,11 @@ export default {
       return this.getSurahLastRead();
     },
     surahListFiltered() {
+      let keyword = "";
       if (this.surahFilter && this.showSurahFilter) {
-        const q = this.surahFilter.toLowerCase();
-        return this.surahList.filter(s => {
-          return (
-            s.nameSimple.toLowerCase().includes(q) ||
-            s.nameArabic.toLowerCase().includes(q) ||
-            s.nameTranslated.toLowerCase().includes(q)
-          );
-        });
+        keyword = this.surahFilter;
       }
-      return this.surahList ?? [];
+      return getFilteredSurahList(keyword);
     }
   },
   methods: {
