@@ -17,16 +17,17 @@ export function updateSurahWBW(state, surah) {
   state.surahWBW = surah;
 }
 
+export function updateSearchAyahResultsLatinAll(state, results) {
+  state.searchAyah.resultsLatinAll = results;
+}
+
 export function addSearchAyahResults(state, results) {
   state.searchAyah.results.push(...results);
 }
 
-export function addSearchAyahResultsTranslation(state, translation) {
-  state.searchAyah.resultTranslations.push(translation);
-}
-
 export function resetSearchAyahResults(state) {
   state.searchAyah.results = [];
+  state.searchAyah.resultsLatinAll = [];
 }
 
 export function resetSearchAyahPaging(state) {

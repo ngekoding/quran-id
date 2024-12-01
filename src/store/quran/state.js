@@ -20,7 +20,7 @@ export default function() {
         totalPage: 0
       },
       results: [],
-      resultTranslations: []
+      resultsLatinAll: []
     },
     loading: {
       fetchSurah: false,

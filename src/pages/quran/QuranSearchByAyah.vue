@@ -13,31 +13,64 @@
             </q-item-label>
           </q-item-section>
         </q-item>
+        <q-space />
+        <q-btn
+          flat
+          round
+          dense
+          icon="info_outline"
+          @click="fullMatchSearchDialog = true"
+        />
       </q-toolbar>
       <q-separator />
     </q-header>
     <div class="content bg-white" :style="contentStyles">
       <div class="q-px-md q-py-md bg-grey-1">
-        <q-input
-          v-model="keyword"
-          type="search"
-          :placeholder="!inputFocusReady ? 'Masukkan kata kunci...' : ''"
-          :input-class="['q-px-sm', { 'text-right': inputFocusReady }]"
-          :dir="inputFocusReady ? 'rtl' : 'ltr'"
-          outlined
-          dense
-          clearable
-          :dark="false"
-          bg-color="white"
-          @focus="() => (inputFocus = true)"
-          @blur="() => (inputFocus = false)"
-        >
-          <template v-slot:prepend>
-            <q-avatar>
-              <q-img src="~assets/images/icons/abjad_arabic_icon.svg" />
-            </q-avatar>
-          </template>
-        </q-input>
+        <div class="row items-center">
+          <q-select
+            v-model="keywordType"
+            :options="keywordTypeOptions"
+            option-value="value"
+            option-label="label"
+            class="col-auto q-mr-xs"
+            outlined
+            dense
+            :dark="false"
+            bg-color="white"
+            behavior="menu"
+          >
+            <template v-slot:option="scope">
+              <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+                <q-item-section class="items-center">
+                  <q-icon :name="scope.opt.icon" size="sm" />
+                  <q-item-label>{{ scope.opt.label }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
+            <template v-slot:selected>
+              <q-icon v-if="keywordType" :name="keywordType.icon" size="sm" />
+            </template>
+          </q-select>
+          <q-input
+            v-model="keyword"
+            type="search"
+            :placeholder="!inputFocusReady ? 'Masukkan kata kunci...' : ''"
+            class="col-grow"
+            :input-class="[
+              'q-px-sm',
+              { 'text-right': inputFocusReady && !latinKeywordSearch }
+            ]"
+            :dir="inputFocusReady && !latinKeywordSearch ? 'rtl' : 'ltr'"
+            outlined
+            dense
+            clearable
+            :dark="false"
+            bg-color="white"
+            @focus="() => (inputFocus = true)"
+            @blur="() => (inputFocus = false)"
+          >
+          </q-input>
+        </div>
         <!-- Search options -->
         <q-select
           v-model="specificSurahs"
@@ -59,18 +92,12 @@
           :input-debounce="0"
           @filter="filterSpecificSurahOptions"
         />
-        <div class="row items-center q-mt-sm">
-          <q-toggle v-model="fullMatchSearch" dense />
-          <div class="row q-ml-sm">
-            <div class="text-body1">Pencarian penuh kata</div>
-            <div
-              class="row items-center text-primary q-ml-sm cursor-pointer"
-              @click="fullMatchSearchDialog = true"
-            >
-              <q-icon name="contact_support" />
-              <span class="text-caption q-ml-xs">Info</span>
-            </div>
-          </div>
+        <div class="q-mt-sm">
+          <q-toggle
+            v-model="fullMatchSearch"
+            label="Pencarian penuh kata"
+            dense
+          />
         </div>
         <q-btn
           color="primary"
@@ -82,9 +109,13 @@
       </div>
       <!-- Search results information -->
       <div v-if="!keywordSearch" class="column items-center q-pa-lg">
-        <q-icon name="auto_stories" size="60px" class="text-grey-8" />
+        <q-icon
+          name="mdi-book-search-outline"
+          size="60px"
+          class="text-grey-8"
+        />
         <p class="text-center text-body1 text-grey-7 q-mt-md">
-          Masukkan kata kunci pencarian dalam tulisan arab untuk mulai mencari.
+          Masukkan kata kunci dan mulai pencarian.
         </p>
       </div>
       <template v-if="keywordSearch && !$store.state.quran.loading.searchAyah">
@@ -115,7 +146,7 @@
       <q-list v-if="searchResults.length > 0" separator>
         <q-item
           v-for="item in searchResults"
-          :key="item.verse_id"
+          :key="item.verseKey"
           class="q-pt-md"
           clickable
         >
@@ -130,7 +161,7 @@
               </q-item-label>
               <q-item-label class="q-pt-sm translation-wrap">
                 <span>{{ item.ayahNumber + ". " }}</span>
-                <span v-html="getTranslation(item.verse_key)" />
+                <span v-html="item.translation" />
               </q-item-label>
             </div>
             <q-item-label class="row q-py-sm translation-wrap">
@@ -184,14 +215,48 @@
       <q-card>
         <q-card-section class="row items-center q-pb-none">
           <div class="text-h6 row items-center">
-            <q-icon name="contact_support" />
-            <span class="q-ml-xs">Pencarian penuh kata</span>
+            <q-icon name="info_outline" />
+            <span class="q-ml-sm">Informasi</span>
           </div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
 
         <q-card-section>
+          <div class="text-subtitle1 text-weight-bold">
+            Pencarian dengan Huruf Latin
+          </div>
+          <p>
+            Apabila pencarian dengan huruf Latin dipilih, kata kunci dapat
+            berupa kata dalam huruf Latin yang sesuai dengan
+            <a
+              href="pedoman-transliterasi-arab-latin.pdf"
+              target="_blank"
+              class="text-primary"
+            >
+              Pedoman Transliterasi Arab-Latin.
+            </a>
+          </p>
+          <p>
+            Untuk mempermudah penulisan, beberapa huruf berikut juga dapat
+            ditulis menggunakan alternatifnya.
+          </p>
+          <q-table
+            :data="latinAlternatives"
+            :columns="latinAlternativeColumns"
+            row-key="latin"
+            :pagination="{ rowsPerPage: 0 }"
+            dense
+            flat
+            bordered
+            hide-pagination
+          />
+        </q-card-section>
+
+        <q-card-section>
+          <div class="text-subtitle1 text-weight-bold">
+            Pencarian Penuh Kata
+          </div>
           <p>
             Secara default, proses pencarian akan mencari kecocokan setiap kata
             pada kata kunci yang diberikan. Misalnya dengan kata kunci
@@ -218,6 +283,7 @@ import AyahOptionsDialog from "src/components/AyahOptionsDialog.vue";
 import ToTop from "src/components/ToTop.vue";
 import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.vue";
 import surahList from "src/data/surah-list";
+import latinAlternatives from "src/data/latin-alternatives";
 
 export default {
   name: "QuranSearchByAyah",
@@ -233,6 +299,15 @@ export default {
       page: "quran-search-by-ayah",
       keyword: "",
       keywordSearch: "",
+      keywordTypeOptions: [
+        { value: "arabic", label: "Arab", icon: "mdi-abjad-arabic" },
+        {
+          value: "latin",
+          label: "Latin",
+          icon: "mdi-alphabetical-variant"
+        }
+      ],
+      keywordType: null,
       specificSurahs: [],
       specificSurahOptions: surahList,
       inputFocus: false,
@@ -245,7 +320,28 @@ export default {
         surahName: "",
         arabic: "",
         translation: ""
-      }
+      },
+      latinAlternatives,
+      latinAlternativeColumns: [
+        {
+          name: "arabic",
+          field: "arabic",
+          label: "Huruf Arab",
+          align: "center"
+        },
+        {
+          name: "latin",
+          field: "latin",
+          label: "Huruf Latin",
+          align: "center"
+        },
+        {
+          name: "alternative",
+          field: "alternative",
+          label: "Alternatif",
+          align: "center"
+        }
+      ]
     };
   },
   meta() {
@@ -257,12 +353,18 @@ export default {
     fullMatchSearch(val) {
       this.$store.dispatch("quran/setFullMatchSearch", val);
       this.onSearch();
+    },
+    keywordType() {
+      if (!this.init) {
+        this.keyword = "";
+        this.keywordSearch = "";
+        this.onSearch();
+      }
     }
   },
   computed: {
     ...mapGetters({
       searchResults: "quran/getSearchAyahResults",
-      searchResultTranslations: "quran/getSearchAyahResultTranslations",
       searchPaging: "quran/getSearchAyahPaging"
     }),
     isLoadMoreAvailable() {
@@ -277,6 +379,9 @@ export default {
         (this.keywordSearch ? this.keywordSearch + " | " : "") +
         this.productName
       );
+    },
+    latinKeywordSearch() {
+      return this.keywordType?.value === "latin";
     }
   },
   methods: {
@@ -302,9 +407,17 @@ export default {
     },
     saveLastKeyword() {
       LocalStorage.set("search-keyword", this.keywordSearch);
+      LocalStorage.set("search-keyword-type", this.keywordType);
+      LocalStorage.set("search-specific-surahs", this.specificSurahs);
     },
     getLastKeyword() {
       return LocalStorage.getItem("search-keyword");
+    },
+    getLastKeywordType() {
+      return LocalStorage.getItem("search-keyword-type");
+    },
+    getLastSpecificSurahs() {
+      return LocalStorage.getItem("search-specific-surahs");
     },
     onSearch() {
       this.$store.dispatch("quran/resetSearchAyahPaging");
@@ -316,8 +429,12 @@ export default {
       this.track(this.pageTitle);
       this.saveLastKeyword();
 
+      const action = this.latinKeywordSearch
+        ? "searchByAyahLatin"
+        : "searchByAyah";
+
       this.$store
-        .dispatch("quran/searchByAyah", {
+        .dispatch(`quran/${action}`, {
           keyword: this.keywordSearch,
           page,
           specificSurahs: this.specificSurahs
@@ -341,17 +458,12 @@ export default {
         }
       });
     },
-    getTranslation(verse_key) {
-      return this.searchResultTranslations.find(
-        item => item.verse_key == verse_key
-      )?.text;
-    },
     onOptionClicked(item) {
       this.ayahOptionsDialogData = {
         ayahNumber: item.ayahNumber,
         surahName: item.surahName,
         arabic: item.text,
-        translation: this.getTranslation(item.verse_key)
+        translation: item.translation
       };
       this.showAyahOptionsDialog = true;
     }
@@ -360,15 +472,19 @@ export default {
     this.track(this.pageTitle);
     this.fitContentHeight();
 
+    if (this.searchResults.length > 0) {
+      this.keywordType = this.getLastKeywordType();
+      this.specificSurahs = this.getLastSpecificSurahs();
+      this.keywordSearch = this.getLastKeyword();
+      this.keyword = this.getLastKeyword();
+    } else {
+      this.keywordType = this.keywordTypeOptions[0]; // Arabic as default
+    }
+
     this.$nextTick(() => {
       window.scrollTo(0, this.getScrollPosition());
       this.init = false;
     });
-
-    if (this.searchResults.length > 0) {
-      this.keywordSearch = this.getLastKeyword();
-      this.keyword = this.getLastKeyword();
-    }
   }
 };
 </script>

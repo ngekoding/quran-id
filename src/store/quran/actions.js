@@ -1,5 +1,9 @@
-import { filterFullMatchSearchResults } from "src/lib/search-helper";
+import {
+  filterFullMatchSearchResults,
+  normalizeLatinText
+} from "src/lib/search-helper";
 import surahList from "src/data/surah-list";
+import createFuzzySearch from "@nozbe/microfuzz";
 
 export async function fetchSurah(context, surahId) {
   context.commit("showLoading", "fetchSurah");
@@ -140,7 +144,7 @@ export async function searchByAyah(
 
   const perPage = context.state.searchAyah.paging.perPage;
 
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     this.$httpQuran({
       url: "search",
       params: {
@@ -149,7 +153,7 @@ export async function searchByAyah(
         page: page
       }
     })
-      .then(res => {
+      .then(async res => {
         if (res.status == 204) {
           context.commit("hideLoading", "searchAyah");
           resolve({
@@ -186,31 +190,36 @@ export async function searchByAyah(
           }
         }
 
-        // Appending surah name, ayah number & translation
-        for (let i = 0; i < results.length; i++) {
-          const item = results[i];
-
-          const verseKeys = item.verse_key.split(":");
-          const surah = surahList.find(s => s.id == verseKeys[0]);
-          results[i].surahId = surah.id;
-          results[i].surahName = surah.nameSimple;
-          results[i].ayahNumber = verseKeys[1];
-
-          this.$httpQuran({
+        const fetchTranslation = async verseKey => {
+          const response = await this.$httpQuran({
             url: "quran/translations/33",
-            params: {
-              verse_key: item.verse_key
-            }
-          }).then(resT => {
-            context.commit("addSearchAyahResultsTranslation", {
-              verse_key: item.verse_key,
-              text: resT.data.translations[0].text
-            });
+            params: { verse_key: verseKey }
           });
-        }
+          return response.data.translations[0].text;
+        };
+
+        // Add surah name, ayah number & translation
+        // And keep only used properties
+        results = await Promise.all(
+          results.map(async item => {
+            const [surahId, ayahNumber] = item.verse_key.split(":");
+            const surah = surahList.find(s => s.id == surahId);
+
+            const translation = await fetchTranslation(item.verse_key);
+
+            return {
+              verseKey: item.verse_key,
+              text: item.text,
+              surahId: parseInt(surahId),
+              surahName: surah.nameSimple,
+              ayahNumber: parseInt(ayahNumber),
+              translation
+            };
+          })
+        );
 
         // Sort by surah and ayah number
-        results = results.sort((a, b) => {
+        results.sort((a, b) => {
           if (a.surahId != b.surahId) {
             return a.surahId - b.surahId;
           }
@@ -229,6 +238,114 @@ export async function searchByAyah(
         context.commit("hideLoading", "searchAyah");
         reject(err);
       });
+  });
+}
+
+export async function searchByAyahLatin(
+  context,
+  { keyword, page = 1, specificSurahs = [] }
+) {
+  context.commit("showLoading", "searchAyah");
+
+  const perPage = context.state.searchAyah.paging.perPage;
+
+  return new Promise(async (resolve, reject) => {
+    // Only fetch the data once
+    if (page === 1) {
+      try {
+        let data = await this.$http
+          .get(`${document.baseURI}quran-latin.json`)
+          .then(res => res.data);
+
+        // Filter the result for specific surahs
+        if (specificSurahs.length) {
+          data = data.filter(item => {
+            return specificSurahs.includes(item.surahId);
+          });
+        }
+
+        const normalizedKeyword = normalizeLatinText(keyword);
+        const strategy = context.state.searchAyah.fullMatch ? "off" : "smart";
+
+        const fuzzySearch = createFuzzySearch(data, {
+          key: "latin",
+          strategy
+        });
+
+        const filtered = fuzzySearch(normalizedKeyword);
+
+        context.commit("updateSearchAyahResultsLatinAll", filtered);
+      } catch (err) {
+        reject(err);
+      }
+    }
+
+    // Simply read the results from the store
+    const resultsAll = context.state.searchAyah.resultsLatinAll;
+
+    const paging = {
+      total: resultsAll.length,
+      perPage: perPage,
+      totalPage: Math.ceil(resultsAll.length / perPage),
+      currentPage: page
+    };
+
+    // Get the only data for the current page
+    let results = resultsAll.slice((page - 1) * perPage, page * perPage);
+
+    // Add arab text and translation
+    const fetchAyahWithTranslation = async verseKey => {
+      const response = await this.$httpQuran({
+        url: "verses/by_key/" + verseKey,
+        params: {
+          words: false,
+          translations: 33,
+          fields: "text_uthmani"
+        }
+      });
+
+      const verse = response.data.verse;
+
+      return {
+        text: verse.text_uthmani,
+        translation: verse.translations[0].text
+      };
+    };
+
+    results = await Promise.all(
+      results.map(async itemRaw => {
+        const item = itemRaw.item;
+        const verseKey = `${item.surahId}:${item.ayahNumber}`;
+        const surah = surahList.find(s => s.id == item.surahId);
+
+        const ayah = await fetchAyahWithTranslation(verseKey);
+
+        return {
+          verseKey,
+          surahId: parseInt(item.surahId),
+          surahName: surah.nameSimple,
+          ayahNumber: parseInt(item.ayahNumber),
+          text: ayah.text,
+          translation: ayah.translation
+        };
+      })
+    );
+
+    // Sort by surah and ayah number
+    results.sort((a, b) => {
+      if (a.surahId != b.surahId) {
+        return a.surahId - b.surahId;
+      }
+      return a.ayahNumber - b.ayahNumber;
+    });
+
+    context.commit("updateSearchAyahPaging", paging);
+    context.commit("addSearchAyahResults", results);
+    context.commit("hideLoading", "searchAyah");
+    resolve({
+      results,
+      paging
+    });
   });
 }
 

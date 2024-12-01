@@ -1,3 +1,5 @@
+import latinAlternatives from "src/data/latin-alternatives";
+
 /**
  * I wrote this function which handles strings with mixed Arabic and English characters,
  * removing special characters (including diacritics) and normalizing
@@ -27,6 +29,22 @@ const filterFullMatchSearchResults = function(results, q) {
   });
 };
 
-export { normalizeText, filterFullMatchSearchResults };
+const escapeRegex = str => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const normalizeLatinText = function(text) {
+  for (const {
+    latin,
+    alternative,
+    skipReplacement = false
+  } of latinAlternatives) {
+    if (skipReplacement) continue;
+    const regex = new RegExp(escapeRegex(alternative), "g");
+    text = text.replace(regex, latin);
+  }
+
+  return text;
+};
+
+export { normalizeText, normalizeLatinText, filterFullMatchSearchResults };
 
 export default filterFullMatchSearchResults;

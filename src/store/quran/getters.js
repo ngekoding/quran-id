@@ -10,8 +10,8 @@ export function getSearchAyahResults(state) {
   return state.searchAyah.results;
 }
 
-export function getSearchAyahResultTranslations(state) {
-  return state.searchAyah.resultTranslations;
+export function getSearchAyahResultsLatinAll(state) {
+  return state.searchAyah.resultsLatinAll;
 }
 
 export function getSearchAyahPaging(state) {

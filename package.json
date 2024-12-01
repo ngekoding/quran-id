@@ -13,6 +13,7 @@
     "build-vercel": "NODE_OPTIONS=--openssl-legacy-provider && PUBLIC_PATH=/ quasar build -m pwa"
   },
   "dependencies": {
+    "@nozbe/microfuzz": "^1.0.0",
     "@quasar/extras": "^1.0.0",
     "axios": "^0.18.1",
     "axios-cache-adapter": "^2.7.0",
