@@ -282,7 +282,7 @@ import QuranSearchResultSkeleton from "./skeletons/QuranSearchResultSkeleton.vue
 import AyahOptionsDialog from "src/components/AyahOptionsDialog.vue";
 import ToTop from "src/components/ToTop.vue";
 import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.vue";
-import surahList from "src/data/surah-list";
+import { surahList, getFilteredSurahList } from "src/data/surah-list";
 import latinAlternatives from "src/data/latin-alternatives";
 
 export default {
@@ -392,10 +392,7 @@ export default {
     },
     filterSpecificSurahOptions(val, update) {
       update(() => {
-        const q = val.toLowerCase();
-        this.specificSurahOptions = surahList.filter(item => {
-          return item.nameSimple.toLowerCase().includes(q);
-        });
+        this.specificSurahOptions = getFilteredSurahList(val);
       });
     },
     saveLastKeyword() {
