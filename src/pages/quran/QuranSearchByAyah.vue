@@ -353,13 +353,6 @@ export default {
     fullMatchSearch(val) {
       this.$store.dispatch("quran/setFullMatchSearch", val);
       this.onSearch();
-    },
-    keywordType() {
-      if (!this.init) {
-        this.keyword = "";
-        this.keywordSearch = "";
-        this.onSearch();
-      }
     }
   },
   computed: {
