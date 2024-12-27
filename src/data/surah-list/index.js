@@ -15,8 +15,9 @@ surahListByApi.forEach(item => {
     versesCount: item.verses_count,
     bismillahPre: item.bismillah_pre,
     nameArabic: correction?.nameArabic ?? kemenag?.nameArabic,
-    nameSimple: correction?.nameSimple ?? kemenag?.nameSimple,
-    nameTranslated: correction?.nameTranslated ?? kemenag?.nameTranslated,
+    nameSimple: correction?.nameSimple?.trim() ?? kemenag?.nameSimple?.trim(),
+    nameTranslated:
+      correction?.nameTranslated?.trim() ?? kemenag?.nameTranslated?.trim(),
     pages: item.pages
   });
 });

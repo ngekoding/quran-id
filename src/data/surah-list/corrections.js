@@ -59,6 +59,7 @@ export default {
     nameTranslated: "Hari Dinampakkan Kesalahan"
   },
   66: {
+    nameSimple: "At-Taḥrīm",
     nameTranslated: "Mengharamkan"
   },
   69: {
