@@ -163,13 +163,8 @@ export default {
     };
   },
   watch: {
-    showSurahFilter(val) {
+    showSurahFilter() {
       this.surahFilter = "";
-      if (val) {
-        this.$nextTick(() => {
-          this.$refs.surahFilterInput.focus();
-        });
-      }
     }
   },
   computed: {
