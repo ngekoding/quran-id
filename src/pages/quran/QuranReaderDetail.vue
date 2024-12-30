@@ -36,7 +36,7 @@
     </q-header>
 
     <!-- Quran detail -->
-    <keep-alive v-if="surah">
+    <keep-alive v-if="surah && headerHeight">
       <component
         ref="quranDetail"
         :is="quranDetailComponent"
@@ -45,8 +45,7 @@
         :verse-key="verseKey"
         :header-height="headerHeight"
         :surah="surah"
-        :pages="surah.pages"
-        :active-page="activePage"
+        :current-page.sync="currentPage"
       />
     </keep-alive>
 
@@ -212,6 +211,7 @@ export default {
       surahList,
       headerHeight: 0,
       surahId: "",
+      currentPage: 0,
       showSurahChangerDialog: false,
       contentStyles: null,
       modeList: ["list", "reading", "wbw"],
@@ -237,7 +237,19 @@ export default {
     surahId: "trackDetail",
     mode() {
       this.showModeSwitcherDialog = false;
+      this.currentPage = 0;
       this.trackDetail();
+    },
+    currentPage(page) {
+      if (page == 0) return;
+      const surah = this.surahList.find(item => {
+        const [firstPage, lastPage] = item.pages;
+        return page >= firstPage && page <= lastPage;
+      });
+
+      if (this.surahId != surah.id) {
+        this.onSurahChanged(surah.id, false);
+      }
     }
   },
   computed: {
@@ -282,7 +294,7 @@ export default {
     trackDetail() {
       this.track(this.pageTitle);
     },
-    onSurahChanged(id) {
+    onSurahChanged(id, resetCurrentPage = true) {
       this.$router
         .replace({
           params: {
@@ -290,6 +302,7 @@ export default {
           }
         })
         .then(() => {
+          if (resetCurrentPage) this.currentPage = 0;
           this.surahId = id;
         });
     },
@@ -300,12 +313,13 @@ export default {
       this.$refs.menuMore.setState("half");
     }
   },
+  mounted() {
+    this.headerHeight = this.$refs.header.$el.clientHeight;
+    this.trackDetail();
+  },
   created() {
     this.surahId = parseInt(this.$route.params.surahId);
-    this.$nextTick(() => {
-      this.headerHeight = this.$refs.header.$el.clientHeight;
-      this.trackDetail();
-    });
+    this.currentPage = this.activePage;
   }
 };
 </script>

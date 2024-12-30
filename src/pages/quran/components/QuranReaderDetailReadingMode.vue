@@ -1,44 +1,33 @@
 <template>
   <div class="quran-reading-mode bg-white">
     <swiper
-      :key="swiperKey"
       ref="quranPageSwiper"
       :options="swiperOptions"
       dir="rtl"
-      @slideNextTransitionEnd="onNext"
-      @slidePrevTransitionEnd="onPrev"
-    >
-      <swiper-slide v-for="image in images" :key="`page-${image.page}`">
-        <q-img :src="image.url" :style="imageStyle" contain />
-      </swiper-slide>
-    </swiper>
+      @slideChange="onSlideChange"
+    />
   </div>
 </template>
 
 <script>
-import { Swiper, SwiperSlide } from "vue-awesome-swiper";
-import "swiper/css/swiper.css";
+import { Swiper } from "vue-awesome-swiper";
+import "swiper/css/swiper.min.css";
 
 export default {
   name: "QuranDetailReadingMode",
   components: {
-    Swiper,
-    SwiperSlide
+    Swiper
   },
   props: {
     surah: {
       type: Object,
       required: true
     },
-    pages: {
-      type: Array,
-      required: true
-    },
     headerHeight: {
       type: Number,
       default: 0
     },
-    activePage: {
+    currentPage: {
       type: Number,
       default: 0
     }
@@ -46,70 +35,62 @@ export default {
   data() {
     return {
       page: "quran-reader-detail-mode",
-      swiperKey: 1,
-      swiperOptions: {},
-      pageCount: 0,
-      currentPage: this.pages[0],
+      pagesCount: 604,
       quranImageBaseUrl: "https://android.quran.com/data/width_1024/page",
-      images: []
+      initial: false
     };
   },
   watch: {
-    pages(val) {
-      this.swiperOptions.initialSlide = 0;
-      this.swiperKey = !this.swiperKey;
-
-      this.currentPage = val[0];
-      this.init();
-    },
-    currentPage: "saveScrollPosition"
+    "surah.id": "init"
   },
   computed: {
     swiper() {
       return this.$refs.quranPageSwiper.$swiper;
     },
-    imageStyle() {
+    swiperOptions() {
       return {
-        height: `calc(100vh - ${this.headerHeight}px - 10px)`,
-        marginTop: "10px"
+        dir: "rtl",
+        slidesPerView: 1,
+        virtual: {
+          slides: (() => {
+            const slides = [];
+            for (let page = 1; page <= this.pagesCount; page++) {
+              slides.push(
+                `<img
+                  src="${this.getImageUrl(page)}"
+                  style="${this.imageStyle}"
+                />`
+              );
+            }
+            return slides;
+          })()
+        }
       };
+    },
+    imageStyle() {
+      return `height: calc(100vh - ${this.headerHeight}px - 20px)`;
     }
   },
   methods: {
+    getImageUrl(page) {
+      return this.quranImageBaseUrl + page.toString().padStart(3, "0") + ".png";
+    },
     init() {
-      this.images = [];
-      this.pageCount = this.pages[1] - this.pages[0] + 1;
-
-      // Load three first images
-      let endPage = this.currentPage + 2;
-
-      endPage = endPage > this.pages[1] ? this.pages[1] : endPage;
-      for (let page = this.pages[0]; page <= endPage; page++) {
-        this.images.push({
-          page,
-          url:
-            this.quranImageBaseUrl + page.toString().padStart(3, "0") + ".png"
-        });
-      }
+      this.initial = true;
+      const initialPage = this.currentPage || this.surah.pages[0];
+      this.swiper.slideTo(initialPage - 1, 0);
+      this.$nextTick(() => {
+        this.swiper.virtual.update();
+        this.initial = false;
+        this.saveScrollPosition();
+      });
     },
-    loadMore() {
-      const nextPage = this.images.slice(-1)[0].page + 1;
-      if (nextPage <= this.pages[1]) {
-        this.images.push({
-          page: nextPage,
-          url:
-            this.quranImageBaseUrl +
-            nextPage.toString().padStart(3, "0") +
-            ".png"
-        });
-      }
-    },
-    onNext() {
-      this.loadMore();
-      this.currentPage++;
-    },
-    onPrev() {
-      this.currentPage--;
+    onSlideChange() {
+      if (this.initial) return;
+      this.$emit("update:currentPage", this.swiper.activeIndex + 1);
+      this.$nextTick(() => {
+        this.saveScrollPosition();
+      });
     },
     saveScrollPosition() {
       this.$store.dispatch("quran/setPageScrollPosition", {
@@ -123,18 +104,20 @@ export default {
       });
     }
   },
-  mounted() {
-    if (this.activePage != 0) {
-      const activePageIndex = this.activePage - this.pages[0];
-      this.swiperOptions.initialSlide = activePageIndex;
-      this.currentPage = this.activePage;
-      this.swiperKey = !this.swiperKey;
-    }
-
-    this.init();
-  },
   activated() {
-    this.saveScrollPosition();
+    this.init();
   }
 };
 </script>
+
+<style lang="scss">
+.swiper-slide {
+  text-align: center;
+  img {
+    width: 100%;
+    margin-top: 10px;
+    object-fit: contain;
+    object-position: top center;
+  }
+}
+</style>
