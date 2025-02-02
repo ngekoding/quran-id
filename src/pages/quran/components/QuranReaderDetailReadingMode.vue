@@ -55,12 +55,14 @@ export default {
           slides: (() => {
             const slides = [];
             for (let page = 1; page <= this.pagesCount; page++) {
-              slides.push(
-                `<img
+              slides.push(`
+                <div class="loading-indicator" dir="ltr">Loading...</div>
+                <img
                   src="${this.getImageUrl(page)}"
                   style="${this.imageStyle}"
-                />`
-              );
+                  onload="this.parentElement.querySelector('.loading-indicator')?.remove()"
+                />
+              `);
             }
             return slides;
           })()
@@ -111,6 +113,17 @@ export default {
 </script>
 
 <style lang="scss">
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
+}
 .swiper-slide {
   text-align: center;
   img {
@@ -118,6 +131,14 @@ export default {
     margin-top: 10px;
     object-fit: contain;
     object-position: top center;
+  }
+  .loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    animation: pulse 1.5s infinite;
   }
 }
 </style>
