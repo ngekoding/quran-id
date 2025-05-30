@@ -33,6 +33,6 @@ For the production build, I use `/quran-id` as the publicPath for building on Gi
 
 ## Screenshots
 
-![Screenshot](./screenshots/screenshot-combined.png)
+![Screenshot](./screenshots/screenshot-combined-updated.png)
 
 Powered by ngekoding.github.io
