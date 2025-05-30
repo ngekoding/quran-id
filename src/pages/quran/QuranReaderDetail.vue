@@ -92,6 +92,17 @@
             clickable
             v-ripple
             v-close-popup
+            @click="$router.push({ name: 'QuranSearchByAyah' })"
+          >
+            <q-item-section avatar>
+              <q-icon name="search" />
+            </q-item-section>
+            <q-item-section>Pencarian ayat</q-item-section>
+          </q-item>
+          <q-item
+            clickable
+            v-ripple
+            v-close-popup
             @click="showTajweedDialog = true"
           >
             <q-item-section avatar>
