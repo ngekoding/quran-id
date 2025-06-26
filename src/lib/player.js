@@ -1,14 +1,12 @@
 import { Howl } from "howler";
-import { EventBus } from "./event-bus";
+import mitt from "mitt";
 
 export default class Player {
   playlist = null;
   index = 0;
+  emitter = mitt();
 
   constructor(playlist) {
-    // Clear previous listeners
-    EventBus.$off();
-
     this.playlist = [];
     this.index = 0;
     playlist.forEach(track => {
@@ -17,6 +15,18 @@ export default class Player {
         howl: null
       });
     });
+  }
+
+  on(event, handler) {
+    this.emitter.on(event, handler);
+  }
+
+  off(event, handler) {
+    this.emitter.off(event, handler);
+  }
+
+  emit(event, payload) {
+    this.emitter.emit(event, payload);
   }
 
   play(index) {
@@ -34,11 +44,11 @@ export default class Player {
         src: data.src,
         html5: true,
 
-        onplay: () => EventBus.$emit("player:play"),
-        onload: () => EventBus.$emit("player:load"),
-        onpause: () => EventBus.$emit("player:pause"),
-        onstop: () => EventBus.$emit("player:stop"),
-        onend: () => EventBus.$emit("player:end"),
+        onplay: () => this.emit("play"),
+        onload: () => this.emit("load"),
+        onpause: () => this.emit("pause"),
+        onstop: () => this.emit("stop"),
+        onend: () => this.emit("end"),
 
         onplayerror: () => {
           this.playlist[soundIndex].howl = null;

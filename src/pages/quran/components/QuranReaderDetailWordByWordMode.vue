@@ -119,7 +119,6 @@ import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.
 import reciterList from "src/data/reciter-list";
 
 import Player from "src/lib/player";
-import { EventBus } from "src/lib/event-bus";
 
 export default {
   name: "QuranDetailListMode",
@@ -383,7 +382,7 @@ export default {
       this.player.player = new Player(playlist);
     },
     setupPlayerListener() {
-      EventBus.$on("player:end", this.onAudioAyahEnded);
+      this.player.player.on("end", this.onAudioAyahEnded);
     }
   },
   created() {

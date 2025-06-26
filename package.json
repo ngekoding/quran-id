@@ -20,6 +20,7 @@
     "core-js": "^3.6.5",
     "howler": "^2.2.3",
     "localforage": "^1.9.0",
+    "mitt": "^3.0.1",
     "quasar": "^1.0.0",
     "swiper": "^5.4.5",
     "tapjs": "^1.0.9",

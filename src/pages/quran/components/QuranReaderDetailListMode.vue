@@ -144,7 +144,6 @@ import reciterList from "src/data/reciter-list";
 import tajweedList from "src/data/tajweed";
 
 import Player from "src/lib/player";
-import { EventBus } from "src/lib/event-bus";
 
 import "tapjs";
 
@@ -525,7 +524,7 @@ export default {
       this.player.player = new Player(playlist);
     },
     setupPlayerListener() {
-      EventBus.$on("player:end", this.onAudioAyahEnded);
+      this.player.player.on("end", this.onAudioAyahEnded);
     }
   },
   created() {
