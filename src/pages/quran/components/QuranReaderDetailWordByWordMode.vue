@@ -29,6 +29,7 @@
                     v-for="(word, wordIndex) in ayah.words.slice(0, -1)"
                     :key="'wbw-' + word.id"
                     class="wbw-wrap q-pl-md q-mb-md"
+                    @click="wbwPlay(word.wordIndex)"
                   >
                     <span>
                       <span class="wbw-arabic" v-html="word.text_uthmani" />
@@ -169,7 +170,12 @@ export default {
         currentAyah: 0,
         ayahStartFrom: 0,
         loopCounter: 0
-      }
+      },
+      wbwPlayer: {
+        player: null,
+        playing: false
+      },
+      wbwWordIndex: 0
     };
   },
   watch: {
@@ -227,9 +233,16 @@ export default {
           this.surah.ayahs.length
         );
 
+        this.wbwWordIndex = 0;
         this.loadedAyahs = [];
         for (let i = 0; i < firstLoadNumber; i++) {
-          this.loadedAyahs.push(this.surah.ayahs[i]);
+          const ayah = this.surah.ayahs[i];
+          const words = ayah.words.map(word => ({
+            ...word,
+            wordIndex:
+              word.char_type_name === "word" ? this.wbwWordIndex++ : null
+          }));
+          this.loadedAyahs.push({ ...ayah, words });
         }
 
         this.$nextTick(() => {
@@ -242,6 +255,7 @@ export default {
 
         this.setupPlayer();
         this.setupPlayerListener();
+        this.setupWBWPlayer();
       });
     },
     resetLoadMore() {
@@ -260,7 +274,12 @@ export default {
 
       const loadEndIndex = Math.min(loadedLength + 10, ayahLength);
       for (let i = loadedLength; i < loadEndIndex; i++) {
-        this.loadedAyahs.push(this.surah.ayahs[i]);
+        const ayah = this.surah.ayahs[i];
+        const words = ayah.words.map(word => ({
+          ...word,
+          wordIndex: word.char_type_name === "word" ? this.wbwWordIndex++ : null
+        }));
+        this.loadedAyahs.push({ ...ayah, words });
       }
 
       done();
@@ -321,6 +340,8 @@ export default {
       return urlPrefix + surahFixedLen + ayahFixedLen + ".mp3";
     },
     playAudio() {
+      this.wbwPlayer.player.stop();
+
       const trackIndex = this.player.currentAyah - 1;
       this.player.player.play(trackIndex);
       this.player.playing = true;
@@ -383,6 +404,43 @@ export default {
     },
     setupPlayerListener() {
       this.player.player.on("end", this.onAudioAyahEnded);
+    },
+    getWBWAudioUrl(ayahNumber, wordPosition) {
+      const baseUrl = "https://audio.qurancdn.com/wbw/";
+
+      // The API returns incorrect audio URLs — construct the correct one manually.
+      const surahFixedLen = this.surahId.toString().padStart(3, "0");
+      const ayahFixedLen = ayahNumber.toString().padStart(3, "0");
+      const wordPositionFixedLen = wordPosition.toString().padStart(3, "0");
+      const filename = [surahFixedLen, ayahFixedLen, wordPositionFixedLen].join(
+        "_"
+      );
+
+      return baseUrl + filename + ".mp3";
+    },
+    setupWBWPlayer() {
+      const playlist = [];
+
+      for (const ayah of this.surah.ayahs) {
+        for (const word of ayah.words) {
+          if (word.char_type_name === "word") {
+            playlist.push({
+              src: this.getWBWAudioUrl(ayah.verse_number, word.position)
+            });
+          }
+        }
+      }
+
+      this.wbwPlayer.player = new Player(playlist);
+
+      // Setup listeners
+      this.wbwPlayer.player.on("play", () => (this.wbwPlayer.playing = true));
+      this.wbwPlayer.player.on("stop", () => (this.wbwPlayer.playing = false));
+      this.wbwPlayer.player.on("end", () => (this.wbwPlayer.playing = false));
+    },
+    wbwPlay(index) {
+      this.stopAudio();
+      this.wbwPlayer.player.play(index);
     }
   },
   created() {
