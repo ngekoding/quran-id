@@ -68,13 +68,13 @@
                   />
                   <q-btn
                     size="sm"
-                    icon="mdi-dots-vertical-circle-outline"
+                    icon="mdi-content-copy"
                     color="grey-3"
                     text-color="black"
                     class="q-ml-sm"
                     round
                     unelevated
-                    @click="onOptionClicked(ayah, surah.translations[index])"
+                    @click="onCopyOptionClicked(ayah.verse_number)"
                   />
                 </q-item-label>
               </q-item-section>
@@ -89,13 +89,13 @@
       </div>
     </template>
 
-    <!-- Ayah options dialog -->
-    <ayah-options-dialog
-      :show.sync="showAyahOptionsDialog"
-      :ayah-number="ayahOptionsDialogData.ayahNumber"
-      :surah-name="ayahOptionsDialogData.surahName"
-      :arabic="ayahOptionsDialogData.arabic"
-      :translation="ayahOptionsDialogData.translation"
+    <!-- Ayah copy options dialog -->
+    <ayah-copy-options-dialog
+      :show.sync="showAyahCopyOptionsDialog"
+      :surah-name="ayahCopyOptionsDialogData.surahName"
+      :ayah-number="ayahCopyOptionsDialogData.ayahNumber"
+      :ayah-count="ayahCopyOptionsDialogData.ayahCount"
+      :ayahs="simpleAyahs"
     />
 
     <!-- Dialog play options -->
@@ -132,7 +132,7 @@
 <script>
 import { mapGetters } from "vuex";
 import QuranReaderDetailSkeleton from "../skeletons/QuranReaderDetailSkeleton.vue";
-import AyahOptionsDialog from "src/components/AyahOptionsDialog.vue";
+import AyahCopyOptionsDialog from "src/components/AyahCopyOptionsDialog.vue";
 import AyahChangerDialog from "src/components/AyahChangerDialog.vue";
 import AyahPlayOptionsDialog from "src/components/AyahPlayOptionsDialog.vue";
 import AyahPlayBottomControl from "src/components/AyahPlayBottomControl.vue";
@@ -151,7 +151,7 @@ export default {
   name: "QuranDetailListMode",
   components: {
     QuranReaderDetailSkeleton,
-    AyahOptionsDialog,
+    AyahCopyOptionsDialog,
     AyahChangerDialog,
     AyahPlayOptionsDialog,
     ToTop,
@@ -184,12 +184,11 @@ export default {
       loadedAyahs: [],
       showAyahChangerDialog: false,
       showSurahChangerDialog: false,
-      showAyahOptionsDialog: false,
-      ayahOptionsDialogData: {
-        ayahNumber: "",
+      showAyahCopyOptionsDialog: false,
+      ayahCopyOptionsDialogData: {
         surahName: "",
-        arabic: "",
-        translation: ""
+        ayahNumber: "",
+        ayahCount: ""
       },
       showAyahPlayOptionsDialog: false,
       ayahPlayOptionsDialogData: {
@@ -243,6 +242,14 @@ export default {
       playerSettings: "quran/getPlayerSettings",
       tajweedMode: "quran/getTajweedMode"
     }),
+    simpleAyahs() {
+      if (!this.surah) return [];
+
+      return this.surah.ayahs.map((ayah, i) => ({
+        arabic: ayah.text_uthmani,
+        translation: this.surah.translations[i].text
+      }));
+    },
     audioReciterId() {
       return this.playerSettings?.audioReciterId ?? 7;
     },
@@ -340,14 +347,12 @@ export default {
       this.activeOffsetTop = position;
       this.tajweedTooltip.show = false;
     },
-    onOptionClicked(arabic, translation) {
-      this.ayahOptionsDialogData = {
-        surahName: this.surah.nameSimple,
-        ayahNumber: translation.verse_number,
-        arabic: arabic.text_uthmani,
-        translation: translation.text
-      };
-      this.showAyahOptionsDialog = true;
+    onCopyOptionClicked(ayahNumber) {
+      console.log(this.surah);
+      this.ayahCopyOptionsDialogData.ayahNumber = ayahNumber;
+      this.ayahCopyOptionsDialogData.ayahCount = this.surah.versesCount;
+      this.ayahCopyOptionsDialogData.surahName = this.surah.nameSimple;
+      this.showAyahCopyOptionsDialog = true;
     },
     onAyahPlayClicked(ayahNumber) {
       if (this.isAyahPlaying(ayahNumber)) {

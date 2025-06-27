@@ -28,6 +28,9 @@ export default ({ Vue }) => {
       normalizeSurahNameTranslation(str) {
         return str.replace(/\\/g, "");
       },
+      stripHtmlTags(str) {
+        return str.replace(/(<([^>]+)>)/gi, "");
+      },
       arabicNumber(number) {
         const arabicNums = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
         return number
