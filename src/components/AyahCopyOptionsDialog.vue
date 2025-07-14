@@ -7,7 +7,10 @@
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
-      <q-card-section class="bg-grey-2 row items-center q-gutter-x-xs">
+      <q-card-section
+        v-if="range"
+        class="bg-grey-2 row items-center q-gutter-x-xs"
+      >
         <q-input
           v-model.number="startAyah"
           type="number"
@@ -69,12 +72,14 @@ export default {
       required: true
     },
     ayahCount: {
-      type: [Number, String],
-      required: true
+      type: [Number, String]
     },
     ayahs: {
       type: Array,
       required: true
+    },
+    range: {
+      type: Boolean
     }
   },
   data() {
@@ -106,34 +111,44 @@ export default {
           type: "toast-error",
           message: "Harap isikan nomor ayat mulai."
         });
+        return;
       }
 
-      const copyEndAyah = this.endAyah ?? this.startAyah;
+      const copyEndAyah = Math.min(
+        Number(this.endAyah) || this.startAyah,
+        Number(this.ayahCount) || this.startAyah
+      );
 
-      const copyArabics = [];
-      const copyTranslations = [];
+      const startIndex = this.ayahs.findIndex(
+        ayah => ayah.ayahNumber == this.startAyah
+      );
+      const endIndex = this.ayahs.findIndex(
+        ayah => ayah.ayahNumber == copyEndAyah
+      );
 
-      for (let i = this.startAyah - 1; i < copyEndAyah; i++) {
-        copyArabics.push(this.stripHtmlTags(this.ayahs[i].arabic));
-        copyTranslations.push(this.ayahs[i].translation);
-      }
+      const ayahsToCopy = this.ayahs.slice(startIndex, endIndex + 1);
 
-      // TODO: complete ayah range copy!
+      let ayahNumber = this.startAyah;
+      const formattedAyahs = ayahsToCopy.map(ayah => {
+        const arabic = this.stripHtmlTags(ayah.arabic);
+        const translation = ayah.translation;
+        const footer = `QS. ${this.surahName}: ${ayahNumber++}`;
 
-      let text;
-      if (type == "ayah") {
-        text = this.arabicNormalized;
-      } else if (type == "translation") {
-        text = this.translation;
-      } else if (type == "both") {
-        text = this.arabicNormalized + "\n\n" + this.translation;
-      }
+        if (type === "ayah") {
+          return `${arabic}\n\n${footer}`;
+        } else if (type === "translation") {
+          return `${translation}\n\n${footer}`;
+        } else if (type === "both") {
+          return `${arabic}\n\n${translation}\n\n${footer}`;
+        } else {
+          return "";
+        }
+      });
 
-      text += "\n\n";
-      text += `QS. ${this.surahName}: ${this.ayahNumber}`;
-      text = this.removeFootNote(text);
+      let copiedText = formattedAyahs.join("\n\n");
+      copiedText = this.removeFootNote(copiedText);
 
-      copyToClipboard(text)
+      copyToClipboard(copiedText)
         .then(() => {
           this.$q.notify({
             type: "toast",
@@ -146,12 +161,6 @@ export default {
             message: "Gagal! Terjadi kesalahan."
           });
         });
-    },
-    bookmark() {
-      this.$q.notify({
-        type: "toast-warning",
-        message: "Maaf fitur ini belum tersedia."
-      });
     }
   }
 };

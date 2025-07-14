@@ -68,7 +68,7 @@
                   />
                   <q-btn
                     size="sm"
-                    icon="mdi-content-copy"
+                    icon="copy_all"
                     color="grey-3"
                     text-color="black"
                     class="q-ml-sm"
@@ -96,6 +96,7 @@
       :ayah-number="ayahCopyOptionsDialogData.ayahNumber"
       :ayah-count="ayahCopyOptionsDialogData.ayahCount"
       :ayahs="simpleAyahs"
+      range
     />
 
     <!-- Dialog play options -->
@@ -246,6 +247,7 @@ export default {
       if (!this.surah) return [];
 
       return this.surah.ayahs.map((ayah, i) => ({
+        ayahNumber: ayah.verse_number,
         arabic: ayah.text_uthmani,
         translation: this.surah.translations[i].text
       }));
@@ -348,7 +350,6 @@ export default {
       this.tajweedTooltip.show = false;
     },
     onCopyOptionClicked(ayahNumber) {
-      console.log(this.surah);
       this.ayahCopyOptionsDialogData.ayahNumber = ayahNumber;
       this.ayahCopyOptionsDialogData.ayahCount = this.surah.versesCount;
       this.ayahCopyOptionsDialogData.surahName = this.surah.nameSimple;

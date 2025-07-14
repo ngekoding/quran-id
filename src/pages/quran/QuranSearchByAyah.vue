@@ -164,20 +164,19 @@
                 <span v-html="item.translation" />
               </q-item-label>
             </div>
-            <q-item-label class="row q-py-sm translation-wrap">
+            <q-item-label class="row items-center q-py-sm translation-wrap">
               <span class="col-grow">
                 QS. {{ `${item.surahName}: ${item.ayahNumber}` }}
               </span>
               <q-btn
-                icon="more_vert"
+                icon="copy_all"
                 color="grey-3"
                 text-color="black"
                 class="self-end"
-                size="xs"
+                size="sm"
                 round
-                dense
                 unelevated
-                @click="onOptionClicked(item)"
+                @click="onCopyOptionClicked(item)"
               />
             </q-item-label>
           </q-item-section>
@@ -202,13 +201,12 @@
         Sudah ditampilkan semua
       </p>
     </div>
-    <!-- Dialog options -->
-    <ayah-options-dialog
-      :show.sync="showAyahOptionsDialog"
-      :ayah-number="ayahOptionsDialogData.ayahNumber"
-      :surah-name="ayahOptionsDialogData.surahName"
-      :arabic="ayahOptionsDialogData.arabic"
-      :translation="ayahOptionsDialogData.translation"
+    <!-- Ayah copy options dialog -->
+    <ayah-copy-options-dialog
+      :show.sync="showAyahCopyOptionsDialog"
+      :surah-name="ayahCopyOptionsDialogData.surahName"
+      :ayah-number="ayahCopyOptionsDialogData.ayahNumber"
+      :ayahs="ayahCopyOptionsDialogData.ayahs"
     />
     <!-- Dialog full match search information -->
     <q-dialog v-model="fullMatchSearchDialog">
@@ -279,7 +277,7 @@
 import { mapGetters } from "vuex";
 import { LocalStorage } from "quasar";
 import QuranSearchResultSkeleton from "./skeletons/QuranSearchResultSkeleton.vue";
-import AyahOptionsDialog from "src/components/AyahOptionsDialog.vue";
+import AyahCopyOptionsDialog from "src/components/AyahCopyOptionsDialog.vue";
 import ToTop from "src/components/ToTop.vue";
 import PageScrollPositionHandler from "src/components/PageScrollPositionHandler.vue";
 import { surahList, getFilteredSurahList } from "src/data/surah-list";
@@ -289,7 +287,7 @@ export default {
   name: "QuranSearchByAyah",
   components: {
     QuranSearchResultSkeleton,
-    AyahOptionsDialog,
+    AyahCopyOptionsDialog,
     ToTop,
     PageScrollPositionHandler
   },
@@ -314,12 +312,12 @@ export default {
       fullMatchSearch: this.$store.state.quran.searchAyah.fullMatch,
       fullMatchSearchDialog: false,
       contentStyles: null,
-      showAyahOptionsDialog: false,
-      ayahOptionsDialogData: {
-        ayahNumber: "",
+      showAyahCopyOptionsDialog: false,
+      ayahCopyOptionsDialogData: {
         surahName: "",
-        arabic: "",
-        translation: ""
+        ayahNumber: "",
+        ayahCount: "",
+        ayahs: []
       },
       latinAlternatives,
       latinAlternativeColumns: [
@@ -448,14 +446,17 @@ export default {
         }
       });
     },
-    onOptionClicked(item) {
-      this.ayahOptionsDialogData = {
-        ayahNumber: item.ayahNumber,
-        surahName: item.surahName,
-        arabic: item.text,
-        translation: item.translation
-      };
-      this.showAyahOptionsDialog = true;
+    onCopyOptionClicked(item) {
+      this.ayahCopyOptionsDialogData.ayahNumber = item.ayahNumber;
+      this.ayahCopyOptionsDialogData.surahName = item.surahName;
+      this.ayahCopyOptionsDialogData.ayahs = [
+        {
+          ayahNumber: item.ayahNumber,
+          arabic: item.text,
+          translation: item.translation
+        }
+      ];
+      this.showAyahCopyOptionsDialog = true;
     }
   },
   mounted() {
