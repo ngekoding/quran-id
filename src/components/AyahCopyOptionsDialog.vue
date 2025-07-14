@@ -7,31 +7,38 @@
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
-      <q-card-section
-        v-if="range"
-        class="bg-grey-2 row items-center q-gutter-x-xs"
-      >
-        <q-input
-          v-model.number="startAyah"
-          type="number"
-          :min="1"
-          label="Dari ayat"
-          class="col ayah-range-input"
-          bg-color="white"
-          dense
-          outlined
-        />
-        <q-input
-          v-model.number="endAyah"
-          type="number"
-          :min="startAyah"
-          :max="ayahCount"
-          label="Sampai"
-          class="col ayah-range-input"
-          bg-color="white"
-          dense
-          outlined
-        />
+      <q-card-section v-if="range" class="bg-grey-2">
+        <div class="row items-center q-gutter-x-xs">
+          <q-input
+            v-model.number="startAyah"
+            type="number"
+            :min="1"
+            label="Dari ayat"
+            class="col ayah-range-input"
+            bg-color="white"
+            dense
+            outlined
+          />
+          <q-input
+            v-model.number="endAyah"
+            type="number"
+            :min="startAyah"
+            :max="ayahCount"
+            label="Sampai"
+            class="col ayah-range-input"
+            bg-color="white"
+            dense
+            outlined
+          />
+        </div>
+        <div class="q-mt-sm">
+          <q-toggle
+            v-model="compactFooter"
+            label="Keterangan ringkas"
+            size="xs"
+            dense
+          />
+        </div>
       </q-card-section>
       <q-list separator class="bg-white">
         <q-item clickable v-ripple @click="copy('ayah')">
@@ -86,7 +93,8 @@ export default {
     return {
       showDialog: false,
       startAyah: null,
-      endAyah: null
+      endAyah: null,
+      compactFooter: false
     };
   },
   watch: {
@@ -128,24 +136,39 @@ export default {
 
       const ayahsToCopy = this.ayahs.slice(startIndex, endIndex + 1);
 
-      let ayahNumber = this.startAyah;
-      const formattedAyahs = ayahsToCopy.map(ayah => {
+      let formattedAyahs = ayahsToCopy.map(ayah => {
         const arabic = this.stripHtmlTags(ayah.arabic);
         const translation = ayah.translation;
-        const footer = `QS. ${this.surahName}: ${ayahNumber++}`;
 
         if (type === "ayah") {
-          return `${arabic}\n\n${footer}`;
+          return `${arabic}`;
         } else if (type === "translation") {
-          return `${translation}\n\n${footer}`;
+          return `${translation}`;
         } else if (type === "both") {
-          return `${arabic}\n\n${translation}\n\n${footer}`;
+          return `${arabic}\n\n${translation}`;
         } else {
           return "";
         }
       });
 
-      let copiedText = formattedAyahs.join("\n\n");
+      let copiedText;
+      if (this.range && this.compactFooter) {
+        const ayahRangeNumber =
+          this.startAyah != copyEndAyah
+            ? `${this.startAyah} - ${copyEndAyah}`
+            : this.startAyah;
+
+        copiedText =
+          formattedAyahs.join("\n\n") +
+          "\n\n" +
+          `QS. ${this.surahName}: ${ayahRangeNumber}`;
+      } else {
+        let ayahNumber = this.startAyah;
+        copiedText = formattedAyahs
+          .map(text => `${text}\n\nQS. ${this.surahName}: ${ayahNumber++}`)
+          .join("\n\n");
+      }
+
       copiedText = this.removeFootNote(copiedText);
 
       copyToClipboard(copiedText)
