@@ -31,7 +31,10 @@
             outlined
           />
         </div>
-        <div class="q-mt-sm">
+        <div
+          v-if="showCompactFooterOption"
+          class="q-mt-xs compact-footer-option"
+        >
           <q-toggle
             v-model="compactFooter"
             label="Keterangan ringkas"
@@ -96,6 +99,11 @@ export default {
       endAyah: null,
       compactFooter: false
     };
+  },
+  computed: {
+    showCompactFooterOption() {
+      return this.endAyah && this.startAyah != this.endAyah;
+    }
   },
   watch: {
     show: {
@@ -194,6 +202,14 @@ export default {
   .q-field__control:before,
   .q-field__control:after {
     border: none !important;
+  }
+}
+.compact-footer-option {
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  .q-toggle {
+    display: flex;
   }
 }
 </style>
