@@ -12,6 +12,25 @@
       v-if="$store.state.quran.loading.fetchSurahWBW"
     />
     <template v-else>
+      <q-dialog v-model="showTip" seamless full-width position="bottom">
+        <q-card flat dark class="q-ma-sm bg-black" style="border-radius: 4px">
+          <q-card-section
+            class="q-pl-md q-pr-sm q-py-sm flex justify-between items-center"
+          >
+            <div class="text-sm">
+              <b>Tip!</b> Tekan potongan ayat untuk mendengarkan.
+            </div>
+            <q-btn
+              flat
+              dense
+              size="sm"
+              icon="close"
+              class="close-btn"
+              @click="dismissTip()"
+            />
+          </q-card-section>
+        </q-card>
+      </q-dialog>
       <div class="content bg-white" :style="contentStyles">
         <!-- Basmallah -->
         <div v-if="surah.bismillahPre" class="basmalah" />
@@ -109,6 +128,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { LocalStorage } from "quasar";
 import QuranReaderDetailSkeleton from "../skeletons/QuranReaderDetailSkeleton.vue";
 import AyahChangerDialog from "src/components/AyahChangerDialog.vue";
 import AyahPlayOptionsDialog from "src/components/AyahPlayOptionsDialog.vue";
@@ -175,7 +195,8 @@ export default {
         player: null,
         playing: false
       },
-      wbwWordIndex: 0
+      wbwWordIndex: 0,
+      showTip: true
     };
   },
   watch: {
@@ -441,6 +462,10 @@ export default {
     wbwPlay(index) {
       this.stopAudio();
       this.wbwPlayer.player.play(index);
+    },
+    dismissTip() {
+      this.showTip = false;
+      LocalStorage.set("wbw-tip", false);
     }
   },
   created() {
@@ -449,6 +474,7 @@ export default {
   mounted() {},
   activated() {
     this.active = true;
+    this.showTip = LocalStorage.getItem("wbw-tip") ?? true;
     window.scrollTo(0, this.activeOffsetTop);
   },
   deactivated() {
