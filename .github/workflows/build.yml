@@ -6,6 +6,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      PUBLIC_PATH: ${{ vars.PUBLIC_PATH }}
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v2.3.1
