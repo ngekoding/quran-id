@@ -8,7 +8,20 @@
       // Thank you internet explorer for requiring such awesome workarounds in order to work properly
       // ====================================================================================================================
       sessionStorage.redirect = location.href;
+
+      (function () {
+        var l = window.location;
+        var path = l.pathname;
+
+        var parts = path.split('/').filter(Boolean);
+        var repoName = '';
+
+        if (l.hostname.endsWith('.github.io') && parts.length > 0) {
+          repoName = '/' + parts[0];
+        }
+
+        window.location.replace(repoName + '/');
+      })();
     </script>
-    <meta http-equiv="refresh" content="0;URL='/quran-id'" />
   </head>
 </html>
